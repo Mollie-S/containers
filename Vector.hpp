@@ -6,17 +6,10 @@ class Vector
 private:
     /* data */
 public:
-    Vector(/* args */);
-    ~Vector();
+    Vector() {}
+    Vector() {}
+    ~Vector(){}
 };
-
-Vector::Vector(/* args */)
-{
-}
-
-Vector::~Vector()
-{
-}
 
 
 #endif
