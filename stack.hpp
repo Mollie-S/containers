@@ -31,10 +31,21 @@ namespace ft
         {
             return _container.back();
         }
+
         const value_type& top() const
         {
             return _container.back();
         }
+
+        void push(const value_type& val)
+        {
+            _container.push_back(val);
+        }
+        void pop()
+        {
+            _container.pop_back();
+        }
+
 
     };
 };
