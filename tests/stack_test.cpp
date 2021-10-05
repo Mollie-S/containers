@@ -1,5 +1,6 @@
-#define CONFIG_CATCH_MAIN
+#define CATCH_CONFIG_MAIN 
 #include "catch.hpp"
+
 #include "../stack.hpp"
 #include <stack>
 
@@ -8,5 +9,5 @@ std::stack<int> stdStackInts;
 
 TEST_CASE("Creating a container", "[empty]")
 {
-    REQUIRE(ftStackInts.empty() == stdStackInts.empty());
+    REQUIRE(ftStackInts.empty() != stdStackInts.empty());
 }
