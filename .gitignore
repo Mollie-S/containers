@@ -1,2 +1,5 @@
 .vscode
 tests/catch.hpp
+.idea/modules.xml
+.idea/my_containers.iml
+.idea/vcs.xml
