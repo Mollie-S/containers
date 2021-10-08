@@ -19,29 +19,58 @@ namespace ft
         // itetators need to be added here:
 		// typedef 	iterator;// convertible to const iterator
        
-		typedef ptrdiff_t                                   difference_type
-		typedef size_t                                      size_type
+		typedef ptrdiff_t                                   difference_type;
+		typedef size_t                                      size_type;
 
-    // private:
-        pointer     _elements // pointer to the first elelment of the container
-        size_type   _size; // num of elements in the container
-        size_type   _capacity; // capacity of the container
-        alloc_type  alloc; // the type of the allocator used
+    private:
+        pointer         _elements; // pointer to the first element of the container
+        pointer         _last; // pointer to the first element of the container
+        size_type       _size; // num of elements in the container
+        size_type       _capacity; // capacity of the container
+        allocator_type  _alloc; // the type of the allocator used
 
 
     public:
-        //default constructor:
+        //default constructor(1):
         explicit vector<T, Alloc>(const allocator_type& alloc = allocator_type())
         : _elements(NULL)
+        , _last(NULL)
         , _capacity(0)
         , _size(0)
-        , alloc(alloc)
+        , _alloc(alloc)
         {
-            std::cout << "Constructor called\n";
+            std::cout << "Default onstructor called\n";
         } 
-	
-		// explicit vector (size_type n, const value_type& val = value_type(),
-		// 				const allocator_type& alloc = allocator_type()); //fill (2)
+         //fill constructor(2)
+		explicit vector<T, Alloc>(size_type n, const value_type& val = value_type(),
+						const allocator_type& alloc = allocator_type())
+        : _capacity(n)
+        , _size(n)
+        , _alloc(alloc)
+        {
+            _elements = _alloc.allocate(n); // get memory for elements
+
+            pointer ptr, ptr1;
+            try
+            {
+                pointer end = _elements + n;
+                for(ptr = _elements; ptr!= end; ++ptr)
+                {
+                    _alloc.construct(ptr, val);
+                }
+                _last = ptr;
+            }
+             catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+                  for(ptr1 = _elements; ptr1 != ptr; ++ptr1)
+                {
+                    _alloc.destroy(ptr1); // destroy constructed elements
+                }
+                _alloc.deallocate(_elements, n); // free memory
+                throw; //rethrow
+            }
+        }
 	
 		// template <class InputIterator>
 		// 		vector (InputIterator first, InputIterator last,
@@ -55,6 +84,16 @@ namespace ft
         size_type size() const
         {
             return _size;
+        }
+
+        size_type capacity() const
+        {
+            return _capacity;
+        }
+
+        bool empty() const
+        {
+            return (_size == 0);
         }
     };
 };

@@ -4,10 +4,25 @@
 #include "../vector/vector.hpp"
 #include <vector>
 
-ft::vector<int> ftVectorInts;
-std::vector<int> stdVectorInts;
 
-TEST_CASE("Creating a container", "[empty]")
+TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used to select which tests to run
 {
-    REQUIRE(ftVectorInts.empty() != stdVectorInts.empty());
+    SECTION("Creating an empty container with default constructor")
+    {
+        ft::vector<int> ftVectorInts;
+        std::vector<int> stdVectorInts;
+        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
+        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
+        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+    }
+
+    SECTION("Creating an empty container with fill constructor")
+    {
+        ft::vector<int> ftVectorInts(5, 10);
+        std::vector<int> stdVectorInts(5, 10);
+        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
+        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
+        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+        REQUIRE(ftVectorInts.size() == 5);
+    }
 }
