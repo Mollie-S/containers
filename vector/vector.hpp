@@ -19,17 +19,23 @@ namespace ft
         // itetators need to be added here:
 		// typedef 	iterator;// convertible to const iterator
        
-		typedef difference_type iterator_traits<iterator>::difference_type
-		typedef size_type size_t
+		typedef ptrdiff_t                                   difference_type
+		typedef size_t                                      size_type
 
     // private:
-        size_type _size;
-        size_type _capacity;
+        pointer     _elements // pointer to the first elelment of the container
+        size_type   _size; // num of elements in the container
+        size_type   _capacity; // capacity of the container
+        alloc_type  alloc; // the type of the allocator used
+
 
     public:
-		explicit vector<T, Alloc> (const allocator_type& alloc = allocator_type())
-        : _size(0)
-        , _capacity(0)//default
+        //default constructor:
+        explicit vector<T, Alloc>(const allocator_type& alloc = allocator_type())
+        : _elements(NULL)
+        , _capacity(0)
+        , _size(0)
+        , alloc(alloc)
         {
             std::cout << "Constructor called\n";
         } 
