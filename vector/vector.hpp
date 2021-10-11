@@ -3,6 +3,7 @@
 
 #include <memory> //needed for allocator
 #include <iostream>
+#include <cmath>
 
 namespace ft
 {
@@ -24,7 +25,6 @@ namespace ft
 
     private:
         pointer         _elements; // pointer to the first element of the container
-        pointer         _last; // pointer to the first element of the container
         size_type       _size; // num of elements in the container
         size_type       _capacity; // capacity of the container
         allocator_type  _alloc; // the type of the allocator used
@@ -34,12 +34,11 @@ namespace ft
         //default constructor(1):
         explicit vector<T, Alloc>(const allocator_type& alloc = allocator_type())
         : _elements(NULL)
-        , _last(NULL)
         , _capacity(0)
         , _size(0)
         , _alloc(alloc)
         {
-            std::cout << "Default onstructor called\n";
+            std::cout << "Default constructor called\n";
         } 
          //fill constructor(2)
 		explicit vector<T, Alloc>(size_type n, const value_type& val = value_type(),
@@ -51,6 +50,7 @@ namespace ft
             _elements = _alloc.allocate(n); // get memory for elements
 
             pointer ptr, ptr1;
+            // throw exception if allocation fails:
             try
             {
                 pointer end = _elements + n;
@@ -58,7 +58,6 @@ namespace ft
                 {
                     _alloc.construct(ptr, val);
                 }
-                _last = ptr;
             }
              catch(const std::exception& e)
             {
@@ -71,10 +70,10 @@ namespace ft
                 throw; //rethrow
             }
         }
-	
+         //	range constructor(3)	
 		// template <class InputIterator>
 		// 		vector (InputIterator first, InputIterator last,
-		// 				const allocator_type& alloc = allocator_type()); //	range (3)	
+		// 				const allocator_type& alloc = allocator_type());
 
 		// vector (const vector& x); // copy (4)
 
@@ -84,6 +83,11 @@ namespace ft
         size_type size() const
         {
             return _size;
+        }
+
+        size_type max_size() const
+        {
+            return ((pow(2, 64) / sizeof(T)) - 1); // need to check, outout is not exactly as needed
         }
 
         size_type capacity() const

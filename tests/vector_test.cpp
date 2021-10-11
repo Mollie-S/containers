@@ -22,6 +22,7 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
         std::vector<int> stdVectorInts(5, 10);
         REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
         REQUIRE(ftVectorInts.size() == stdVectorInts.size());
+        REQUIRE(ftVectorInts.max_size() == stdVectorInts.max_size());
         REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
         REQUIRE(ftVectorInts.size() == 5);
     }
