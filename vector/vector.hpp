@@ -64,7 +64,7 @@ namespace ft
                 std::cerr << e.what() << '\n';
                   for(ptr1 = _elements; ptr1 != ptr; ++ptr1)
                 {
-                    _alloc.destroy(ptr1); // destroy constructed elements
+                    _alloc.destroy(ptr1); // destructs an object stored in the allocated storage
                 }
                 _alloc.deallocate(_elements, n); // free memory
                 throw; //rethrow
@@ -77,7 +77,15 @@ namespace ft
 
 		// vector (const vector& x); // copy (4)
 
-        ~vector(){}
+        ~vector()
+        {
+            pointer ptr;
+            for(ptr = _elements; ptr != ptr; ++ptr)
+            {
+                _alloc.destroy(ptr); // destructs an object stored in the allocated storage
+            }
+            _alloc.deallocate(_elements, n); // free memory
+        }
         
     public:
         size_type size() const
@@ -87,7 +95,7 @@ namespace ft
 
         size_type max_size() const
         {
-            return ((pow(2, 64) / sizeof(T)) - 1); // need to check, outout is not exactly as needed
+            return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         }
 
         void resize (size_type n, value_type val = value_type())
