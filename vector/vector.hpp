@@ -47,16 +47,15 @@ namespace ft
         , _size(n)
         , _alloc(alloc)
         {
-            _elements = _alloc.allocate(n); // get memory for elements
+                _elements = _alloc.allocate(n); // get memory for elements
 
             pointer ptr, ptr1;
-            // throw exception if allocation fails:
             try
             {
                 pointer end = _elements + n;
                 for(ptr = _elements; ptr!= end; ++ptr)
                 {
-                    _alloc.construct(ptr, val);
+                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by p.
                 }
             }
              catch(const std::exception& e)
@@ -84,7 +83,7 @@ namespace ft
             {
                 _alloc.destroy(ptr); // destructs an object stored in the allocated storage
             }
-            _alloc.deallocate(_elements, n); // free memory
+            _alloc.deallocate(_elements, _size); // free memory
         }
         
     public:
@@ -100,7 +99,24 @@ namespace ft
 
         void resize (size_type n, value_type val = value_type())
         {
-            
+            // add some code here
+        }
+
+        void reserve (size_type n)
+        {
+            if (n > _capacity)
+            {
+                try
+                {
+                    pointer temp = _alloc.allocate(n); // get memory for elements
+
+                }
+                catch (const std::length_error& e) // if n is greater than max size
+                {
+                    std::cout << e.what() << "\n";
+                }
+            }
+            memmove(temp, _elements, size_t num )
         }
 
         size_type capacity() const

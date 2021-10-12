@@ -27,3 +27,15 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
         REQUIRE(ftVectorInts.size() == 5);
     }
 }
+TEST_CASE("Testing reserve method", "[integers]") // do it for ft_container!!!!
+{
+    std::vector<int> stdVectorInts(5, 10);
+    std::vector<int>::iterator it;
+    std::vector<int>::iterator it1;
+    it =  stdVectorInts.begin();
+    stdVectorInts.reserve(100);
+    it1 =  stdVectorInts.begin();
+    
+    REQUIRE(&(*it) != &(*it1));
+    REQUIRE(*it == *it1);
+}
