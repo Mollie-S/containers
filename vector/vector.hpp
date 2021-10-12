@@ -90,6 +90,11 @@ namespace ft
             return ((pow(2, 64) / sizeof(T)) - 1); // need to check, outout is not exactly as needed
         }
 
+        void resize (size_type n, value_type val = value_type())
+        {
+            
+        }
+
         size_type capacity() const
         {
             return _capacity;
