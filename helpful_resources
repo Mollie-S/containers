@@ -1,2 +1,11 @@
 Iterators:
 https://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls 
+
+Writing a custom iterator in modern C++:
+https://internalpointers.com/post/writing-custom-iterators-modern-cpp
+from here - How to Use Tag Dispatching In Your Code Effectively:
+https://www.fluentcpp.com/2018/04/27/tag-dispatching/
+
+iterator traits:
+https://www.codeproject.com/Articles/36530/An-Introduction-to-Iterator-Traits
+https://en.cppreference.com/w/cpp/iterator/iterator_traits
