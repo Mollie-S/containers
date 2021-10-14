@@ -35,7 +35,5 @@ TEST_CASE("Testing reserve method", "[integers]") // do it for ft_container!!!!
     it =  stdVectorInts.begin();
     stdVectorInts.reserve(100);
     it1 =  stdVectorInts.begin();
-    
-    REQUIRE(&(*it) != &(*it1));
-    REQUIRE(*it == *it1);
+    REQUIRE(it != it1);
 }

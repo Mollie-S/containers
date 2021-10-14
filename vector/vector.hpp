@@ -116,7 +116,7 @@ namespace ft
                     std::cout << e.what() << "\n";
                 }
             }
-            memmove(temp, _elements, size_t num )
+            // memmove(temp, _elements, size_t num )
         }
 
         size_type capacity() const
