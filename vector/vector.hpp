@@ -10,7 +10,7 @@ namespace ft
     template < class T, class Alloc = std::allocator<T> >   // generic template
     class vector
     {
-        typedef T								            value_type;
+        typedef T								            value_type; // cannot use "using as it is c++11"
         typedef Alloc							            allocator_type;
         typedef typename allocator_type::reference		    reference;
         typedef typename allocator_type::const_reference	const_reference;
@@ -64,9 +64,9 @@ namespace ft
                   for(ptr1 = _elements; ptr1 != ptr; ++ptr1)
                 {
                     _alloc.destroy(ptr1); // destructs an object stored in the allocated storage
+                    throw; //rethrow
                 }
                 _alloc.deallocate(_elements, n); // free memory
-                throw; //rethrow
             }
         }
          //	range constructor(3)	
@@ -79,7 +79,7 @@ namespace ft
         ~vector()
         {
             pointer ptr;
-            for(ptr = _elements; ptr != ptr; ++ptr)
+            for(ptr = _elements; ptr != _elements + _size; ++ptr)
             {
                 _alloc.destroy(ptr); // destructs an object stored in the allocated storage
             }
@@ -102,21 +102,40 @@ namespace ft
             // add some code here
         }
 
-        void reserve (size_type n)
-        {
-            if (n > _capacity)
-            {
-                try
-                {
-                    pointer temp = _alloc.allocate(n); // get memory for elements
 
-                }
-                catch (const std::length_error& e) // if n is greater than max size
-                {
-                    std::cout << e.what() << "\n";
-                }
+
+// Correctly using reserve() can prevent unnecessary reallocations,
+//  but inappropriate uses of reserve() (for instance, calling it before every push_back() call)
+// may actually increase the number of reallocations (by causing the capacity to grow linearly rather than exponentially) 
+// and result in increased computational complexity and decreased performance.
+        void reserve(size_type new_cap)
+        {
+            // if (new_cap > max_size())
+            // {
+            //     throw std::length_error; 
+            // }
+            if (new_cap <= _capacity)
+            {
+                return;
             }
-            // memmove(temp, _elements, size_t num )
+            try // do we need this block here?
+            {
+                pointer temp = _alloc.allocate(new_cap); // get memory for elements
+                memmove(temp, _elements, _size);
+                pointer ptr;
+                for(ptr = _elements; ptr != _elements + _size; ++ptr)
+                {
+                    _alloc.destroy(ptr);
+                }
+                _alloc.deallocate(_elements, _size);
+                _elements = temp;
+                _capacity = new_cap;
+            }
+            catch (const std::length_error& e) // if n is greater than max size
+            {
+                std::cout << e.what() << "\n";
+                throw; //rethrow
+            }
         }
 
         size_type capacity() const
@@ -127,6 +146,11 @@ namespace ft
         bool empty() const
         {
             return (_size == 0);
+        }
+
+        void clear()
+        {
+
         }
     };
 };
