@@ -3,9 +3,16 @@ https://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterat
 
 Writing a custom iterator in modern C++:
 https://internalpointers.com/post/writing-custom-iterators-modern-cpp
+
 from here - How to Use Tag Dispatching In Your Code Effectively:
 https://www.fluentcpp.com/2018/04/27/tag-dispatching/
 
 iterator traits:
 https://www.codeproject.com/Articles/36530/An-Introduction-to-Iterator-Traits
 https://en.cppreference.com/w/cpp/iterator/iterator_traits
+
+when self-assignment check in assignment operator needed or not needed:
+https://stackoverflow.com/questions/57672592/should-an-stl-container-avoid-copying-elements-into-themselves-when-the-containe/57676637#57676637
+
+self-assignment check replaced by swap operations:
+https://stackoverflow.com/questions/12015156/what-is-wrong-with-checking-for-self-assignment-and-what-does-it-mean
