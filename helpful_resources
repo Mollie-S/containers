@@ -13,6 +13,8 @@ https://en.cppreference.com/w/cpp/iterator/iterator_traits
 
 when self-assignment check in assignment operator needed or not needed:
 https://stackoverflow.com/questions/57672592/should-an-stl-container-avoid-copying-elements-into-themselves-when-the-containe/57676637#57676637
+and here about self-assignment check:
+https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c62-make-copy-assignment-safe-for-self-assignment
 
 self-assignment check replaced by swap operations:
 https://stackoverflow.com/questions/12015156/what-is-wrong-with-checking-for-self-assignment-and-what-does-it-mean
