@@ -18,3 +18,18 @@ https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c62-make-copy-assig
 
 self-assignment check replaced by swap operations:
 https://stackoverflow.com/questions/12015156/what-is-wrong-with-checking-for-self-assignment-and-what-does-it-mean
+
+difference between vector fill and range constructors (need to implement enable_if, is_iterator< is_integral etc)
+https://stackoverflow.com/questions/21042872/how-to-implement-fill-constructor-and-range-constructor-for-sequence-containers
+https://stackoverflow.com/questions/45847787/how-to-differentiate-fill-constructor-and-range-constructor-in-c11
+
+_Is_iterator. The source is available, and it's basically just a static test that the type isn't an integral type. There's a whole lot of boilerplate code backing it up, but it's all standard C++.
+
+implementing Is_input_iterator(checking if the type is iterable, dereferencable and comparable):
+https://stackoverflow.com/questions/4335962/how-to-check-if-a-template-parameter-is-an-iterator-type-or-not
+
+How is std::is_integral implemented?
+https://stackoverflow.com/questions/43571962/how-is-stdis-integral-implemented
+
+reserve implementation:
+https://stackoverflow.com/questions/34821661/reserve-implementation-for-stdvector-in-stl?rq=1
