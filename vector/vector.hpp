@@ -6,10 +6,10 @@
 #include <cmath>
 
 namespace ft
-{
+    {
     template < class T, class Alloc = std::allocator<T> >   // generic template
     class vector
-    {
+        {
         typedef T								            value_type; // cannot use "using as it is c++11"
         typedef Alloc							            allocator_type;
         typedef typename allocator_type::reference		    reference;
@@ -23,115 +23,123 @@ namespace ft
         typedef ptrdiff_t                                   difference_type;
         typedef size_t                                      size_type;
 
-    private:
-        pointer         _elements; // pointer to the first element of the container
-        size_type       _size; // num of elements in the container
-        size_type       _capacity; // capacity of the container
-        allocator_type  _alloc; // the type of the allocator used
+        private:
+            pointer         _elements; // pointer to the first element of the container
+            size_type       _size; // num of elements in the container
+            size_type       _capacity; // capacity of the container
+            allocator_type  _alloc; // the type of the allocator used
 
 
-    public:
-        //default constructor(1):
-        explicit vector<T, Alloc>(const allocator_type& alloc = allocator_type())
-            : _elements(NULL)
-            , _capacity(0)
-            , _size(0)
-            , _alloc(alloc) {
-            std::cout << "Default constructor called\n";
-        }
-        //fill constructor(2)
-        explicit vector<T, Alloc>(size_type n, const value_type& val = value_type(),
-            const allocator_type& alloc = allocator_type())
-            : _capacity(n)
-            , _size(n)
-            , _alloc(alloc) {
-            _elements = _alloc.allocate(n); // get memory for elements
-
-            pointer ptr, ptr1;
-            try {
-                pointer end = _elements + n;
-                for (ptr = _elements; ptr != end; ++ptr) {
-                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by p.
+        public:
+            //default constructor(1):
+            explicit vector<T, Alloc>(const allocator_type& alloc = allocator_type())
+                : _elements(NULL)
+                , _capacity(0)
+                , _size(0)
+                , _alloc(alloc) {
+                std::cout << "Default constructor called\n";
                 }
-            }
-            catch (const std::exception& e) {
-                std::cerr << e.what() << '\n';
-                for (ptr1 = _elements; ptr1 != ptr; ++ptr1) {
-                    _alloc.destroy(ptr1); // destructs an object stored in the allocated storage
-                    throw; //rethrow
+            //fill constructor(2)
+            explicit vector<T, Alloc>(size_type n, const value_type& val = value_type(),
+                const allocator_type& alloc = allocator_type())
+                : _capacity(n)
+                , _size(n)
+                , _alloc(alloc) {
+                _elements = _alloc.allocate(n); // get memory for elements
+
+                pointer ptr, ptr1;
+                try {
+                    pointer end = _elements + n;
+                    for (ptr = _elements; ptr != end; ++ptr) {
+                        _alloc.construct(ptr, val); // constructs an element object on the location pointed by p.
+                        }
+                    }
+                catch (const std::exception& e) {
+                    std::cerr << e.what() << '\n';
+                    for (ptr1 = _elements; ptr1 != ptr; ++ptr1) {
+                        _alloc.destroy(ptr1); // destructs an object stored in the allocated storage
+                        throw; //rethrow
+                        }
+                    _alloc.deallocate(_elements, n); // free memory
+                    }
                 }
-                _alloc.deallocate(_elements, n); // free memory
-            }
-        }
 
-        // the standard says that if the range constructor gets selected by overload resolution 
-        // but the "iterator" type is actually an integral type,
-        // it has to delegate to the fill constructor by casting its argument types to force the latter to be an exact match.
+            // the standard says that if the range constructor gets selected by overload resolution 
+            // but the "iterator" type is actually an integral type,
+            // it has to delegate to the fill constructor by casting its argument types to force the latter to be an exact match.
 
-            //	range constructor(3)	
-        // template <class InputIterator>
-        // 		vector (InputIterator first, InputIterator last,
-        // 				const allocator_type& alloc = allocator_type());
+                //	range constructor(3)	
+            // template <class InputIterator>
+            // 		vector (InputIterator first, InputIterator last,
+            // 				const allocator_type& alloc = allocator_type());
 
-        // vector (const vector& x); // copy (4)
+            // vector (const vector& x); // copy (4)
 
-        ~vector() {
-            pointer ptr;
-            for (ptr = _elements; ptr != _elements + _size; ++ptr) {
-                _alloc.destroy(ptr); // destructs an object stored in the allocated storage
-            }
-            _alloc.deallocate(_elements, _size); // free memory
-        }
+            ~vector() {
+                pointer ptr;
+                for (ptr = _elements; ptr != _elements + _size; ++ptr) {
+                    _alloc.destroy(ptr); // destructs an object stored in the allocated storage
+                    }
+                _alloc.deallocate(_elements, _size); // free memory
+                }
 
-    public:
-        size_type size() const {
-            return _size;
-        }
+        public:
+            size_type size() const {
+                return _size;
+                }
 
-        size_type max_size() const {
-            return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
-        }
+            size_type max_size() const {
+                return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
+                }
 
-        void resize(size_type n, value_type val = value_type()) {
-            // add some code here
-        }
+            void resize(size_type n, value_type val = value_type()) {
+                // add some code here
+                }
 
 
+            // Correctly using reserve() can prevent unnecessary reallocations,
+            //  but inappropriate uses of reserve() (for instance, calling it before every push_back() call)
+            // may actually increase the number of reallocations (by causing the capacity to grow linearly rather than exponentially) 
+            // and result in increased computational complexity and decreased performance.
+            void reserve(size_type new_cap) {
+                if (new_cap <= _capacity) {
+                    return;
+                    }
+                if (new_cap > max_size()) {
+                    throw std::length_error("in reserve()");
+                    }
+                pointer temp = _alloc.allocate(new_cap);
+                for (size_type i = 0; i != _size; ++i) {  // using index not to create 2 pointers
+                    try {
+                        _alloc.construct(temp[i], _elements[i]); // need to try and catch possible exception from the constructor
+                        _alloc.destroy(_elements[i]);
 
-        // Correctly using reserve() can prevent unnecessary reallocations,
-        //  but inappropriate uses of reserve() (for instance, calling it before every push_back() call)
-        // may actually increase the number of reallocations (by causing the capacity to grow linearly rather than exponentially) 
-        // and result in increased computational complexity and decreased performance.
-        void reserve(size_type new_cap) {
-            if (new_cap > max_size()) {
-                throw std::length_error("in reserve()");
-            }
-            if (new_cap <= _capacity) {
-                return;
-            }
-            pointer temp = _alloc.allocate(new_cap); // get memory for elements
-            memmove(temp, _elements, _size); // REMOVE MEMMOVE, CHECK SELF-REFERENCIAL STRUCTURES
-            pointer ptr;
-            for (ptr = _elements; ptr != _elements + _size; ++ptr) {
-                _alloc.destroy(ptr);
-            }
-            _alloc.deallocate(_elements, _size);
-            _elements = temp;
-            _capacity = new_cap;
-        }
+                    }
+                    catch (...) {// (...)will be catching any exception 
+                        for (size_type j = 0; j != i; ++j) {
+                            _alloc.destroy(temp[j]);
+                        }
+                        throw;
+                    }
+                }
+                _alloc.deallocate(_elements, _size);
+                _elements = temp;
+                _capacity = new_cap;
+                }
 
-        size_type capacity() const {
-            return _capacity;
-        }
 
-        bool empty() const {
-            return (_size == 0);
-        }
+            size_type capacity() const {
+                return _capacity;
+                }
 
-        void clear() {
+            bool empty() const {
+                return (_size == 0);
+                }
 
-        }
+            void clear() {
+
+                }
+        };
     };
-};
 
 #endif
