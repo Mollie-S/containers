@@ -34,3 +34,5 @@ https://stackoverflow.com/questions/43571962/how-is-stdis-integral-implemented
 reserve implementation:
 https://stackoverflow.com/questions/34821661/reserve-implementation-for-stdvector-in-stl?rq=1
 
+Strong exception guarantee VS basic exception guarantee: (how to deal with exceptions that might be possibly thrown by an allocator):
+https://stackoverflow.com/questions/12137555/strong-exception-guarantee-vs-basic-exception-guarantee
