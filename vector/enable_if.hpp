@@ -22,8 +22,8 @@ struct iterator_traits<T*>;
 template< class T >
 struct iterator_traits<const T*>;
 
-template<class T> is_iterator : public integral_constant<bool, !is_integral<T>::value>{
-
-	};
+// template<class T> is_iterator : public integral_constant<bool, !is_integral<T>::value>{
+// 
+// 	};
 
 #endif
