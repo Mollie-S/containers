@@ -7,7 +7,7 @@
 
 namespace ft
 {
-    template <class T, class Alloc = std::allocator<T>> // generic template
+    template <class T, class Alloc = ::std::allocator<T> > // generic template
     class vector
     {
         typedef T value_type; // cannot use "using as it is c++11"
@@ -28,6 +28,33 @@ namespace ft
         size_type _size;       // num of elements in the container
         size_type _capacity;   // capacity of the container
         allocator_type _alloc; // the type of the allocator used
+
+        void uninitialized_copy(const vector& dest, const vector& src)
+        {
+            for (size_type i = 0; i != src._size; ++i)
+            { // using index not to create 2 pointers
+                try
+                {
+                    _alloc.construct(dest[i], src[i]); // need to try and catch possible exception from the constructor
+                }
+                catch (...)
+                { // (...)will be catching any exception
+                    for (size_type j = 0; j != i; ++j)
+                    {
+                        _alloc.destroy(dest[j]); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
+                    }
+                    throw;
+                }
+            }
+        }
+
+        void destroy_elements(vector& src)
+        {
+            for (size_type i = 0; i != src._size; ++i)
+            {
+                _alloc.destroy(src[i]);
+            }
+        }
 
     public:
         //default constructor(1):
@@ -62,6 +89,7 @@ namespace ft
                 }
                 _alloc.deallocate(_elements, n); // free memory
             }
+            std::cout << "Fill constructor called\n";
         }
 
         // the standard says that if the range constructor gets selected by overload resolution
@@ -83,6 +111,17 @@ namespace ft
                 _alloc.destroy(ptr); // destructs an object stored in the allocated storage
             }
             _alloc.deallocate(_elements, _size); // free memory
+        }
+
+        vector& operator= (const vector& x)
+        {
+            if 
+            _elements = _alloc.allocate(x._size);
+            uninitialized_copy(this, x);
+
+            destroy_elements(_elements);
+            _alloc.deallocate(_elements, _size);
+            return this*;
         }
 
     public:
@@ -125,22 +164,8 @@ namespace ft
                 throw std::length_error("in reserve()");
             }
             pointer temp = _alloc.allocate(new_cap);
-            for (size_type i = 0; i != _size; ++i)
-            { // using index not to create 2 pointers
-                try
-                {
-                    _alloc.construct(temp[i], _elements[i]); // need to try and catch possible exception from the constructor
-                    _alloc.destroy(_elements[i]);
-                }
-                catch (...)
-                { // (...)will be catching any exception
-                    for (size_type j = 0; j != i; ++j)
-                    {
-                        _alloc.destroy(temp[j]); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
-                    }
-                    throw;
-                }
-            }
+            uninitialized_copy(temp, _elements);
+            destroy_elements(_elements);
             _alloc.deallocate(_elements, _size);
             _elements = temp;
             _capacity = new_cap;
@@ -159,22 +184,22 @@ namespace ft
         void clear()
         {
         }
- 
- // If T is a type for which it can be expensive to copy elements, such as string and vector, the usual swap()
-// becomes an expensive operation. Note something curious: we didn’t want any copies at all; we just
-// wanted to move the values of a, b, and tmp around. We can tell that to the compiler:
-        void swap(T &a, T &b) // "perfect swap" (almost)
+
+        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, this swap()
+        // becomes an expensive operation in versions under C++11
+        void swap (vector& x)
         {
-            T tmp{static_cast<T &&>(a)}; // the initialization may write to a
-            a = static_cast<T &&>(b);    // the assignment may write to b
-            b = static_cast<T &&>(tmp);  // the assignment may write to tmp
+            T *temp = _elements;
+            size_t temp_size = _size;
+            size_t temp_capacity = _capacity;
+            _elements = x._elements;
+            _size = x._size;
+            _capacity = x._capacity;
+            x._elements = temp._elements;
+            x._size = temp._size;
+            x._capacity - temp._capacity;
+
         }
     };
-    // The result value of static_cast<T&&>(x) is an rvalue of type T&& for x.
-    // An operation that is optimized for rvalues can now use its optimization for x. 
-    //In particular, if a type T has a move constructor (§3.3.2, §17.5.2) or a move assignment, it will be used.
-//     The use of static_cast in swap() is a bit verbose and slightly prone to mistyping, so the standard
-// library provides a move() function: move(x) means static_cast<X&&>(x) where X is the type of x.
-};
-
+}
 #endif
