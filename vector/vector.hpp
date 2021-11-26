@@ -115,10 +115,11 @@ namespace ft
 
         vector& operator= (const vector& x)
         {
-            if 
-            _elements = _alloc.allocate(x._size);
+            if (_size < x._size)
+            {
+                _elements = _alloc.allocate(x._size);
+            }
             uninitialized_copy(this, x);
-
             destroy_elements(_elements);
             _alloc.deallocate(_elements, _size);
             return this*;
@@ -190,7 +191,7 @@ namespace ft
         
         void swap (vector& x)
         {
-            T *temp = _elements;
+            pointer temp = _elements;
             size_t temp_size = _size;
             size_t temp_capacity = _capacity;
             _elements = x._elements;
