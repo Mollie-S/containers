@@ -187,6 +187,7 @@ namespace ft
 
         //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, this swap()
         // becomes an expensive operation in versions under C++11
+        
         void swap (vector& x)
         {
             T *temp = _elements;
@@ -198,7 +199,6 @@ namespace ft
             x._elements = temp._elements;
             x._size = temp._size;
             x._capacity - temp._capacity;
-
         }
     };
 }

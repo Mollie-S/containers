@@ -155,6 +155,7 @@
 	const_reference front() const {return _data[0];}
 	const_reference back() const {return _data[_size == 0 ? 0 : _size - 1];}
 
+
 	T	*data() {return _data;}
 	const T	*data() const {return _data;}
 
@@ -225,18 +226,7 @@
 		}
 		_size = count;
 	}
-	void swap(vector& other)
-	{
-		T *tmp = this->_data;
-		size_t tmp_size = this->_size;
-		size_t tmp_capacity = this->_capacity;
-		this->_size = other._size;
-		this->_capacity = other._capacity;
-		this->_data = other._data;
-		other._data = tmp;
-		other._size = tmp_size;
-		other._capacity = tmp_capacity;
-	}
+
 
 	iterator begin()		{return iterator(_data);}
 	iterator end()			{return iterator(_data + _size);}	
