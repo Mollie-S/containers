@@ -143,12 +143,12 @@
 	size_type size() const {return _size;}
 	size_type capacity() const {return _capacity;}
 	size_type max_size() const {return (std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T) * 2 + 1);}
-	void clear() {
-		_alloc.deallocate(_data, _capacity);
-		_size = 0;
-		_capacity = 0;
-		_data = 0;
-	}
+	// void clear() {
+	// 	_alloc.deallocate(_data, _capacity);
+	// 	_size = 0;
+	// 	_capacity = 0;
+	// 	_data = 0;
+	// }
 
 	reference back() {return _data[_size == 0 ? 0 : _size - 1];}
 	reference front() {return _data[0];}

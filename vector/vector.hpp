@@ -29,16 +29,38 @@ namespace ft
         size_type _capacity;   // capacity of the container
         allocator_type _alloc; // the type of the allocator used
 
+
+        void uninitialized_fill(pointer start, pointer end, value_type val)
+        {
+            pointer ptr, ptr1; // ptr1 for destructing if construction fails
+            try
+            {
+                for (ptr = start; ptr != end; ++ptr)
+                {
+                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by ptr.
+                }
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << e.what() << '\n';
+                for (ptr1 = start; ptr1 != ptr; ++ptr1)
+                {
+                    _alloc.destroy(ptr1);
+                    throw;                //rethrow
+                }
+            }
+        }
+
         void uninitialized_copy(const vector& dest, const vector& src)
         {
-            for (size_type i = 0; i != src._size; ++i)
-            { // using index not to create 2 pointers
-                try
+            for (size_type i = 0; i != src._size; ++i) // using index not to create 2 pointers s
+            { 
+                try // if there are exception from the constructor
                 {
-                    _alloc.construct(dest[i], src[i]); // need to try and catch possible exception from the constructor
+                    _alloc.construct(dest[i], src[i]);  // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new. 
                 }
-                catch (...)
-                { // (...)will be catching any exception
+                catch (...) // (...)will be catching any exception
+                { 
                     for (size_type j = 0; j != i; ++j)
                     {
                         _alloc.destroy(dest[j]); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
@@ -48,13 +70,34 @@ namespace ft
             }
         }
 
+        // WHY TO USE DESTRUCT AND DEALLOCATE:
+        // A program may end the lifetime of any object by reusing the storage which the object occupies
+        // or by explicitly calling the destructor for an object of a class type with a non-trivial destructor. 
+        // For an object of a class type with a non-trivial destructor,
+        //  the program is not required to call the destructor explicitly
+        //  before the storage which the object occupies is reused or released;
+        // however, if there is no explicit call to the destructor 
+        // or if a delete-expression (5.3.5) is not used to release the storage,
+        //  the destructor shall not be implicitly called and any program that depends on the side effects
+        //  produced by the destructor has undeﬁned behavior.
+
+        void destroy(vector& destroy_start, vector& destroy_end)
+        {
+             for (; destroy_start != destroy_end; ++destroy_start)
+            {
+                _alloc.destroy(destroy_start);
+            }
+        }
+
         void destroy_elements(vector& src)
         {
             for (size_type i = 0; i != src._size; ++i)
             {
-                _alloc.destroy(src[i]);
+                _alloc.destroy(src[i]); // Calls the destructor of the object
             }
+            _alloc.deallocate(_elements, _size); // Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call to allocate()
         }
+
 
     public:
         //default constructor(1):
@@ -69,26 +112,17 @@ namespace ft
             : _capacity(n), _size(n), _alloc(alloc)
         {
             _elements = _alloc.allocate(n); // get memory for elements
-
-            pointer ptr, ptr1;
             try
             {
-                pointer end = _elements + n;
-                for (ptr = _elements; ptr != end; ++ptr)
-                {
-                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by p.
-                }
+                uninitialized_fill(_elements, _elements + n, val);
             }
-            catch (const std::exception &e)
+            catch(...)
             {
-                std::cerr << e.what() << '\n';
-                for (ptr1 = _elements; ptr1 != ptr; ++ptr1)
-                {
-                    _alloc.destroy(ptr1); // destructs an object stored in the allocated storage
-                    throw;                //rethrow
-                }
-                _alloc.deallocate(_elements, n); // free memory
+                _alloc.deallocate(_elements, n);
+                throw;
             }
+            
+         
             std::cout << "Fill constructor called\n";
         }
 
@@ -103,17 +137,9 @@ namespace ft
 
         // vector (const vector& x); // copy (4)
 
-        ~vector()
-        {
-            pointer ptr;
-            for (ptr = _elements; ptr != _elements + _size; ++ptr)
-            {
-                _alloc.destroy(ptr); // destructs an object stored in the allocated storage
-            }
-            _alloc.deallocate(_elements, _size); // free memory
-        }
+        ~vector() {destroy_elements(_elements);}
 
-        vector& operator= (const vector& x)
+        vector& operator= (const vector& x) // check if it works correctly!!!
         {
             if (_size < x._size)
             {
@@ -121,7 +147,6 @@ namespace ft
             }
             uninitialized_copy(this, x);
             destroy_elements(_elements);
-            _alloc.deallocate(_elements, _size);
             return this*;
         }
 
@@ -145,9 +170,20 @@ namespace ft
             return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         }
 
-        void resize(size_type n, value_type val = value_type())
+        // Using resize() on a vectoris very similar to using the C standard library function realloc() on a C array allocated on the free store.  
+        void resize(size_type n, value_type val = value_type())  
         {
-            // add some code here
+            reserve(n);
+            if (_size < n)
+            {
+                uninitialized_fill(_elements + _size, _elements + n, val); // pointer to the elements will be updated
+            }
+            else
+            {
+                destroy(_elements + n, _elements + _size);
+            }
+            _size = n;
+            _capacity = n;
         }
 
         // Correctly using reserve() can prevent unnecessary reallocations,
@@ -167,7 +203,6 @@ namespace ft
             pointer temp = _alloc.allocate(new_cap);
             uninitialized_copy(temp, _elements);
             destroy_elements(_elements);
-            _alloc.deallocate(_elements, _size);
             _elements = temp;
             _capacity = new_cap;
         }
@@ -184,10 +219,11 @@ namespace ft
 
         void clear()
         {
+            resize(0);
         }
 
-        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, this swap()
-        // becomes an expensive operation in versions under C++11
+        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, 
+        // this swap() becomes an expensive operation in versions under C++11
         
         void swap (vector& x)
         {
@@ -203,4 +239,5 @@ namespace ft
         }
     };
 }
+
 #endif
