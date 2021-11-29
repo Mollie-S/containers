@@ -10,12 +10,12 @@ namespace ft
     template <class T, class Alloc = ::std::allocator<T> > // generic template
     class vector
     {
-        typedef T value_type; // cannot use "using as it is c++11"
-        typedef Alloc allocator_type;
-        typedef typename allocator_type::reference reference;
-        typedef typename allocator_type::const_reference const_reference;
-        typedef typename allocator_type::pointer pointer;
-        typedef typename allocator_type::const_pointer const_pointer;
+        typedef T                                           value_type; // cannot use "using as it is c++11"
+        typedef Alloc                                       allocator_type;
+        typedef typename allocator_type::reference          reference;
+        typedef typename allocator_type::const_reference    const_reference;
+        typedef typename allocator_type::pointer            pointer;
+        typedef typename allocator_type::const_pointer      const_pointer;
 
         // itetators need to be added here:
         // typedef 	iterator;// convertible to const iterator
@@ -53,17 +53,18 @@ namespace ft
 
         void uninitialized_copy(const vector& dest, const vector& src)
         {
-            for (size_type i = 0; i != src._size; ++i) // using index not to create 2 pointers s
+            pointer dest_ptr = dest, src_ptr = src;
+            for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr) // using index not to create 2 pointers s
             { 
                 try // if there are exception from the constructor
                 {
-                    _alloc.construct(dest[i], src[i]);  // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new. 
+                    _alloc.construct(dest_ptr, src_ptr);  // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new. 
                 }
                 catch (...) // (...)will be catching any exception
                 { 
-                    for (size_type j = 0; j != i; ++j)
+                    for (; dest != dest_ptr; ++dest)
                     {
-                        _alloc.destroy(dest[j]); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
+                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
                     }
                     throw;
                 }
@@ -81,7 +82,7 @@ namespace ft
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void destroy(vector& destroy_start, vector& destroy_end)
+        void ft_destroy(vector& destroy_start, vector& destroy_end)
         {
              for (; destroy_start != destroy_end; ++destroy_start)
             {
@@ -89,11 +90,12 @@ namespace ft
             }
         }
 
-        void destroy_elements(vector& src)
+        void destroy_elements()
         {
-            for (size_type i = 0; i != src._size; ++i)
+            pointer end = _elements + _size;
+            for (pointer ptr = _elements; ptr != end; ++ptr)
             {
-                _alloc.destroy(src[i]); // Calls the destructor of the object
+                _alloc.destroy(ptr); // Calls the destructor of the object
             }
             _alloc.deallocate(_elements, _size); // Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call to allocate()
         }
@@ -111,7 +113,7 @@ namespace ft
                                   const allocator_type &alloc = allocator_type())
             : _capacity(n), _size(n), _alloc(alloc)
         {
-            _elements = _alloc.allocate(n); // get memory for elements
+            _elements = _alloc.allocate(n);
             try
             {
                 uninitialized_fill(_elements, _elements + n, val);
@@ -137,7 +139,7 @@ namespace ft
 
         // vector (const vector& x); // copy (4)
 
-        ~vector() {destroy_elements(_elements);}
+        ~vector() {destroy_elements();}
 
         vector& operator= (const vector& x) // check if it works correctly!!!
         {
@@ -146,8 +148,14 @@ namespace ft
                 _elements = _alloc.allocate(x._size);
             }
             uninitialized_copy(this, x);
-            destroy_elements(_elements);
-            return this*;
+            destroy_elements();
+            return *this;
+        }
+
+        // If the container size is greater than n, the function never throws exceptions (no-throw guarantee).Otherwise, the behavior is undefined.
+        reference operator[]( size_type pos )
+        {
+            return _elements[pos];
         }
 
     public:
@@ -160,6 +168,43 @@ namespace ft
         // {
 
         // }
+
+        reference at( size_type pos )
+        {
+            if (pos >= _size)
+            {
+                throw std::out_of_range("at()");
+            }
+            return _elements[pos];
+        }
+
+        const_reference at( size_type pos ) const
+        {
+            if (pos >= _size)
+            {
+                throw std::out_of_range("at()");
+            }
+            return _elements[pos];
+        }
+
+        size_type capacity() const
+        {
+            return _capacity;
+        }
+
+    
+
+        void clear()
+        {
+            resize(0);
+        }
+
+        bool empty() const
+        {
+            return (_size == 0);
+        }
+
+
         size_type size() const
         {
             return _size;
@@ -180,7 +225,7 @@ namespace ft
             }
             else
             {
-                destroy(_elements + n, _elements + _size);
+                ft_destroy(_elements + n, _elements + _size);
             }
             _size = n;
             _capacity = n;
@@ -202,25 +247,12 @@ namespace ft
             }
             pointer temp = _alloc.allocate(new_cap);
             uninitialized_copy(temp, _elements);
-            destroy_elements(_elements);
+            destroy_elements();
             _elements = temp;
             _capacity = new_cap;
         }
 
-        size_type capacity() const
-        {
-            return _capacity;
-        }
-
-        bool empty() const
-        {
-            return (_size == 0);
-        }
-
-        void clear()
-        {
-            resize(0);
-        }
+  
 
         //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, 
         // this swap() becomes an expensive operation in versions under C++11
