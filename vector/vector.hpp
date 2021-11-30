@@ -11,66 +11,60 @@ namespace ft
     class vector
     {
         //  iterators are an abstraction of pointers
-     	class iterator  // Iterator base class
+        class iterator // Iterator base class
         {
-            // This base class only provides some member types, 
-            // which in fact are not required to be present in any iterator type 
-            // (iterator types have no specific member requirements), 
-            // but they might be useful, 
-            //since they define the members needed for the default iterator_traits class template 
-            //to generate the appropriate instantiation automatically 
+            // This base class only provides some member types,
+            // which in fact are not required to be present in any iterator type
+            // (iterator types have no specific member requirements),
+            // but they might be useful,
+            //since they define the members needed for the default iterator_traits class template
+            //to generate the appropriate instantiation automatically
             //(and such instantiation is required to be valid for all iterator types).
 
         public:
-            typedef T 					                    value_type; // cannot use "using as it is c++11"
-            typedef	Alloc			                        allocator_type;
-            typedef size_t 				                    size_type;
-            typedef value_type const&	                    const_reference;
-            typedef value_type& 		                    reference;
-            typedef std::ptrdiff_t		                    difference_type;
+            typedef T                                       value_type; // cannot use "using as it is c++11"
+            typedef Alloc                                   allocator_type;
+            typedef size_t                                  size_type;
+            typedef value_type&                             reference;
+            typedef value_type const &                      const_reference;
             typedef typename allocator_type::pointer        pointer;
-            typedef typename allocator_type::const_pointer	const_pointer;
+            typedef typename allocator_type::const_pointer  const_pointer;
+            typedef std::ptrdiff_t                          difference_type;
             typedef std::random_access_iterator_tag         iterator_category
 
-        // random_access_iterator -  Empty class to identify the category of an iterator as a random-access iterator:
+                // random_access_iterator -  Empty class to identify the category of an iterator as a random-access iterator:
 
+                // DO we define value_type etc fron iterator_traits????::::
 
-        // DO we define value_type etc fron iterator_traits????::::
+                //             value_type, the type denoted by std::iterator_traits<It>::value_type
+                // difference_type, the type denoted by std::iterator_traits<It>::difference_type
+                // reference, the type denoted by std::iterator_traits<It>::reference
 
-        //             value_type, the type denoted by std::iterator_traits<It>::value_type  
-        // difference_type, the type denoted by std::iterator_traits<It>::difference_type
-        // reference, the type denoted by std::iterator_traits<It>::reference
-
-        protected:
-            T*          _ptr;  // T or pointer???
+                protected : T *_ptr; // T or pointer???
 
         public:
             iterator() : _ptr(NULL) {}
-            iterator(T* d): _ptr(d) {}
+            iterator(T* d) : _ptr(d) {}
             iterator(const iterator& it) : _ptr(it._ptr) {}
-            ~iterator() {};
-            
+            ~iterator(){};
+
             iterator& operator=(const iterator& i)
             {
                 _ptr = i._ptr;
                 return (*this);
             }
-
             reference operator*()
             {
                 return (*_ptr);
             }
-
             reference operator*() const
             {
                 return (*_ptr);
             }
-
             pointer operator->()
             {
                 return (_ptr);
             }
-
             pointer operator->() const
             {
                 return (_ptr);
@@ -82,80 +76,84 @@ namespace ft
                 _ptr++;
                 return *this;
             }
-
             iterator operator++(int) // postfix operator as it accepts an argument
             {
                 iterator temp = *this;
                 ++(*this);
                 return temp;
             }
-
             iterator& operator--()
             {
                 ptr--;
                 return *this;
             }
-            
             iterator operator--(int)
             {
                 iterator temp = *this;
                 --(*this);
                 return temp;
             }
-
-
             iterator& operator+=(const int &val)
             {
                 ptr += val;
                 return (*this);
             }
-
             iterator& operator-=(const int &val)
             {
                 _ptr -= val;
                 return (*this);
             }
-
-
-            friend iterator operator+(vector<T, Allocator>::iterator lhs, const int &rhs)
+            // RELATIONAL OPERATORS
+            bool operator<(const iterator& rhs) const
             {
-                lhs += rhs;
-                return (lhs);
+                return _ptr < rhs._ptr;
             }
-
-            friend iterator operator-(vector<T, Allocator>::iterator lhs, const int &rhs)
+            bool operator>(const iterator& rhs)
             {
-                lhs -= rhs;
-                return (lhs);
+                return _ptr > rhs._ptr;
             }
-        
-            friend bool operator==(const iterator& lhs, const iterator& rhs)
+            bool operator<=(const iterator& rhs) const
             {
-                return (lhs.ptr == rhs.ptr);
+                return _ptr <= rhs._ptr;
             }
-            friend bool operator!=(const iterator& lhs, const iterator& rhs) {return !(lhs == rhs);} 
+            bool operator>=(const iterator& rhs)
+            {
+                return _ptr >= rhs._ptr;
+            }
         };
 
-        // typedef 	iterator;// convertible to const iterator
+        friend iterator operator+(vector<T, Allocator>::iterator lhs, const int &rhs)
+        {
+            lhs += rhs;
+            return (lhs);
+        }
+        friend iterator operator-(vector<T, Allocator>::iterator lhs, const int &rhs)
+        {
+            lhs -= rhs;
+            return (lhs);
+        }
+        friend bool operator==(const iterator& lhs, const iterator& rhs)
+        {
+            return (lhs.ptr == rhs.ptr);
+        }
+        friend bool operator!=(const iterator& lhs, const iterator& rhs) { return !(lhs == rhs); }
 
-        typedef typename iterator::value_type value_type;
+        // typedef 	iterator;// convertible to const iterator?????  another subclass with const iterator???
 
-        typedef T value_type; 
-        typedef Alloc                                       allocator_type;
-        typedef typename allocator_type::reference          reference;
-        typedef typename allocator_type::const_reference    const_reference;
-        typedef typename allocator_type::pointer            pointer;
-        typedef typename allocator_type::const_pointer      const_pointer;
-        typedef ptrdiff_t                                   difference_type;
-        typedef size_t                                      size_type;
-
+        typedef typename iterator::value_type       value_type;
+        typedef typename iterator::allocator_type   allocator_type;
+        typedef typename iterator::reference        reference;
+        typedef typename iterator::const_reference  const_reference;
+        typedef typename iterator::pointer          pointer;
+        typedef typename iterator::const_pointer    const_pointer;
+        typedef typename iterator::difference_type  difference_type;
+        typedef typename iterator::size_type        size_type;
 
     private:
-        pointer _elements;     // pointer to the first element of the container
-        size_type _size;       // num of elements in the container
-        size_type _capacity;   // capacity of the container
-        allocator_type _alloc; // the type of the allocator used
-
+        pointer         _elements;     // pointer to the first element of the container
+        size_type       _size;       // num of elements in the container
+        size_type       _capacity;   // capacity of the container
+        allocator_type  _alloc; // the type of the allocator used
 
         void uninitialized_fill(pointer start, pointer end, value_type val)
         {
@@ -173,22 +171,22 @@ namespace ft
                 for (ptr1 = start; ptr1 != ptr; ++ptr1)
                 {
                     _alloc.destroy(ptr1);
-                    throw;                //rethrow
+                    throw; //rethrow
                 }
             }
         }
 
-        void uninitialized_copy(const vector& dest, const vector& src)
+        void uninitialized_copy(const vector &dest, const vector &src)
         {
             pointer dest_ptr = dest, src_ptr = src;
             for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr) // using index not to create 2 pointers s
-            { 
+            {
                 try // if there are exception from the constructor
                 {
-                    _alloc.construct(dest_ptr, src_ptr);  // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new. 
+                    _alloc.construct(dest_ptr, src_ptr); // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new.
                 }
                 catch (...) // (...)will be catching any exception
-                { 
+                {
                     for (; dest != dest_ptr; ++dest)
                     {
                         _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
@@ -200,18 +198,18 @@ namespace ft
 
         // WHY TO USE DESTRUCT AND DEALLOCATE:
         // A program may end the lifetime of any object by reusing the storage which the object occupies
-        // or by explicitly calling the destructor for an object of a class type with a non-trivial destructor. 
+        // or by explicitly calling the destructor for an object of a class type with a non-trivial destructor.
         // For an object of a class type with a non-trivial destructor,
         //  the program is not required to call the destructor explicitly
         //  before the storage which the object occupies is reused or released;
-        // however, if there is no explicit call to the destructor 
+        // however, if there is no explicit call to the destructor
         // or if a delete-expression (5.3.5) is not used to release the storage,
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void ft_destroy(vector& destroy_start, vector& destroy_end)
+        void ft_destroy(vector &destroy_start, vector &destroy_end)
         {
-             for (; destroy_start != destroy_end; ++destroy_start)
+            for (; destroy_start != destroy_end; ++destroy_start)
             {
                 _alloc.destroy(destroy_start);
             }
@@ -226,7 +224,6 @@ namespace ft
             }
             _alloc.deallocate(_elements, _size); // Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call to allocate()
         }
-
 
     public:
         //default constructor(1):
@@ -245,13 +242,12 @@ namespace ft
             {
                 uninitialized_fill(_elements, _elements + n, val);
             }
-            catch(...)
+            catch (...)
             {
                 _alloc.deallocate(_elements, n);
                 throw;
             }
-            
-         
+
             std::cout << "Fill constructor called\n";
         }
 
@@ -266,9 +262,9 @@ namespace ft
 
         // vector (const vector& x); // copy (4)
 
-        ~vector() {destroy_elements();}
+        ~vector() { destroy_elements(); }
 
-        vector& operator= (const vector& x) // check if it works correctly!!!
+        vector &operator=(const vector &x) // check if it works correctly!!!
         {
             if (_size < x._size)
             {
@@ -280,7 +276,7 @@ namespace ft
         }
 
         // If the container size is greater than n, the function never throws exceptions (no-throw guarantee).Otherwise, the behavior is undefined.
-        reference operator[]( size_type pos )
+        reference operator[](size_type pos)
         {
             return _elements[pos];
         }
@@ -296,7 +292,7 @@ namespace ft
 
         // }
 
-        reference at( size_type pos )
+        reference at(size_type pos)
         {
             if (pos >= _size)
             {
@@ -305,7 +301,7 @@ namespace ft
             return _elements[pos];
         }
 
-        const_reference at( size_type pos ) const
+        const_reference at(size_type pos) const
         {
             if (pos >= _size)
             {
@@ -319,8 +315,6 @@ namespace ft
             return _capacity;
         }
 
-    
-
         void clear()
         {
             resize(0);
@@ -330,7 +324,6 @@ namespace ft
         {
             return (_size == 0);
         }
-
 
         size_type size() const
         {
@@ -342,8 +335,8 @@ namespace ft
             return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         }
 
-        // Using resize() on a vectoris very similar to using the C standard library function realloc() on a C array allocated on the free store.  
-        void resize(size_type n, value_type val = value_type())  
+        // Using resize() on a vectoris very similar to using the C standard library function realloc() on a C array allocated on the free store.
+        void resize(size_type n, value_type val = value_type())
         {
             reserve(n);
             if (_size < n)
@@ -379,12 +372,10 @@ namespace ft
             _capacity = new_cap;
         }
 
-  
-
-        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector, 
+        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector,
         // this swap() becomes an expensive operation in versions under C++11
-        
-        void swap (vector& x)
+
+        void swap(vector &x)
         {
             pointer temp = _elements;
             size_t temp_size = _size;
