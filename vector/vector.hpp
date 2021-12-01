@@ -255,12 +255,24 @@ namespace ft
         // but the "iterator" type is actually an integral type,
         // it has to delegate to the fill constructor by casting its argument types to force the latter to be an exact match.
 
-        //	range constructor(3)
-        // template <class InputIterator>
-        // 		vector (InputIterator first, InputIterator last,
-        // 				const allocator_type& alloc = allocator_type());
+        // Additionally, if InputIterator in the range constructor (3)
+        // is not at least of a forward iterator category (i.e., it is just an input iterator)
+        //, the new capacity cannot be determined beforehand and the construction incurs 
+        //in additional logarithmic complexity in size (reallocations while growing).
 
-        // vector (const vector& x); // copy (4)
+        //	range constructor(3)
+
+        template <class InputIterator>
+        vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+                    typename ft::enable_if<!ft::is_integral<InputIt>::value>)
+                    : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
+        {
+            for (; first != last; ++first)
+                push_back(*first);
+        }
+
+        // copy (4)
+        // vector (const vector& x); 
 
         ~vector() { destroy_elements(); }
 
@@ -275,7 +287,10 @@ namespace ft
             return *this;
         }
 
-        // If the container size is greater than n, the function never throws exceptions (no-throw guarantee).Otherwise, the behavior is undefined.
+        // If the container size is greater than n,
+        // the function never throws exceptions (no-throw guarantee).
+        //Otherwise, the behavior is undefined.
+
         reference operator[](size_type pos)
         {
             return _elements[pos];
@@ -330,12 +345,23 @@ namespace ft
             return _size;
         }
 
+         //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         size_type max_size() const
         {
-            return _alloc.max_size(); //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
+            return _alloc.max_size();
         }
 
-        // Using resize() on a vectoris very similar to using the C standard library function realloc() on a C array allocated on the free store.
+        {
+            
+        void push_back( const T& value )
+        {
+            if (_capacity == _size)     // no more free space; relocate:
+                reserve(_size? 2 * _size : 8);  // grow or start with 8 - recommendation from Stroustrup's book
+            _alloc.construct(_elements + _size, val); // add val at end
+            _size++;
+        }
+
+        // Using resize() on a vector is very similar to using the C standard library function realloc() on a C array allocated on the free store.
         void resize(size_type n, value_type val = value_type())
         {
             reserve(n);
