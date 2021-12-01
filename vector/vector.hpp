@@ -40,7 +40,6 @@ namespace ft
                 // difference_type, the type denoted by std::iterator_traits<It>::difference_type
                 // reference, the type denoted by std::iterator_traits<It>::reference
 
-                protected : T *_ptr; // T or pointer???
 
         public:
             iterator() : _ptr(NULL) {}
@@ -176,10 +175,10 @@ namespace ft
             }
         }
 
-        void uninitialized_copy(const vector &dest, const vector &src)
+        void uninitialized_copy(const vector& dest, const vector& src) // it probably doesn't work 
         {
-            pointer dest_ptr = dest, src_ptr = src;
-            for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr) // using index not to create 2 pointers s
+            pointer dest_ptr = dest._elements, src_ptr = src._elements;
+            for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr)
             {
                 try // if there are exception from the constructor
                 {
@@ -276,15 +275,15 @@ namespace ft
 
         ~vector() { destroy_elements(); }
 
-        vector &operator=(const vector &x) // check if it works correctly!!!
+        vector& operator=( const vector& other ) // check if it works correctly!!! do we need to clear twice?
         {
-            if (_size < x._size)
-            {
-                _elements = _alloc.allocate(x._size);
-            }
-            uninitialized_copy(this, x);
-            destroy_elements();
-            return *this;
+            if (this == &other)
+                return *this;
+			clear();
+			_alloc.deallocate(_data, _capacity);
+			_alloc = other._alloc;
+			assign(other.begin(), other.end());
+			return *this;
         }
 
         // If the container size is greater than n,
@@ -297,15 +296,29 @@ namespace ft
         }
 
     public:
-        // TO IMPLEMENT:
+        // assign() and operator= are pretty much equivalent. 
+        //The reason for the second is that you might have types which need (implicit) conversion:
         // range (1)
-        // template <class InputIterator>
-        // void assign (InputIterator first, InputIterator last);
-        // fill (2)
-        // void assign (size_type n, const value_type& val)
-        // {
+        
+        // Additionally, in the range version (1), 
+        //if InputIterator is not at least of a forward iterator category
+        // (i.e., it is just an input iterator) the new capacity cannot be determined beforehand 
+        //and the operation incurs in additional logarithmic complexity in the new size (reallocations while growing).
 
-        // }
+        // TO DO enableif with input iterarator?????
+        void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIt>::value>)
+        {
+			clear();
+			for (; first != last; ++first)
+			push_back(*first);
+        }
+
+        // fill (2)
+        void assign (size_type n, const value_type& val)
+        {
+            clear();
+			resize(n, val);
+        }
 
         reference at(size_type pos)
         {
@@ -405,20 +418,20 @@ namespace ft
             _capacity = new_cap;
         }
 
-        //Unfortunately if T is a type for which it can be expensive to copy elements, such as string and vector,
-        // this swap() becomes an expensive operation in versions under C++11
-
         void swap(vector &x)
         {
             pointer temp = _elements;
             size_t temp_size = _size;
             size_t temp_capacity = _capacity;
+            allocator_type temp_alloc = _alloc;
             _elements = x._elements;
             _size = x._size;
             _capacity = x._capacity;
+            _alloc = x._alloc;
             x._elements = temp._elements;
             x._size = temp._size;
             x._capacity - temp._capacity;
+            x._alloc = temp._alloc;
         }
     };
 };
