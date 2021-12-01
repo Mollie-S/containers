@@ -350,9 +350,15 @@ namespace ft
         {
             return _alloc.max_size();
         }
-
-        {
             
+        void pop_back()
+        {
+            // If the container is not empty, the function never throws exceptions (no-throw guarantee).
+            // Otherwise, it causes undefined behavior. (so no empty() check)
+            _size--;
+            _alloc.destroy(_elements + _size);
+        }
+
         void push_back( const T& value )
         {
             if (_capacity == _size)     // no more free space; relocate:
@@ -360,6 +366,7 @@ namespace ft
             _alloc.construct(_elements + _size, val); // add val at end
             _size++;
         }
+
 
         // Using resize() on a vector is very similar to using the C standard library function realloc() on a C array allocated on the free store.
         void resize(size_type n, value_type val = value_type())
