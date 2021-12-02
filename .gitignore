@@ -4,3 +4,6 @@ tests/catch.hpp
 .idea/my_containers.iml
 .idea/vcs.xml
 a.out
+vector_it.dSYM/Contents/Resources/DWARF/vector_it
+vector_it
+vector_it.dSYM/Contents/Info.plist
