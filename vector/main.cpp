@@ -16,8 +16,10 @@ int main(void)
     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
     ft::vector<int> myVect(intArray, intArray + arraySize);
     ft::vector<int>::iterator it;
-    for (it = myVect.begin(); it != myVect.end(); ++it) {
-    // for (it = myVect.begin(); it != it + arraySize; ++it) {
+    // for (it = myVect.begin(); it != myVect.end(); ++it) {
+    ft::vector<int>::iterator end = myVect.begin() + arraySize;
+    for (it = myVect.begin(); it != end; ++it)
+    {
         std::cout << *it << std::endl;
     }
 
