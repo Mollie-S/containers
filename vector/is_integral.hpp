@@ -21,8 +21,7 @@ namespace ft
     template<> struct is_integral<const short> : ft::true_type {};
     template<> struct is_integral<const long> : ft::true_type {};
     template<> struct is_integral<const char> : ft::true_type {};
-    template<> struct is_integral<const wchar_t> : ft::true_type {};
-}
+    template<> struct is_integral<const wchar_t> : ft::true_type {}; }
 
 
 

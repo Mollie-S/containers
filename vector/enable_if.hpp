@@ -17,18 +17,4 @@ namespace ft
 // it's syntactic sugar so you don't have to write
 // typename std::enable_if</* */>::type
 
-
-
-
-template< class Iter >
-struct iterator_traits;
-template< class T >
-struct iterator_traits<T*>;
-template< class T >
-struct iterator_traits<const T*>;
-
-// template<class T> is_iterator : public integral_constant<bool, !is_integral<T>::value>{
-// 
-// 	};
-
 #endif
