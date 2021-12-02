@@ -18,7 +18,7 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
         REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
     }
 
-    SECTION("Creating an empty container with fill constructor")
+    SECTION("Creating a container with fill constructor")
     {
         ft::vector<int> ftVectorInts(5, 10);
         std::vector<int> stdVectorInts(5, 10);
@@ -28,6 +28,27 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
         REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
         REQUIRE(ftVectorInts.size() == 5);
     }
+
+    SECTION("Creating a container with the range constructor")
+    {
+        int intArray[] = { 1, 2, 9, 10, 11, 12, 13, 14};
+        size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+        ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+        std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
+        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
+        REQUIRE(ftVectorInts.max_size() == stdVectorInts.max_size());
+        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+    }
+}
+TEST_CASE("Iterators test", "[integers]")
+{
+    int intArray[] = { 1, 2, 9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24,25, 28, 29, 30};
+    size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+    ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+    std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+    ft::vector<int>::iterator it;
+    std::vector<int>::iterator it;
 }
 
 TEST_CASE("Testing reserve method", "[integers]")
