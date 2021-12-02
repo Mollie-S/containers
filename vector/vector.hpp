@@ -11,6 +11,7 @@ namespace ft
     template <class T, class Alloc = ::std::allocator<T> > // generic template
     class vector
     {
+    public:
         //  iterators are an abstraction of pointers
         class iterator // Iterator base class
         {
@@ -40,12 +41,12 @@ namespace ft
                 //             value_type, the type denoted by std::iterator_traits<It>::value_type
                 // difference_type, the type denoted by std::iterator_traits<It>::difference_type
                 // reference, the type denoted by std::iterator_traits<It>::reference
-
+        private:
             pointer _ptr;
 
         public:
             iterator() : _ptr(NULL) {}
-            iterator(T* d) : _ptr(d) {}
+            iterator(pointer ptr) : _ptr(ptr) {}
             iterator(const iterator& it) : _ptr(it._ptr) {}
             ~iterator(){};
 
@@ -121,24 +122,21 @@ namespace ft
             {
                 return _ptr >= rhs._ptr;
             }
+            friend iterator operator+(const iterator& lhs, const int rhs)
+            {
+                return (lhs._ptr + rhs);
+            }
+            friend iterator operator-(const iterator& lhs, const int rhs)
+            {
+                return (lhs._ptr - rhs);
+            }
+            friend bool operator==(const iterator& lhs, const iterator& rhs)
+            {
+                return (lhs._ptr == rhs._ptr);
+            }
+            friend bool operator!=(const iterator& lhs, const iterator& rhs) { return !(lhs._ptr == rhs._ptr); }
         };
 
-
-        // friend iterator operator+(vector<T, Allocator>::iterator lhs, const int &rhs)
-        // {
-        //     lhs += rhs;
-        //     return (lhs);
-        // }
-        // friend iterator operator-(vector<T, Allocator>::iterator lhs, const int &rhs)
-        // {
-        //     lhs -= rhs;
-        //     return (lhs);
-        // }
-        friend bool operator==(const iterator& lhs, const iterator& rhs)
-        {
-            return (lhs.ptr == rhs.ptr);
-        }
-        friend bool operator!=(const iterator& lhs, const iterator& rhs) { return !(lhs == rhs); }
 
         // typedef 	iterator;// convertible to const iterator?????  another subclass with const iterator???
 
@@ -296,6 +294,23 @@ namespace ft
         reference operator[](size_type pos)
         {
             return _elements[pos];
+        }
+
+        // ITERATORS:
+        iterator begin()
+        {
+            return _elements;
+        }
+
+// TODO:
+        // const_iterator begin() const
+        // {
+
+        // }
+
+        iterator end()
+        {
+            return _elements + _size;
         }
 
     public:
