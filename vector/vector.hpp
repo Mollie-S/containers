@@ -4,6 +4,7 @@
 #include <memory> //needed for allocator
 #include <iostream>
 #include <cmath>
+#include "enable_if.hpp"
 
 namespace ft
 {
@@ -30,7 +31,7 @@ namespace ft
             typedef typename allocator_type::pointer        pointer;
             typedef typename allocator_type::const_pointer  const_pointer;
             typedef std::ptrdiff_t                          difference_type;
-            typedef std::random_access_iterator_tag         iterator_category
+            typedef std::random_access_iterator_tag         iterator_category;
 
                 // random_access_iterator -  Empty class to identify the category of an iterator as a random-access iterator:
 
@@ -40,6 +41,7 @@ namespace ft
                 // difference_type, the type denoted by std::iterator_traits<It>::difference_type
                 // reference, the type denoted by std::iterator_traits<It>::reference
 
+            pointer _ptr;
 
         public:
             iterator() : _ptr(NULL) {}
@@ -83,7 +85,7 @@ namespace ft
             }
             iterator& operator--()
             {
-                ptr--;
+                _ptr--;
                 return *this;
             }
             iterator operator--(int)
@@ -94,7 +96,7 @@ namespace ft
             }
             iterator& operator+=(const int &val)
             {
-                ptr += val;
+                _ptr += val;
                 return (*this);
             }
             iterator& operator-=(const int &val)
@@ -121,16 +123,17 @@ namespace ft
             }
         };
 
-        friend iterator operator+(vector<T, Allocator>::iterator lhs, const int &rhs)
-        {
-            lhs += rhs;
-            return (lhs);
-        }
-        friend iterator operator-(vector<T, Allocator>::iterator lhs, const int &rhs)
-        {
-            lhs -= rhs;
-            return (lhs);
-        }
+
+        // friend iterator operator+(vector<T, Allocator>::iterator lhs, const int &rhs)
+        // {
+        //     lhs += rhs;
+        //     return (lhs);
+        // }
+        // friend iterator operator-(vector<T, Allocator>::iterator lhs, const int &rhs)
+        // {
+        //     lhs -= rhs;
+        //     return (lhs);
+        // }
         friend bool operator==(const iterator& lhs, const iterator& rhs)
         {
             return (lhs.ptr == rhs.ptr);
@@ -175,14 +178,14 @@ namespace ft
             }
         }
 
-        void uninitialized_copy(const vector& dest, const vector& src) // it probably doesn't work 
+        void uninitialized_copy(pointer dest, pointer src)
         {
-            pointer dest_ptr = dest._elements, src_ptr = src._elements;
+            pointer dest_ptr = dest, src_ptr = src;
             for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr)
             {
                 try // if there are exception from the constructor
                 {
-                    _alloc.construct(dest_ptr, src_ptr); // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new.
+                    _alloc.construct(dest_ptr, *src_ptr); // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new.
                 }
                 catch (...) // (...)will be catching any exception
                 {
@@ -262,8 +265,8 @@ namespace ft
         //	range constructor(3)
 
         template <class InputIterator>
-        vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-                    typename ft::enable_if<!ft::is_integral<InputIt>::value>)
+        vector (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0,
+                const allocator_type& alloc = allocator_type())
                     : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
         {
             for (; first != last; ++first)
@@ -280,7 +283,7 @@ namespace ft
             if (this == &other)
                 return *this;
 			clear();
-			_alloc.deallocate(_data, _capacity);
+			_alloc.deallocate(_elements, _capacity);
 			_alloc = other._alloc;
 			assign(other.begin(), other.end());
 			return *this;
@@ -306,7 +309,8 @@ namespace ft
         //and the operation incurs in additional logarithmic complexity in the new size (reallocations while growing).
 
         // TO DO enableif with input iterarator?????
-        void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIt>::value>)
+        template <class InputIterator> 
+        void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
 			clear();
 			for (; first != last; ++first)
@@ -376,7 +380,7 @@ namespace ft
         {
             if (_capacity == _size)     // no more free space; relocate:
                 reserve(_size? 2 * _size : 8);  // grow or start with 8 - recommendation from Stroustrup's book
-            _alloc.construct(_elements + _size, val); // add val at end
+            _alloc.construct(_elements + _size, value); // add val at end
             _size++;
         }
 
@@ -418,16 +422,18 @@ namespace ft
             _capacity = new_cap;
         }
 
-        void swap(vector &x)
+        void swap(vector &x) // ft_swap!!!! thanks Maarten!
         {
             pointer temp = _elements;
             size_t temp_size = _size;
             size_t temp_capacity = _capacity;
             allocator_type temp_alloc = _alloc;
+
             _elements = x._elements;
             _size = x._size;
             _capacity = x._capacity;
             _alloc = x._alloc;
+
             x._elements = temp._elements;
             x._size = temp._size;
             x._capacity - temp._capacity;
