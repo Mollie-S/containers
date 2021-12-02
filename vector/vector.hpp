@@ -296,22 +296,54 @@ namespace ft
             return _elements[pos];
         }
 
+        // ELEMENT ACCESS:
+        reference back()
+        {
+            return _elements[_size - 1];
+        }
+        const_reference back() const
+        {
+            return _elements[_size - 1];
+        }
+
+        reference front()
+        {
+            return _elements[0];
+        }
+        const_reference front() const
+        {
+            return _elements[0];
+        }
+
         // ITERATORS:
         iterator begin()
         {
             return _elements;
         }
 
+        iterator end()
+        {
+            return _elements + _size;
+        }
 // TODO:
         // const_iterator begin() const
         // {
 
         // }
 
-        iterator end()
-        {
-            return _elements + _size;
-        }
+        // const_iterator end() const
+        // {
+
+        // }
+        // reverse_iterator rbegin()
+        // {
+
+        // }
+        // const_reverse_iterator rbegin() const
+        // {
+
+        // }
+
 
     public:
         // assign() and operator= are pretty much equivalent. 
