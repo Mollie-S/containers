@@ -43,12 +43,14 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
 }
 TEST_CASE("Iterators test", "[integers]")
 {
-    int intArray[] = { 1, 2, 9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24,25, 28, 29, 30};
+    int intArray[] = { 100, 2, 9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24,25, 28, 29, 30};
     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
     ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
     std::vector<int> stdVectorInts(intArray, intArray + arraySize);
-    ft::vector<int>::iterator it;
-    std::vector<int>::iterator it;
+    ft::vector<int>::iterator ftIt = ftVectorInts.begin();
+    std::vector<int>::iterator stdIt  = stdVectorInts.begin();
+    REQUIRE(*ftIt == *stdIt);
+
 }
 
 TEST_CASE("Testing reserve method", "[integers]")
