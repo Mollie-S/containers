@@ -6,5 +6,9 @@ jobs:
     steps:
       - checkout # check out the code in the project directory
       - run:
+          name: Install clang # Update List of packages and install clang
+          command: |
+            apt-get update && apt-get install -y clang
           name: Build Vector Tests
-          command: 'c++ tests/vector_test.cpp -std=c++11 -o testVector'
+          command: |
+            clang++ tests/vector_test.cpp -std=c++11 -o testVector
