@@ -1,5 +1,5 @@
 .vscode
-tests/catch.hpp
+# tests/catch.hpp
 .idea/modules.xml
 .idea/my_containers.iml
 .idea/vcs.xml
@@ -9,3 +9,4 @@ vector_it
 vector_it.dSYM/Contents/Info.plist
 testVector
 vectorit
+.idea/workspace.xml
