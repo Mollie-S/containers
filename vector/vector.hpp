@@ -50,6 +50,11 @@ namespace ft
             iterator(const iterator& it) : _ptr(it._ptr) {}
             ~iterator(){};
 
+            pointer get_ptr()  //TEMP!!!!!!!!
+            {
+                return _ptr;
+            }
+
             iterator& operator=(const iterator& i)
             {
                 _ptr = i._ptr;
@@ -130,6 +135,11 @@ namespace ft
             {
                 return (lhs._ptr - rhs);
             }
+            // template <class InputIterator>
+            // friend size_type operator-(const iterator& lhs, const iterator& rhs, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) // how to overload it?
+            // {
+            //     return (lhs._ptr - rhs._ptr);
+            // }
             friend bool operator==(const iterator& lhs, const iterator& rhs)
             {
                 return (lhs._ptr == rhs._ptr);
@@ -260,8 +270,8 @@ namespace ft
         //, the new capacity cannot be determined beforehand and the construction incurs 
         //in additional logarithmic complexity in size (reallocations while growing).
 
-        //	range constructor(3)
 
+        //	range constructor(3)
         template <class InputIterator>
         vector (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0,
                 const allocator_type& alloc = allocator_type())
@@ -287,16 +297,25 @@ namespace ft
 			return *this;
         }
 
-        // If the container size is greater than n,
-        // the function never throws exceptions (no-throw guarantee).
-        //Otherwise, the behavior is undefined.
-
-        reference operator[](size_type pos)
-        {
-            return _elements[pos];
-        }
+     
 
         // ELEMENT ACCESS:
+        reference at(size_type pos)
+        {
+            if (pos >= _size)
+            {
+                throw std::out_of_range("at()");
+            }
+            return _elements[pos];
+        }
+        const_reference at(size_type pos) const
+        {
+            if (pos >= _size)
+            {
+                throw std::out_of_range("at()");
+            }
+            return _elements[pos];
+        }
         reference back()
         {
             return _elements[_size - 1];
@@ -305,7 +324,6 @@ namespace ft
         {
             return _elements[_size - 1];
         }
-
         reference front()
         {
             return _elements[0];
@@ -314,6 +332,14 @@ namespace ft
         {
             return _elements[0];
         }
+        // If the container size is greater than n,
+        // the function never throws exceptions (no-throw guarantee).
+        //Otherwise, the behavior is undefined.
+        reference operator[](size_type pos)
+        {
+            return _elements[pos];
+        }
+
 
         // ITERATORS:
         iterator begin()
@@ -355,6 +381,9 @@ namespace ft
         // (i.e., it is just an input iterator) the new capacity cannot be determined beforehand 
         //and the operation incurs in additional logarithmic complexity in the new size (reallocations while growing).
 
+
+
+
         // TO DO enableif with input iterarator?????
         template <class InputIterator> 
         void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
@@ -371,50 +400,54 @@ namespace ft
 			resize(n, val);
         }
 
-        reference at(size_type pos)
-        {
-            if (pos >= _size)
-            {
-                throw std::out_of_range("at()");
-            }
-            return _elements[pos];
-        }
+   
 
-        const_reference at(size_type pos) const
-        {
-            if (pos >= _size)
-            {
-                throw std::out_of_range("at()");
-            }
-            return _elements[pos];
-        }
-
+        // CAPACITY:
         size_type capacity() const
         {
             return _capacity;
         }
-
-        void clear()
-        {
-            resize(0);
-        }
-
         bool empty() const
         {
             return (_size == 0);
         }
-
         size_type size() const
         {
             return _size;
         }
-
          //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         size_type max_size() const
         {
             return _alloc.max_size();
         }
+
+
+        // MODIFIERS:
+        void clear()
+        {
+            resize(0);
+        }
+        // Linear complexity: the number of calls to the destructor of T is the same as the number of elements erased,
+        // the assignment operator of T is called the number of times equal to the number of elements in the vector after the erased elements
+        iterator erase (iterator position)
+        {
+            // size_type posShift = position - begin(); // RETURN WHEN OPERATOT
+            iterator itEnd = end();
+            _alloc.destroy(position.get_ptr());
+            if (position != itEnd - 1)
+            {
+                for (iterator it = position; it + 1 !=itEnd; ++it)
+                {
+                    *it = *(it + 1);
+                }
+            }
+            _size--;
+            return position;
+        }
+        iterator erase (iterator first, iterator last)
+        {
             
+        }
         void pop_back()
         {
             // If the container is not empty, the function never throws exceptions (no-throw guarantee).
@@ -430,8 +463,6 @@ namespace ft
             _alloc.construct(_elements + _size, value); // add val at end
             _size++;
         }
-
-
         // Using resize() on a vector is very similar to using the C standard library function realloc() on a C array allocated on the free store.
         void resize(size_type n, value_type val = value_type())
         {
