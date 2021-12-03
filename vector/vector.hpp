@@ -205,6 +205,12 @@ namespace ft
                 }
             }
         }
+        template <typename D>
+        void ft_swap(D& data)
+        {
+            D temp = data;
+
+        }
 
         // WHY TO USE DESTRUCT AND DEALLOCATE:
         // A program may end the lifetime of any object by reusing the storage which the object occupies
@@ -217,7 +223,7 @@ namespace ft
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void ft_destroy(vector &destroy_start, vector &destroy_end)
+        void ft_destroy(pointer &destroy_start, pointer &destroy_end)
         {
             for (; destroy_start != destroy_end; ++destroy_start)
             {
@@ -446,7 +452,16 @@ namespace ft
         }
         iterator erase (iterator first, iterator last)
         {
-            
+            ft_destroy(first.get_ptr(), last.get_ptr());
+            iterator itEnd = end();
+            if (last != itEnd)
+            {
+                for (iterator it = first; it + 1 !=itEnd; ++it, ++last)
+                {
+                    *it = *(last);
+                }
+            }
+            _size -= (last - first);
         }
         void pop_back()
         {
