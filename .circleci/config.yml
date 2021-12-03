@@ -9,6 +9,7 @@ jobs:
           name: Install clang # Update List of packages and install clang
           command: |
             apt-get update && apt-get install -y clang
+      - run:
           name: Build Vector Tests
           command: |
             clang++ tests/vector_test.cpp -std=c++11 -o testVector
