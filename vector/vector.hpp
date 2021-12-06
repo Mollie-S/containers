@@ -136,10 +136,10 @@ namespace ft
                 return (lhs._ptr - rhs);
             }
             // template <class InputIterator>
-            // friend size_type operator-(const iterator& lhs, const iterator& rhs, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) // how to overload it?
-            // {
-            //     return (lhs._ptr - rhs._ptr);
-            // }
+            friend size_type operator-(const iterator& lhs, const iterator& rhs) // how to overload it?
+            {
+                return (lhs._ptr - rhs._ptr);
+            }
             friend bool operator==(const iterator& lhs, const iterator& rhs)
             {
                 return (lhs._ptr == rhs._ptr);
@@ -223,7 +223,7 @@ namespace ft
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void ft_destroy(pointer &destroy_start, pointer &destroy_end)
+        void ft_destroy(pointer& destroy_start, pointer& destroy_end)
         {
             for (; destroy_start != destroy_end; ++destroy_start)
             {
@@ -304,7 +304,6 @@ namespace ft
         }
 
      
-
         // ELEMENT ACCESS:
         reference at(size_type pos)
         {
@@ -437,12 +436,12 @@ namespace ft
         // the assignment operator of T is called the number of times equal to the number of elements in the vector after the erased elements
         iterator erase (iterator position)
         {
-            // size_type posShift = position - begin(); // RETURN WHEN OPERATOT
-            iterator itEnd = end();
-            _alloc.destroy(position.get_ptr());
-            if (position != itEnd - 1)
+            size_type offset = position - begin();
+            iterator it_end = end();
+            _alloc.destroy(_elements + offset);
+            if (position != it_end - 1)
             {
-                for (iterator it = position; it + 1 !=itEnd; ++it)
+                for (iterator it = position; it + 1 !=it_end; ++it)
                 {
                     *it = *(it + 1);
                 }
@@ -452,11 +451,14 @@ namespace ft
         }
         iterator erase (iterator first, iterator last)
         {
-            ft_destroy(first.get_ptr(), last.get_ptr());
-            iterator itEnd = end();
-            if (last != itEnd)
+            iterator it_start = begin();
+            size_type first_offset = first - it_start;
+            size_type last_offset = last - it_start;
+            ft_destroy(_elements + first_offset, _elements + last_offset);
+            iterator it_end = end();
+            if (last != it_end)
             {
-                for (iterator it = first; it + 1 !=itEnd; ++it, ++last)
+                for (iterator it = first; it + 1 !=it_end; ++it, ++last)
                 {
                     *it = *(last);
                 }

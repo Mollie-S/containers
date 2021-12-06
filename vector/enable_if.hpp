@@ -10,7 +10,10 @@ namespace ft
 
     // if the condition (given instead of true in prototype) is true returns the type if not nothing happens
     template<class T>
-    struct enable_if<true, T> { typedef T type; };
+    struct enable_if<true, T> 
+    { 
+        typedef T type; 
+    };
 }
 
 // std::enable_if_t is a type alias of the inner ::type of std::enable_if,

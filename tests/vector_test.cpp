@@ -69,18 +69,33 @@ TEST_CASE("Iterators test", "[integers]")
 
 TEST_CASE("Testing reserve method", "[integers]")
 {
-    ft::vector<int> ftVectorInts(5, 10);
-    size_t capacity_1 = ftVectorInts.capacity();
-    ftVectorInts.reserve(100);
-    size_t capacity_2 = ftVectorInts.capacity();
-    REQUIRE(capacity_1 != capacity_2 );
-    // std::vector<int> stdVectorInts(5, 10);
-    // std::vector<int>::iterator it;
-    // std::vector<int>::iterator it1;
-    // it =  stdVectorInts.begin();
-    // stdVectorInts.reserve(100);
-    // it1 =  stdVectorInts.begin();
-    // REQUIRE(it != it1);
+    SECTION("Checking capacity after reserve")
+    {
+        ft::vector<int> ftVectorInts(5, 10);
+        std::vector<int> stdVectorInts(5,10);
+        size_t capacity_1 = ftVectorInts.capacity();
+        ftVectorInts.reserve(100);
+        stdVectorInts.reserve(100);
+        size_t capacity_2 = ftVectorInts.capacity();
+        REQUIRE(capacity_1 != capacity_2);
+        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+    
+    }
+    //     SECTION("Erasing the last element")
+    // {
+    //     ft::vector<int> ftVect(5, 10);
+    //     int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
+    //     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+    //     ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+    //     std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+    //     ft::vector<int>::iterator ftItEnd = ftVectorInts.end();
+    //     std::vector<int>::iterator stdItEnd  = stdVectorInts.end();
+    //     it =  stdVectorInts.begin();
+    //     stdVectorInts.reserve(100);
+    //     it1 =  stdVectorInts.begin();
+    //     REQUIRE(it != it1);
+    // }
+
 }
 
 TEST_CASE("Testing erase method", "[integers]")
@@ -96,6 +111,33 @@ TEST_CASE("Testing erase method", "[integers]")
         ftVectorInts.erase(ftItEnd - 1);
         stdVectorInts.erase(stdItEnd - 1);
         REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
-
     }
+    SECTION("Erasing the first element")
+    {
+        int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
+        size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+        ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+        std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+        ft::vector<int>::iterator ftIt = ftVectorInts.begin();
+        std::vector<int>::iterator stdIt  = stdVectorInts.begin();
+        ftVectorInts.erase(ftIt);
+        stdVectorInts.erase(stdIt);
+        REQUIRE(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
+        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+    }
+    // SECTION("Erasing the range")
+    // {
+    //     int intArray[] = { 20000, 2, 9, 10, 11, 0, 0, 0, 0, 0, 12, 13, 14, 89};
+    //     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+    //     ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+    //     std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+    //     ft::vector<int>::iterator ftIt = ftVectorInts.begin();
+    //     std::vector<int>::iterator stdIt  = stdVectorInts.begin();
+    //     ftVectorInts.erase(ftIt + 5, ftIt + 10);
+    //     stdVectorInts.erase(stdIt + 5, stdIt + 10);
+    //     REQUIRE(ftVectorInts.size() != stdVectorInts.size());
+    //     REQUIRE(ftVectorInts.capacity() != stdVectorInts.capacity());
+    //     REQUIRE(*(ftVectorInts.begin() + 5) != *(stdVectorInts.begin() + 5));
+    //     REQUIRE(*(ftVectorInts.end() - 1) != *(stdVectorInts.end() - 1));
+    // }
 }
