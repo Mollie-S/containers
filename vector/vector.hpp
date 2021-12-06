@@ -165,7 +165,7 @@ namespace ft
         size_type       _capacity;   // capacity of the container
         allocator_type  _alloc; // the type of the allocator used
 
-        void uninitialized_fill(pointer start, pointer end, value_type val)
+        void uninitialized_fill(pointer start, pointer end, const value_type& val)
         {
             pointer ptr, ptr1; // ptr1 for destructing if construction fails
             try
@@ -206,10 +206,25 @@ namespace ft
             }
         }
         template <typename D>
-        void ft_swap(D& data)
+        void ft_swap(vector &first, vector &second, D& data)
         {
-            D temp = data;
+            D temp = second.data;
+            second.data = first.data;
+            first.data = temp;
+        }
 
+        iterator ft_insert(iterator position, size_type n, const value_type& val)
+        {
+            iterator it_end = end();
+            for (iterator current = it_end, prev = (current - n); current != (position - 1); --current, --prev)
+            {
+                *prev = *current;
+            }
+            size_type fill_start = position - begin();
+            size_type fill_end = fill_start + n;
+            uninitialized_fill(_elements + fill_start, _elements + fill_end, val);
+            _size += n;
+            return position;
         }
 
         // WHY TO USE DESTRUCT AND DEALLOCATE:
@@ -329,6 +344,13 @@ namespace ft
         {
             return _elements[_size - 1];
         }
+
+        pointer data() {
+            return _elements;
+        }
+        const_pointer data() const{
+            return _elements;
+        }
         reference front()
         {
             return _elements[0];
@@ -426,6 +448,26 @@ namespace ft
             return _alloc.max_size();
         }
 
+        // Correctly using reserve() can prevent unnecessary reallocations,
+        //  but inappropriate uses of reserve() (for instance, calling it before every push_back() call)
+        // may actually increase the number of reallocations (by causing the capacity to grow linearly rather than exponentially)
+        // and result in increased computational complexity and decreased performance.
+        void reserve(size_type new_cap)
+        {
+            if (new_cap <= _capacity)
+            {
+                return;
+            }
+            if (new_cap > max_size())
+            {
+                throw std::length_error("in reserve()");
+            }
+            pointer temp = _alloc.allocate(new_cap);
+            uninitialized_copy(temp, _elements);
+            destroy_elements();
+            _elements = temp;
+            _capacity = new_cap;
+        }
 
         // MODIFIERS:
         void clear()
@@ -465,6 +507,38 @@ namespace ft
             }
             _size -= (last - first);
         }
+
+        iterator insert(iterator position, const value_type& val)
+        {
+            if (_capacity == _size)     // no more free space; relocate:
+                reserve(_size? 2 * _size : 8);
+            iterator it_start = begin();
+            iterator it_end = end();
+            for (iterator current = it_end, prev = (current - 1); current != (position - 1); --current, -- prev)
+            {
+                *prev = *current;
+            }
+            *position = val;
+            _size++;
+            return position;
+        }
+        // fill (2)	//  (return: Iterator pointing to the first element inserted, or pos if count==0) how is it possible if return type is void?
+        void insert(iterator position, size_type n, const value_type& val)
+        {
+            if ((_size + n) > _capacity) // no more free space; relocate:
+            }
+                reserve(_size + n);
+                ft_insert(position, n,val);
+            {
+                
+        }
+        // TODO:
+        // range (3)	
+        // template <class InputIterator>
+        //     void insert (iterator position, InputIterator first, InputIterator last);
+
+
+
         void pop_back()
         {
             // If the container is not empty, the function never throws exceptions (no-throw guarantee).
@@ -476,11 +550,12 @@ namespace ft
         void push_back( const T& value )
         {
             if (_capacity == _size)     // no more free space; relocate:
-                reserve(_size? 2 * _size : 8);  // grow or start with 8 - recommendation from Stroustrup's book
+                reserve(_size? 2 * _size : 8);  // grow or start with 8 - recommendation from Stroustrup's book (because does it make sense to do otherwise?)
             _alloc.construct(_elements + _size, value); // add val at end
             _size++;
         }
         // Using resize() on a vector is very similar to using the C standard library function realloc() on a C array allocated on the free store.
+        // Resizes the container so that it contains n elements.
         void resize(size_type n, value_type val = value_type())
         {
             reserve(n);
@@ -496,43 +571,28 @@ namespace ft
             _capacity = n;
         }
 
-        // Correctly using reserve() can prevent unnecessary reallocations,
-        //  but inappropriate uses of reserve() (for instance, calling it before every push_back() call)
-        // may actually increase the number of reallocations (by causing the capacity to grow linearly rather than exponentially)
-        // and result in increased computational complexity and decreased performance.
-        void reserve(size_type new_cap)
-        {
-            if (new_cap <= _capacity)
-            {
-                return;
-            }
-            if (new_cap > max_size())
-            {
-                throw std::length_error("in reserve()");
-            }
-            pointer temp = _alloc.allocate(new_cap);
-            uninitialized_copy(temp, _elements);
-            destroy_elements();
-            _elements = temp;
-            _capacity = new_cap;
-        }
 
         void swap(vector &x) // ft_swap!!!! thanks Maarten!
         {
-            pointer temp = _elements;
-            size_t temp_size = _size;
-            size_t temp_capacity = _capacity;
-            allocator_type temp_alloc = _alloc;
+            // pointer temp = _elements;
+            // size_t temp_size = _size;
+            // size_t temp_capacity = _capacity;
+            // allocator_type temp_alloc = _alloc;
 
-            _elements = x._elements;
-            _size = x._size;
-            _capacity = x._capacity;
-            _alloc = x._alloc;
+            // _elements = x._elements;
+            // _size = x._size;
+            // _capacity = x._capacity;
+            // _alloc = x._alloc;
 
-            x._elements = temp._elements;
-            x._size = temp._size;
-            x._capacity - temp._capacity;
-            x._alloc = temp._alloc;
+            // x._elements = temp._elements;
+            // x._size = temp._size;
+            // x._capacity - temp._capacity;
+            // x._alloc = temp._alloc;
+
+            ft_swap(_elements);
+            ft_swap(_size);
+            ft_swap(_capacity);
+            ft_swap(_alloc);
         }
     };
 };
