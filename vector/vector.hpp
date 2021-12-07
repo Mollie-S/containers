@@ -525,11 +525,14 @@ namespace ft
         // fill (2)	//  (return: Iterator pointing to the first element inserted, or pos if count==0) how is it possible if return type is void?
         void insert(iterator position, size_type n, const value_type& val)
         {
-            if ((_size + n) > _capacity) // no more free space; relocate:
-            }
-                reserve(_size + n);
-                ft_insert(position, n,val);
+            const size_type newsize = _size + n;
+            if (newsize > _capacity) // no more free space; relocate:
             {
+                reserve(newsize);
+                ft_insert(position, n, val);
+
+            }
+            
                 
         }
         // TODO:
