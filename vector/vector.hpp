@@ -158,6 +158,7 @@ namespace ft
         typedef typename iterator::const_pointer    const_pointer;
         typedef typename iterator::difference_type  difference_type;
         typedef typename iterator::size_type        size_type;
+        // typedef typename iterator    const      const_iterator; // ????
 
     private:
         pointer         _elements;     // pointer to the first element of the container
@@ -216,6 +217,7 @@ namespace ft
         iterator ft_insert(iterator position, size_type n, const value_type& val)
         {
             iterator it_end = end();
+            // do I replace it with unitia;ized copy???
             for (iterator current = it_end, prev = (current - n); current != (position - 1); --current, --prev)
             {
                 *prev = *current;
@@ -413,7 +415,7 @@ namespace ft
 
         // TO DO enableif with input iterarator?????
         template <class InputIterator> 
-        void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
+        void assign(InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
 			clear();
 			for (; first != last; ++first)
@@ -421,13 +423,11 @@ namespace ft
         }
 
         // fill (2)
-        void assign (size_type n, const value_type& val)
+        void assign(size_type n, const value_type& val)
         {
             clear();
 			resize(n, val);
         }
-
-   
 
         // CAPACITY:
         size_type capacity() const
@@ -508,20 +508,12 @@ namespace ft
             _size -= (last - first);
         }
 
+        // TODO: REWRITE WITH ASSIGN 1 ELEMENT AND REVERSE OPERATOR:
         iterator insert(iterator position, const value_type& val)
         {
-            if (_capacity == _size)     // no more free space; relocate:
-                reserve(_size? 2 * _size : 8);
-            iterator it_start = begin();
-            iterator it_end = end();
-            for (iterator current = it_end, prev = (current - 1); current != (position - 1); --current, -- prev)
-            {
-                *prev = *current;
-            }
-            *position = val;
-            _size++;
-            return position;
+            ft_insert(position,1,val);
         }
+        // TODO: use assign with reverse iterator!
         // fill (2)	//  (return: Iterator pointing to the first element inserted, or pos if count==0) how is it possible if return type is void?
         void insert(iterator position, size_type n, const value_type& val)
         {
@@ -529,19 +521,23 @@ namespace ft
             if (newsize > _capacity) // no more free space; relocate:
             {
                 reserve(newsize);
-                ft_insert(position, n, val);
-
             }
-            
-                
+            ft_insert(position,n,val);
         }
+
         // TODO:
         // range (3)	
         // template <class InputIterator>
-        //     void insert (iterator position, InputIterator first, InputIterator last);
-
-
-
+        // void insert (iterator position, InputIterator first, InputIterator last)
+        // {
+        //     size_type distance = last - first;
+        //     const size_type newsize = _size + distance;
+        //     if (newsize > _capacity)
+        //     {
+        //         reserve(newsize);
+        //     }
+                
+        // }
         void pop_back()
         {
             // If the container is not empty, the function never throws exceptions (no-throw guarantee).
