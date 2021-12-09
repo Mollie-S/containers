@@ -188,25 +188,25 @@ TEST_CASE("Resize method", "[integers]")
         // no iterators check as there are no elements
     }
 }
-TEST_CASE("Swap() method", "[integers]")
-{
-    SECTION("Swap two integers in a vector")
-    {
-        int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
-        size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
-        ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
-        std::vector<int> stdVectorInts(intArray, intArray + arraySize);
-
-               ft::vector<int> ftVectorInts1(5, 10);
-        std::vector<int> stdVectorInts1(5,10);
-
-        ft::swap(ftVectorInts,ftVectorInts1);
-        std::swap(stdVectorInts,stdVectorInts1);
-        ft::vector<int>::iterator ftIt = ftVectorInts.begin();
-        std::vector<int>::iterator stdIt = stdVectorInts.begin();
-        REQUIRE(*(ftIt) == *(stdIt));
-        REQUIRE(*(ftIt + 1) == *(stdIt + 1));
-
-    }
-    
-}
+// TEST_CASE("Swap() method", "[integers]")
+// {
+//     SECTION("Swap two integers in a vector")
+//     {
+//         int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
+//         size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+//         ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+//         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+// 
+//                ft::vector<int> ftVectorInts1(5, 10);
+//         std::vector<int> stdVectorInts1(5,10);
+// 
+//         ft::swap(ftVectorInts,ftVectorInts1);
+//         std::swap(stdVectorInts,stdVectorInts1);
+//         ft::vector<int>::iterator ftIt = ftVectorInts.begin();
+//         std::vector<int>::iterator stdIt = stdVectorInts.begin();
+//         REQUIRE(*(ftIt) == *(stdIt));
+//         REQUIRE(*(ftIt + 1) == *(stdIt + 1));
+// 
+//     }
+//     
+// }
