@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cmath>
 #include "enable_if.hpp"
+#include "utils.hpp"
 
 namespace ft
 {
@@ -50,11 +51,13 @@ namespace ft
             iterator(const iterator& it) : _ptr(it._ptr) {}
             ~iterator(){};
 
-            pointer get_ptr()  //TEMP!!!!!!!!
+           	size_type	distance(iterator first, iterator last)
             {
-                return _ptr;
+                size_type count = 0;
+                while (first + count != last)
+                    count++;
+                return count;
             }
-
             iterator& operator=(const iterator& i)
             {
                 _ptr = i._ptr;
@@ -135,8 +138,7 @@ namespace ft
             {
                 return (lhs._ptr - rhs);
             }
-            // template <class InputIterator>
-            friend size_type operator-(const iterator& lhs, const iterator& rhs) // how to overload it?
+            friend size_type operator-(const iterator& lhs, const iterator& rhs)
             {
                 return (lhs._ptr - rhs._ptr);
             }
@@ -206,13 +208,8 @@ namespace ft
                 }
             }
         }
-        template <typename D>
-        void ft_swap(vector &first, vector &second, D& data)
-        {
-            D temp = second.data;
-            second.data = first.data;
-            first.data = temp;
-        }
+
+      
 
         iterator ft_insert(iterator position, size_type n, const value_type& val)
         {
@@ -240,7 +237,7 @@ namespace ft
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void ft_destroy(pointer& destroy_start, pointer& destroy_end)
+        void ft_destroy(pointer destroy_start, pointer destroy_end)
         {
             for (; destroy_start != destroy_end; ++destroy_start)
             {
@@ -292,7 +289,6 @@ namespace ft
         // is not at least of a forward iterator category (i.e., it is just an input iterator)
         //, the new capacity cannot be determined beforehand and the construction incurs 
         //in additional logarithmic complexity in size (reallocations while growing).
-
 
         //	range constructor(3)
         template <class InputIterator>
@@ -494,9 +490,12 @@ namespace ft
         iterator erase (iterator first, iterator last)
         {
             iterator it_start = begin();
+            difference_type followingLastRemovedElement = first - it_start;
+
             size_type first_offset = first - it_start;
             size_type last_offset = last - it_start;
             ft_destroy(_elements + first_offset, _elements + last_offset);
+
             iterator it_end = end();
             if (last != it_end)
             {
@@ -505,7 +504,8 @@ namespace ft
                     *it = *(last);
                 }
             }
-            _size -= (last - first);
+            _size -= (last_offset - first_offset);
+            return begin() + followingLastRemovedElement;
         }
 
         // TODO: REWRITE WITH ASSIGN 1 ELEMENT AND REVERSE OPERATOR:
@@ -549,7 +549,7 @@ namespace ft
         void push_back( const T& value )
         {
             if (_capacity == _size)     // no more free space; relocate:
-                reserve(_size? 2 * _size : 8);  // grow or start with 8 - recommendation from Stroustrup's book (because does it make sense to do otherwise?)
+                reserve(_size? 2 * _size : 2);  // grow or start with 8 - recommendation from Stroustrup's book (because does it make sense to do otherwise?)
             _alloc.construct(_elements + _size, value); // add val at end
             _size++;
         }
@@ -557,43 +557,34 @@ namespace ft
         // Resizes the container so that it contains n elements.
         void resize(size_type n, value_type val = value_type())
         {
-            reserve(n);
-            if (_size < n)
+            if (n > _size)
             {
-                uninitialized_fill(_elements + _size, _elements + n, val); // pointer to the elements will be updated
+                reserve(n);
+                while (n > _size)
+                {
+                    push_back(val);
+                }
             }
             else
             {
                 ft_destroy(_elements + n, _elements + _size);
+                _size = n;
             }
-            _size = n;
-            _capacity = n;
         }
 
 
-        void swap(vector &x) // ft_swap!!!! thanks Maarten!
-        {
-            // pointer temp = _elements;
-            // size_t temp_size = _size;
-            // size_t temp_capacity = _capacity;
-            // allocator_type temp_alloc = _alloc;
-
-            // _elements = x._elements;
-            // _size = x._size;
-            // _capacity = x._capacity;
-            // _alloc = x._alloc;
-
-            // x._elements = temp._elements;
-            // x._size = temp._size;
-            // x._capacity - temp._capacity;
-            // x._alloc = temp._alloc;
-
-            ft_swap(_elements);
-            ft_swap(_size);
-            ft_swap(_capacity);
-            ft_swap(_alloc);
-        }
+    
     };
+
+        template< class T, class Alloc = ::std::allocator<T>  >
+        void swap( ft::vector<T,Alloc>& lhs,
+           ft::vector<T,Alloc>& rhs )
+        {
+            ft_swap(lhs._elements, rhs._elements);
+            ft_swap(lhs._size, rhs._size);
+            ft_swap(lhs._capacity, rhs._capacity);
+            ft_swap(lhs._alloc, rhs._alloc);
+        };
 };
 
 #endif
