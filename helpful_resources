@@ -11,6 +11,7 @@ iterator traits:
 https://www.codeproject.com/Articles/36530/An-Introduction-to-Iterator-Traits
 https://en.cppreference.com/w/cpp/iterator/iterator_traits
 https://stackoverflow.com/questions/6742008/what-are-the-typical-use-cases-of-an-iterator-trait
+https://stackoverflow.com/questions/3967996/how-to-retrieve-value-type-from-iterator-in-c
 
 when self-assignment check in assignment operator needed or not needed:
 https://stackoverflow.com/questions/57672592/should-an-stl-container-avoid-copying-elements-into-themselves-when-the-containe/57676637#57676637
