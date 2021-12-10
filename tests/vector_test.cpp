@@ -4,6 +4,7 @@
 #include "../vector/vector.hpp"
 #include <vector>
 
+// https://gjbex.github.io/DPD-online-book/Testing/UnitTesting/catch2_cpp/ more about fixtures
 // add to the command line:
 // -std=c++11
 
@@ -192,7 +193,7 @@ TEST_CASE("Swap() method", "[integers]")
         REQUIRE(*(ftIt) == *(stdIt));
 
     }
-    SECTION("ft::vector:;swap")
+    SECTION("ft::vector::swap - member function")
     {
         int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
         size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
@@ -210,4 +211,43 @@ TEST_CASE("Swap() method", "[integers]")
 
         REQUIRE(*(ftIt) == *(stdIt));
     }
+}
+
+TEST_CASE("Copy Constructor", "[integers]")
+{
+    // SECTION("copy constructor")
+    // {
+    //     int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
+    //     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
+    //     ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
+    //     std::vector<int> stdVectorInts(intArray, intArray + arraySize);
+
+    //     ft::vector<int> newFtVec(ftVectorInts);
+    //     std::vector<int> newStdVec(stdVectorInts);
+
+
+    //     ft::vector<int>::iterator ftIt = newFtVec.begin();
+    //     std::vector<int>::iterator stdIt = newStdVec.begin();
+
+    //     REQUIRE(*(ftIt) == *(stdIt));
+    // }
+
+    // SECTION("copy constructor")
+    // {
+    //     ft::vector<int> ftVectorInts1(5, 10);
+    //     std::vector<int> stdVectorInts1(5,10);
+
+    //     ft::vector<int> newFtVec(ftVectorInts1);
+    //     std::vector<int> newStdVec(stdVectorInts1);
+
+    //     ft::vector<int>::iterator ftIt = newFtVec.begin();
+    //     std::vector<int>::iterator stdIt = newStdVec.begin();
+
+    //     REQUIRE(*(ftIt) == *(stdIt));
+    // }
+}
+
+TEST_CASE_METHOD()
+{
+    
 }

@@ -150,7 +150,8 @@ namespace ft
         };
 
 
-        // typedef 	iterator;// convertible to const iterator?????  another subclass with const iterator???
+    //  vector<string>::const_iterator   iter;     // is an iterator that refers to things that are constant, while
+    // const vector<string>::iterator   iter;       // would make the iterator itself constant, but allow you to modify the object it refers to.
 
         typedef typename iterator::value_type       value_type;
         typedef typename iterator::allocator_type   allocator_type;
@@ -160,7 +161,7 @@ namespace ft
         typedef typename iterator::const_pointer    const_pointer;
         typedef typename iterator::difference_type  difference_type;
         typedef typename iterator::size_type        size_type;
-        // typedef typename iterator    const      const_iterator; // ????
+        // typedef iterator<const T&, const T*>   const_iterator;
 
     private:
         pointer         _elements;     // pointer to the first element of the container
@@ -585,8 +586,8 @@ namespace ft
     
     };
 
-    template< class T, class Alloc = ::std::allocator<T>  >
-    void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+    template< class T>
+    void swap (vector<T>& x, vector<T>& y)
     {
         x.swap(y);
     };

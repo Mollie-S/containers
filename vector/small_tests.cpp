@@ -5,10 +5,14 @@
 
 int main ()
 {
-    ft::vector<int> ftVectorInts(5, 10);
-    size_t capacity_1 = ftVectorInts.capacity();
-    ftVectorInts.reserve(100);
-    size_t capacity_2 = ftVectorInts.capacity();
+    // ft::vector<int> ftVectorInts(5, 10);
+    // size_t capacity_1 = ftVectorInts.capacity();
+    // ftVectorInts.reserve(100);
+    // size_t capacity_2 = ftVectorInts.capacity();
+
+ std::vector<int> bar;
+ std::cout << bar[bar.size()] << "\n";
+
 
 //   std::vector<int>::size_type sz;
 //   std::vector<int> foo;
