@@ -300,8 +300,8 @@ namespace ft
                 push_back(*first);
         }
 
-        copy (4)
-        vector (const vector& x) : _elements(NULL), _capacity(0), _size(0), _alloc(alloc) { *this = x; }
+        // copy (4)
+        vector (const vector& x) : _elements(NULL), _capacity(0), _size(0), _alloc() { *this = x; }
 
         ~vector() { destroy_elements(); }
 
