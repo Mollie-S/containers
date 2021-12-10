@@ -84,21 +84,6 @@ TEST_CASE("Reserve() method", "[integers]")
         REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
     
     }
-    //     SECTION("Erasing the last element")
-    // {
-    //     ft::vector<int> ftVect(5, 10);
-    //     int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
-    //     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
-    //     ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
-    //     std::vector<int> stdVectorInts(intArray, intArray + arraySize);
-    //     ft::vector<int>::iterator ftItEnd = ftVectorInts.end();
-    //     std::vector<int>::iterator stdItEnd  = stdVectorInts.end();
-    //     it =  stdVectorInts.begin();
-    //     stdVectorInts.reserve(100);
-    //     it1 =  stdVectorInts.begin();
-    //     REQUIRE(it != it1);
-    // }
-
 }
 
 TEST_CASE("Testing erase method", "[integers]")
@@ -225,5 +210,4 @@ TEST_CASE("Swap() method", "[integers]")
 
         REQUIRE(*(ftIt) == *(stdIt));
     }
-    
 }

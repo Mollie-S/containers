@@ -572,7 +572,10 @@ namespace ft
             }
         }
 
-        void swap (vector& x)
+    //Notice that a non-member function exists with the same name, 
+    //swap, overloading that algorithm with an optimization that behaves like this member function.
+        
+        void swap (vector& x) // partial specialization for vector swap function
         {
             ft::swap(x._elements, _elements);
             ft::swap(x._size, _size);
@@ -582,13 +585,11 @@ namespace ft
     
     };
 
-    // partial specialization for vector swap function
-   template< class T, class Alloc = ::std::allocator<T>  >
-        void swap( ft::vector<T,Alloc>& lhs,
-           ft::vector<T,Alloc>& rhs )
-        {
-            lhs.swap(rhs);
-        };
+    template< class T, class Alloc = ::std::allocator<T>  >
+    void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+    {
+        x.swap(y);
+    };
 };
 
 #endif
