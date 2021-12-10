@@ -572,17 +572,23 @@ namespace ft
             }
         }
 
-        // specialization for swap function
-        void swap (vector& x);
+        void swap (vector& x)
         {
-            ft::swap(x._elements, rhs._elements);
-            ft::swap(x._size, rhs._size);
-            ft::swap(x._capacity, rhs._capacity);
-            ft::swap(x._alloc, rhs._alloc);
+            ft::swap(x._elements, _elements);
+            ft::swap(x._size, _size);
+            ft::swap(x._capacity, _capacity);
+            ft::swap(x._alloc, _alloc);
         };
     
     };
 
+    // partial specialization for vector swap function
+   template< class T, class Alloc = ::std::allocator<T>  >
+        void swap( ft::vector<T,Alloc>& lhs,
+           ft::vector<T,Alloc>& rhs )
+        {
+            lhs.swap(rhs);
+        };
 };
 
 #endif
