@@ -37,9 +37,9 @@ namespace ft
 		vector_iter(const vector_iter& it) : _ptr(it._ptr) {}
 		~vector_iter(){};
 
-		size_type	distance(vector_iter first, vector_iter last)
+		difference_type	distance(vector_iter first, vector_iter last)
 		{
-			size_type count = 0;
+			difference_type count = 0;
 			while (first + count != last)
 				count++;
 			return count;
@@ -116,7 +116,7 @@ namespace ft
 		{
 			return (lhs._ptr - rhs);
 		}
-		friend size_type operator-(const vector_iter& lhs, const vector_iter& rhs)
+		friend difference_type operator-(const vector_iter& lhs, const vector_iter& rhs)
 		{
 			return (lhs._ptr - rhs._ptr);
 		}
