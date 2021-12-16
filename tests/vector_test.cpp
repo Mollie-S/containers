@@ -246,8 +246,3 @@ TEST_CASE("Copy Constructor", "[integers]")
     //     REQUIRE(*(ftIt) == *(stdIt));
     // }
 }
-
-TEST_CASE_METHOD()
-{
-    
-}
