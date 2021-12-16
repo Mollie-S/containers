@@ -6,7 +6,7 @@
 #include <cmath>
 #include "enable_if.hpp"
 #include "utils.hpp"
-
+#include "vector_iterator.hpp"
 namespace ft
 {
     template <class T, class Alloc = ::std::allocator<T> > // generic template
@@ -14,154 +14,24 @@ namespace ft
     {
     public:
         //  iterators are an abstraction of pointers
-        class iterator // Iterator base class
-        {
-            // This base class only provides some member types,
-            // which in fact are not required to be present in any iterator type
-            // (iterator types have no specific member requirements),
-            // but they might be useful,
-            //since they define the members needed for the default iterator_traits class template
-            //to generate the appropriate instantiation automatically
-            //(and such instantiation is required to be valid for all iterator types).
-
-        public:
-            typedef T                                       value_type; // cannot use "using as it is c++11"
-            typedef Alloc                                   allocator_type;
-            typedef size_t                                  size_type;
-            typedef value_type&                             reference;
-            typedef value_type const &                      const_reference;
-            typedef typename allocator_type::pointer        pointer;
-            typedef typename allocator_type::const_pointer  const_pointer;
-            typedef std::ptrdiff_t                          difference_type;
-            typedef std::random_access_iterator_tag         iterator_category;
-
-                // random_access_iterator -  Empty class to identify the category of an iterator as a random-access iterator:
-
-                // DO we define value_type etc fron iterator_traits????::::
-
-                //             value_type, the type denoted by std::iterator_traits<It>::value_type
-                // difference_type, the type denoted by std::iterator_traits<It>::difference_type
-                // reference, the type denoted by std::iterator_traits<It>::reference
-        private:
-            pointer _ptr;
-
-        public:
-            iterator() : _ptr(NULL) {}
-            iterator(pointer ptr) : _ptr(ptr) {}
-            iterator(const iterator& it) : _ptr(it._ptr) {}
-            ~iterator(){};
-
-           	size_type	distance(iterator first, iterator last)
-            {
-                size_type count = 0;
-                while (first + count != last)
-                    count++;
-                return count;
-            }
-            iterator& operator=(const iterator& i)
-            {
-                _ptr = i._ptr;
-                return (*this);
-            }
-            reference operator*()
-            {
-                return (*_ptr);
-            }
-            reference operator*() const
-            {
-                return (*_ptr);
-            }
-            pointer operator->()
-            {
-                return (_ptr);
-            }
-            pointer operator->() const
-            {
-                return (_ptr);
-            }
-
-            //  ARITHMETIC OPERATORS
-            iterator& operator++()
-            {
-                _ptr++;
-                return *this;
-            }
-            iterator operator++(int) // postfix operator as it accepts an argument
-            {
-                iterator temp = *this;
-                ++(*this);
-                return temp;
-            }
-            iterator& operator--()
-            {
-                _ptr--;
-                return *this;
-            }
-            iterator operator--(int)
-            {
-                iterator temp = *this;
-                --(*this);
-                return temp;
-            }
-            iterator& operator+=(const int &val)
-            {
-                _ptr += val;
-                return (*this);
-            }
-            iterator& operator-=(const int &val)
-            {
-                _ptr -= val;
-                return (*this);
-            }
-            // RELATIONAL OPERATORS
-            bool operator<(const iterator& rhs) const
-            {
-                return _ptr < rhs._ptr;
-            }
-            bool operator>(const iterator& rhs)
-            {
-                return _ptr > rhs._ptr;
-            }
-            bool operator<=(const iterator& rhs) const
-            {
-                return _ptr <= rhs._ptr;
-            }
-            bool operator>=(const iterator& rhs)
-            {
-                return _ptr >= rhs._ptr;
-            }
-            friend iterator operator+(const iterator& lhs, const int rhs)
-            {
-                return (lhs._ptr + rhs);
-            }
-            friend iterator operator-(const iterator& lhs, const int rhs)
-            {
-                return (lhs._ptr - rhs);
-            }
-            friend size_type operator-(const iterator& lhs, const iterator& rhs)
-            {
-                return (lhs._ptr - rhs._ptr);
-            }
-            friend bool operator==(const iterator& lhs, const iterator& rhs)
-            {
-                return (lhs._ptr == rhs._ptr);
-            }
-            friend bool operator!=(const iterator& lhs, const iterator& rhs) { return !(lhs._ptr == rhs._ptr); }
-        };
-
 
     //  vector<string>::const_iterator   iter;     // is an iterator that refers to things that are constant, while
     // const vector<string>::iterator   iter;       // would make the iterator itself constant, but allow you to modify the object it refers to.
-
-        typedef typename iterator::value_type       value_type;
-        typedef typename iterator::allocator_type   allocator_type;
-        typedef typename iterator::reference        reference;
-        typedef typename iterator::const_reference  const_reference;
-        typedef typename iterator::pointer          pointer;
-        typedef typename iterator::const_pointer    const_pointer;
-        typedef typename iterator::difference_type  difference_type;
-        typedef typename iterator::size_type        size_type;
-        // typedef iterator<const T&, const T*>   const_iterator;
+        		
+        typedef T                                       value_type; // cannot use "using as it is c++11"
+		typedef Alloc                                   allocator_type;
+		typedef value_type&                             reference;
+		typedef value_type const &                      const_reference;
+		typedef typename allocator_type::pointer        pointer;
+		typedef typename allocator_type::const_pointer  const_pointer;
+		typedef std::ptrdiff_t                          difference_type;
+		typedef size_t                                  size_type;
+        typedef vector_iter<pointer>                    iterator;
+        typedef vector_iter<const_pointer>              const_iterator;
+        //TODO 
+        //reverse iterator must be implemented and std::reverse_iterator will be replaced
+        typedef ::std::reverse_iterator<iterator>         reverse_iterator;
+        typedef ::std::reverse_iterator<const_iterator>   const_reverse_iterator;
 
     private:
         pointer         _elements;     // pointer to the first element of the container
