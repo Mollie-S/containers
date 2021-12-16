@@ -10,14 +10,14 @@ namespace ft
 		//since they define the members needed for the default iterator_traits class template
 		//to generate the appropriate instantiation automatically
 		//(and such instantiation is required to be valid for all iterator types).
-	template <class Iter>
+	template <class Iterator>
 	class vector_iter // Iterator base class
 	{
 	
 	//TODO
-	// replace std with ft when iterator traits implemented:
+	// replace std with ft when iterator_traits implemented:
 	public:
-		typedef Iter                                                      			iterator_type;
+		typedef Iterator                                                      		iterator_type;
 		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
     	typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
