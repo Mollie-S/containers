@@ -23,7 +23,7 @@ namespace ft
 		// initialization (2)	
 		explicit reverse_iterator (iterator_type it) : _current(it) {}
 		// copy (3)	
-		reverse_iterator (const reverse_iterator<Iterator>& rev_it) : : _current(rev_it.base()) {}
+		reverse_iterator (const reverse_iterator<Iterator>& rev_it) : _current(rev_it.base()) {}
 
 
 		//Returns a copy of the base iterator.
@@ -97,9 +97,8 @@ namespace ft
 		// Internally, the function accesses the proper element of its base iterator, returning the same as: base()[-n-1].
 		reference operator[] (difference_type n) const
 		{
-			return base()[-n-1]
+			return (base()[-n - 1]);
 		}
-		
 	};
 
 	// NON_MEMBER OVERLOADS:
@@ -111,30 +110,30 @@ bool operator== (const reverse_iterator<Iterator>& lhs, const reverse_iterator<I
 }
 
 template <class Iterator>
-bool operator!= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)]
+bool operator!= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 {
 	return lhs.base() != rhs.base();
 }
 
 template <class Iterator>
-bool operator<  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)]
+bool operator<  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 {
 	return lhs.base() > rhs.base(); // not <!!!
 }
 
 template <class Iterator>
-bool operator<= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)]
+bool operator<= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 {
 	return lhs.base() >= rhs.base(); // not <=!!!
 }
 template <class Iterator>
-bool operator>  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)]
+bool operator>  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 {
 	return lhs.base() < rhs.base();
 }
 
 template <class Iterator>
-bool operator>= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)]
+bool operator>= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 {
 	return lhs.base() <= rhs.base();
 }
