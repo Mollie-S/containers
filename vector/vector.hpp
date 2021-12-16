@@ -7,6 +7,7 @@
 #include "enable_if.hpp"
 #include "utils.hpp"
 #include "vector_iterator.hpp"
+#include "reverse_iterator.hpp"
 namespace ft
 {
     template <class T, class Alloc = ::std::allocator<T> > // generic template
@@ -28,10 +29,8 @@ namespace ft
 		typedef size_t                                  size_type;
         typedef vector_iter<pointer>                    iterator;
         typedef vector_iter<const_pointer>              const_iterator;
-        //TODO 
-        //reverse iterator must be implemented and std::reverse_iterator will be replaced
-        typedef ::std::reverse_iterator<iterator>         reverse_iterator;
-        typedef ::std::reverse_iterator<const_iterator>   const_reverse_iterator;
+        typedef ft::reverse_iterator<iterator>          reverse_iterator;
+        typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
     private:
         pointer         _elements;     // pointer to the first element of the container
@@ -242,45 +241,40 @@ namespace ft
         {
             return _elements;
         }
-
         iterator end()
         {
             return _elements + _size;
         }
-// TODO:
-        // const_iterator begin() const
-        // {
-
-        // }
-
-        // const_iterator end() const
-        // {
-
-        // }
-        // reverse_iterator rbegin()
-        // {
-
-        // }
-        // const_reverse_iterator rbegin() const
-        // {
-
-        // }
-
+        const_iterator begin() const
+        {
+            return _elements;
+        }
+        const_iterator end() const
+        {
+            return _elements + _size;
+        }
+        reverse_iterator rbegin()
+        {
+            return reverse_iterator(end());
+        }
+        const_reverse_iterator rbegin() const
+        {
+            return const_reverse_iterator(end());
+        }
+        reverse_iterator rend()
+        {
+            return reverse_iterator(begin());
+        }
+        const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(begin());
+        }
 
     public:
         // assign() and operator= are pretty much equivalent. 
         //The reason for the second is that you might have types which need (implicit) conversion:
         // range (1)
-        
-        // Additionally, in the range version (1), 
-        //if InputIterator is not at least of a forward iterator category
-        // (i.e., it is just an input iterator) the new capacity cannot be determined beforehand 
-        //and the operation incurs in additional logarithmic complexity in the new size (reallocations while growing).
-
-
-
-
-        // TO DO enableif with input iterarator?????
+        // TODO enableif with input iterarator?????
         template <class InputIterator> 
         void assign(InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
@@ -456,11 +450,51 @@ namespace ft
     
     };
 
+    // NON_MEMBER OVERLOADS:
     template< class T>
     void swap (vector<T>& x, vector<T>& y)
     {
         x.swap(y);
     };
+
+    //relational operators (vector):
+    template <class T, class Alloc>
+    bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        //TODO  equal meeds to be implemented:
+        if (::std::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    template <class T, class Alloc>
+    bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        return !(lhs == rhs);
+    }
+    //TODO: ::std::lexicographical_compare misy be reimplemented
+    template <class T, class Alloc>
+    bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        return ::std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin()), rhs.end());
+    }
+    template <class T, class Alloc>
+    bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        return !(rhs < lhs); // reusing operator<() but changing the sides
+    }
+    template <class T, class Alloc>
+    bool operator> (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        return rhs < lhs; // reusing operator<() but changing the sides
+    }
+    template <class T, class Alloc>
+    bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    {
+        return !(lhs < rhs);
+    }
 };
 
 #endif
