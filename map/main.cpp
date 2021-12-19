@@ -3,6 +3,6 @@
 
 int main(void )
 {
-    // std::map<int,int> firstMap;
+    std::map<int,int> firstMap;
     return 0;
 }

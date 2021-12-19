@@ -32,9 +32,9 @@ namespace ft{
 		// typedef reverse_iterator<const_iterator>         const_reverse_iterator;
 
 
-		static_assert(sizeof(__diagnose_non_const_comparator<_Key, _Compare>()), "");
-		static_assert((is_same<typename allocator_type::value_type, value_type>::value),
-					"Allocator::value_type must be same type as value_type");
+		// static_assert(sizeof(__diagnose_non_const_comparator<_Key, _Compare>()), "");
+		// static_assert((is_same<typename allocator_type::value_type, value_type>::value),
+		// 			"Allocator::value_type must be same type as value_type");
 
 
 		class value_compare // Nested function class to compare elements
@@ -51,6 +51,19 @@ namespace ft{
 				return comp(x.first, y.first);
 			}
 		};
+
+		// // TODO:
+		// // CONSTRUCTORS:
+		// //empty (1)	
+		// explicit map (const key_compare& comp = key_compare(),
+		// 			const allocator_type& alloc = allocator_type());
+		// // range (2)
+		// template <class InputIterator>
+		// map (InputIterator first, InputIterator last,
+		// 	const key_compare& comp = key_compare(),˜
+		// 	const allocator_type& alloc = allocator_type());
+		// // copy (3)
+		// map (const map& x);
     };
 };
 
