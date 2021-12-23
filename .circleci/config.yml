@@ -12,4 +12,4 @@ jobs:
             - run:
                   name: Build Vector Tests
                   command: |
-                      cd tests && clang++ vector_test.cpp -std=c++11 -o testVector
+                      cd tests && clang++ tests/map_test.cpp tests/vector_test.cpp tests/main_tests.cpp  -std=c++11 -o all_tests && ./all_tests
