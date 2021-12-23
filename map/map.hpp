@@ -2,12 +2,14 @@
 #define MAP_HPP
 
 #include <memory>
+#include <stdbool.h>
 #include <iostream>
 #include "rbtree_node.hpp"
 #include "reverse_iterator.hpp"
 
 
-namespace ft{
+namespace ft
+{
 	template < class Key,                                     		// map::key_type
            class T,                                       			// map::mapped_type
            class Compare = ::std::less<Key>,                     	// map::key_compare
@@ -77,11 +79,11 @@ namespace ft{
 		// we will be using _sentinel as a dummy for node leaves pointing to nil. In order to save a marginal amount of execution time, these (possibly many) NIL leaves may be implemented as pointers to one unique (and black) sentinel node (instead of pointers of value NULL).
 		void init_null_node()
 		{
+			this->_null_node = allocate_node(value_type()); // initializing an empty pair and allocating node for it
 			this->_null_node->_parent = nullptr;
-			this->_null_node._left = nullptr;
-			this->_null_node._right = nullptr;
-			this->_null_node._color = BLACK;
-			this->_null_node._val = nullptr;
+			this->_null_node->_left = nullptr;
+			this->_null_node->_right = nullptr;
+			this->_null_node->_color = BLACK;
 		}
 
 		void init_rbtree()
@@ -89,6 +91,7 @@ namespace ft{
 			init_null_node();
 			_root = _null_node;
 		}
+		
 		node_pointer allocate_node(const value_type& value)
 		{
 			node_pointer new_node = _node_alloc.allocate(1); //Attempts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
@@ -105,13 +108,14 @@ namespace ft{
 			new_node->_right = _null_node;
 		}
 
-		boolean isRed(node_pointer node) 
+		bool isRed(node_pointer node) 
 		{  
 			if (node == nullptr) 
 				return false;
 			return node->_color == RED;
 		} 
 
+public:
 		// // TODO:
 		// // CONSTRUCTORS:
 		// //empty (1)	
@@ -133,6 +137,6 @@ namespace ft{
 		
     };
 
-};
+}
 
 #endif
