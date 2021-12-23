@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN 
+
 #include "catch.hpp"
 
 #include "../map/map.hpp"
@@ -8,5 +8,6 @@
 
 TEST_CASE("Testing map constructors", "[integer keys]")
 {
-    
+	std::map<int,int> firstMap;
+	ft::map<int, int> second;
 }
