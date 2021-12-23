@@ -69,32 +69,15 @@ namespace ft
 		typedef typename Alloc::template rebind<ft::rbtree_node<const Key, T> >::other node_allocator;
 
 		node_pointer	_root;
-		node_pointer 	_null_node; // also called a sentinel. It is is a dummy object that allows us to simplify boundary conditions.
-        allocator_type  _alloc;
 		node_allocator	_node_alloc;
 		size_type       _size;
 		value_compare	_comp;
 
-		// we will be using _sentinel as a dummy for node leaves pointing to nil. In order to save a marginal amount of execution time, these (possibly many) NIL leaves may be implemented as pointers to one unique (and black) sentinel node (instead of pointers of value NULL).
-		void init_null_node()
-		{
-			this->_null_node = allocate_node(value_type()); // initializing an empty pair and allocating node for it
-			this->_null_node->_parent = nullptr;
-			this->_null_node->_left = nullptr;
-			this->_null_node->_right = nullptr;
-			this->_null_node->_color = BLACK;
-		}
-
-		void init_rbtree()
-		{
-			init_null_node();
-			_root = _null_node;
-		}
 		
 		node_pointer allocate_node(const value_type& value)
 		{
 			node_pointer new_node = _node_alloc.allocate(1); //Attempts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
-			_alloc.construct(&(new_node->_value), value);
+			_node_alloc.construct(new_node, value);
 			return new_node;
 		}
 
@@ -102,14 +85,14 @@ namespace ft
 		{
 			node_pointer new_node = allocate_node(value);
 			new_node->_color = RED;
-			new_node->_parent = nullptr;
-			new_node->_left = _null_node;
-			new_node->_right = _null_node;
+			new_node->_parent = NULL;
+			new_node->_left = NULL;
+			new_node->_right = NULL;
 		}
 
 		bool isRed(node_pointer node) 
 		{  
-			if (node == nullptr) 
+			if (node == NULL) 
 				return false;
 			return node->_color == RED;
 		} 
@@ -120,9 +103,7 @@ public:
 		// //empty (1)	
 		explicit map (const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-					 : _size(0), _alloc(alloc), _comp(comp) {
-			init_rbtree();
-		}
+					 : _size(0), _node_alloc(_alloc), _comp(comp), _root(NULL) {} // allocator has got a template constructor that allows to construct an instance out of another type
 
 		// // range (2)
 		// template <class InputIterator>
