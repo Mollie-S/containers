@@ -3,18 +3,22 @@
 
 #include <memory>
 #include <iostream>
+#include "rbtree_node.hpp"
 #include "reverse_iterator.hpp"
 
 
 namespace ft{
-    template < class Key, class T,class Compare = ::std::less<Key>,
-           class Alloc = ::std::allocator<::std::pair<const Key,T> > > // pair must be reimplemented!!!
+	template < class Key,                                     		// map::key_type
+           class T,                                       			// map::mapped_type
+           class Compare = ::std::less<Key>,                     	// map::key_compare
+           class Alloc = std::allocator<ft::pair<const Key,T> >    // map::allocator_type
+           >
     class map {
     public:
 
         typedef Key											key_type;
         typedef T											mapped_type;
-        typedef std::pair<const key_type, mapped_type>		value_type;
+        typedef ft::pair<const key_type, mapped_type>		value_type;
         typedef Compare										key_compare;
         typedef Alloc										allocator_type;
         typedef value_type&									reference;
@@ -51,12 +55,57 @@ namespace ft{
 				return comp(x.first, y.first);
 			}
 		};
+	private:
+		typedef ft::rbtree_node<const Key,T>*	node_pointer;
+
+
+		// explanation for rebind: 
+		// The _Alloc template is used to obtain objects of some type. The container may have an internal need to allocate objects of a different type. For example, when you have a std::list<T, A>, the allocator A is meant to allocate objects of type T but the std::list<T, A> actually needs to allocate objects of some node type. Calling the node type _Ty, the std::list<T, A> needs to get hold of an allocator for _Ty objects which is using the allocation mechanism provided by A. Using
+		// typename _A::template rebind<_Ty>::other
+		// specifies the corresponding type. Now, there are a few syntactic annoyances in this declaration:
+		// Since rebind is a member template of _A and _A is a template argument, the rebind becomes a dependent name. To indicate that a dependent name is a template, it needs to be prefixed by template. Without the template keyword the < would be considered to be the less-than operator.
+		// The name other also depends on a template argument, i.e., it is also a dependent name. To indicate that a dependent name is a type, the typename keyword is needed.
+		typedef typename Alloc::template rebind<ft::rbtree_node<const Key, T> >::other node_allocator;
+
+		node_pointer	_root;
+		//A sentinel is a dummy object that allows us to simplify boundary conditions.
+		node_pointer 	_sentinel;
+        allocator_type  _alloc;
+		node_allocator	_node_alloc;
+		size_type       _size;
+		value_compare	_comp;
+
+		// we will be using _sentinel as a dummy for node leaves pointing to nil. In order to save a marginal amount of execution time, these (possibly many) NIL leaves may be implemented as pointers to one unique (and black) sentinel node (instead of pointers of value NULL).
+		void init_null_node(node_pointer node, node_pointer parent)
+		{
+			node->_parent = parent;
+			node->_left = nullptr;
+			node->_right = nullptr;
+			node->_color = BLACK;
+			node->_val = nullptr;
+		}
+
+		void init_rbtree()
+		{
+			init_null_node(_sentinel, nullptr);
+			_root = _sentinel;
+		}
+
+		boolean isRed(node_pointer node) 
+		{  
+			if (node == nullptr) 
+				return false;
+			return node->_color == RED;      
+		} 
 
 		// // TODO:
 		// // CONSTRUCTORS:
 		// //empty (1)	
-		// explicit map (const key_compare& comp = key_compare(),
-		// 			const allocator_type& alloc = allocator_type());
+		explicit map (const key_compare& comp = key_compare(),
+					const allocator_type& alloc = allocator_type())
+					 : _size(0), _alloc(alloc), _comp(comp) {
+			init_rbtree();
+		}
 		// // range (2)
 		// template <class InputIterator>
 		// map (InputIterator first, InputIterator last,
@@ -64,7 +113,11 @@ namespace ft{
 		// 	const allocator_type& alloc = allocator_type());
 		// // copy (3)
 		// map (const map& x);
+
+		
+		
     };
+
 };
 
 #endif
