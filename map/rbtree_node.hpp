@@ -16,6 +16,7 @@ namespace ft
 		rbtree_node*				_right;
 		e_color 					_color;
 		ft::pair<const Key, T> 		_value;
+		explicit rbtree_node(const rbtree_node& value): _parent(NULL), _left(NULL), _right(NULL), _color(BLACK), _value(value) {}
 	};
 }
 
