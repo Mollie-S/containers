@@ -38,3 +38,18 @@ https://stackoverflow.com/questions/34821661/reserve-implementation-for-stdvecto
 
 Strong exception guarantee VS basic exception guarantee: (how to deal with exceptions that might be possibly thrown by an allocator):
 https://stackoverflow.com/questions/12137555/strong-exception-guarantee-vs-basic-exception-guarantee
+
+rbtree:
+https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
+https://www.programiz.com/dsa/red-black-tree
+
+rbtree and sentinel explanation: 
+https://edutechlearners.com/download/Introduction_to_algorithms-3rd%20Edition.pdf
+
+Why is std::map implemented as a red-black tree? (discussions and links to why map is implemented as rbtree compared to hash tables and AVL)
+https://stackoverflow.com/questions/5288320/why-is-stdmap-implemented-as-a-red-black-tree
+
+
+rbTRee searching inserting:
+http://math.oxford.emory.edu/site/cs171/redBlackTreeSearchingAndInserting/
+
