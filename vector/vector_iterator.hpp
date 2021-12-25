@@ -34,7 +34,7 @@ namespace ft
 	public:
 		vector_iter() : _ptr(NULL) {}
 		vector_iter(pointer ptr) : _ptr(ptr) {}
-		vector_iter(const vector_iter& it) : _ptr(it._ptr) {}
+		vector_iter(const vector_iter& other) : _ptr(other._ptr) {}
 		~vector_iter(){};
 
 		difference_type	distance(vector_iter first, vector_iter last)
@@ -44,9 +44,12 @@ namespace ft
 				count++;
 			return count;
 		}
-		vector_iter& operator=(const vector_iter& i)
+		vector_iter& operator=(const vector_iter& other)
 		{
-			_ptr = i._ptr;
+			if (*this != other)
+			{
+				_ptr = other._ptr;
+			}
 			return (*this);
 		}
 		reference operator*() const
