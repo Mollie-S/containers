@@ -67,7 +67,7 @@ namespace ft
 
 		friend class map_iter<pointer>;
 	private:
-		typedef ft::rbtree_node<const Key, T> *node_pointer;
+		typedef ft::rbtree_node<const Key, T>*	node_pointer;
 
 		// explanation for rebind: 
 		// The _Alloc template is used to obtain objects of some type. The container may have an internal need to allocate objects of a different type. For example, when you have a std::list<T, A>, the allocator A is meant to allocate objects of type T but the std::list<T, A> actually needs to allocate objects of some node type. Calling the node type _Ty, the std::list<T, A> needs to get hold of an allocator for _Ty objects which is using the allocation mechanism provided by A. Using
@@ -76,11 +76,16 @@ namespace ft
 		// Since rebind is a member template of _A and _A is a template argument, the rebind becomes a dependent name. To indicate that a dependent name is a template, it needs to be prefixed by template. Without the template keyword the < would be considered to be the less-than operator.
 		// The name other also depends on a template argument, i.e., it is also a dependent name. To indicate that a dependent name is a type, the typename keyword is needed.
 
-		node_pointer	_root;
-		allocator_type	_alloc;
-		node_alloc_type	_node_alloc;
-		size_type       _size;
-		value_compare	_comp;
+		rbtree_node_base*	_root;
+		// we will be using _sentinel as a dummy for node leaves pointing to nil. 
+		//In order to save a marginal amount of execution time, 
+		//these (possibly many) NIL leaves may be implemented as pointers to one unique (and black)
+		// sentinel node (instead of pointers of value NULL). view Thomas H. Cormen introduction to algorithms:
+		rbtree_node_base 	_sentinel;
+		allocator_type 		_alloc;
+		node_alloc_type		_node_alloc;
+		size_type       	_size;
+		value_compare		_comp;
 
 		
 		node_pointer allocate_node(const value_type& value)
@@ -109,10 +114,11 @@ namespace ft
 public:
 		// // TODO:
 		// // CONSTRUCTORS:
-		// //empty (1)	
+		// //empty (1)
+		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
 		explicit map (const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-					 : _size(0), _alloc(alloc), _node_alloc(alloc), _comp(comp), _root(NULL) {} // allocator has got a template constructor that allows to construct an instance out of another type
+					 : _size(0), _alloc(alloc), _node_alloc(alloc), _comp(comp), _root(&_sentinel) {}
 
 		// // range (2)
 		// template <class InputIterator>
@@ -127,31 +133,62 @@ public:
 		{
 			return _alloc;
 		}
+		
+// 		//TODO:
+// 		// ELEMENT ACCESS:
+// 		mapped_type& operator[] (const key_type& k)
+// 		{
+// 
+// 		}
 
+		// ITERATORS:
 		iterator begin()
 		{
-			node_pointer node = _root;
-			if (node == NULL)
-        		return NULL;
-			while (node->_left != NULL)
+			rbtree_node_base* node = _root;
+			if (empty())
+        		return iterator(node);
+			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
 			{
 				node = node->_left;
 			}
 			return iterator(node);
 		}
+		
 		const_iterator begin() const
 		{
-			node_pointer node = _root;
-			if (node == NULL)
-        		return NULL;
-			while (node->_left != NULL)
+			rbtree_node_base* node = _root;
+			if (empty())
+        		return iterator(node);
+			while (node->_left != &_sentinel)
 			{
 				node = node->_left;
 			}
 			return iterator(node);
 		}
+		iterator end()
+		{
+			return iterator(&_sentinel);		
+		}
+		const_iterator end() const
+		{
+			return iterator(&_sentinel);
+		}
 
-    };
+		// CAPACITY:
+
+		bool empty() const
+		{
+			return (_root == &_sentinel);
+		}
+		size_type max_size() const
+		{
+			return _node_alloc.max_size();
+		}
+		size_type size() const
+		{
+			return _size;
+		}
+	};
 
 }
 
