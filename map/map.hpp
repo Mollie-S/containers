@@ -77,6 +77,7 @@ namespace ft
 		// The name other also depends on a template argument, i.e., it is also a dependent name. To indicate that a dependent name is a type, the typename keyword is needed.
 
 		node_pointer	_root;
+		allocator_type	_alloc;
 		node_alloc_type	_node_alloc;
 		size_type       _size;
 		value_compare	_comp;
@@ -111,7 +112,7 @@ public:
 		// //empty (1)	
 		explicit map (const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-					 : _size(0), _node_alloc(alloc), _comp(comp), _root(NULL) {} // allocator has got a template constructor that allows to construct an instance out of another type
+					 : _size(0), _alloc(alloc), _node_alloc(alloc), _comp(comp), _root(NULL) {} // allocator has got a template constructor that allows to construct an instance out of another type
 
 		// // range (2)
 		// template <class InputIterator>
@@ -121,6 +122,11 @@ public:
 		// // copy (3)
 		// map (const map& x);
 
+
+		allocator_type get_allocator() const
+		{
+			return _alloc;
+		}
 
 		iterator begin()
 		{
