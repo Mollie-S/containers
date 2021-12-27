@@ -3,28 +3,62 @@
 
 #include "rbtree_node.hpp"
 
+// TODO : remove when iterator_traits implemented
 namespace ft
 {
-	template <class Iterator>
+	template <class Value>
+	class map_iter;
+}
+
+namespace std {
+	template<typename Value> 
+	struct iterator_traits<ft::map_iter<Value> >
+	{
+		typedef Value        	value_type;
+    	typedef std::size_t   	difference_type;
+    	typedef Value*         	pointer;
+    	typedef Value&         	reference;
+	};
+}
+
+namespace ft
+{
+	template <class Value>
 	class map_iter // Iterator base class
 	{
 		//TODO
 		// replace std with ft when iterator_traits implemented:
 	public:
+		
+		// typedef Value							                      			iterator_type;
+		// typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
+		// typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
+    	// typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
+    	// typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
+    	// typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
 
-		typedef Iterator                                                      		iterator_type;
+		typedef map_iter<Value>							                      			iterator_type;
 		typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
 		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
     	typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
     	typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
 
+		// typedef Value        	value_type;
+    	// typedef std::size_t   	difference_type;
+    	// typedef Value*         	pointer;
+    	// typedef Value&         	reference;
+
 	private:
-		iterator_type _node_ptr;
+		rbtree_node_base* _node_ptr;
+
+		bool isSentinel(rbtree_node_base* node_ptr){
+			return (node_ptr->_left == NULL && node_ptr->_right == NULL);
+		}
 
 	public:
 		map_iter() : _node_ptr(NULL) {}
-		map_iter(pointer node_ptr) : _node_ptr(_node_ptr) {}
+		map_iter(rbtree_node_base* node_ptr) : _node_ptr(node_ptr) {}
 		map_iter(const map_iter& other) : _node_ptr(other._node_ptr) {}
 		~map_iter(){};
 
@@ -45,11 +79,13 @@ namespace ft
 		}
 		reference operator*() const
 		{
-			return (_node_ptr->_value);
+			assert(!isSentinel(_node_ptr));
+			return (static_cast<rbtree_node<Value>* >(_node_ptr)->_value);		
 		}
 		pointer operator->() const
 		{
-			return (_node_ptr);
+			assert(!isSentinel(_node_ptr));
+			return (&static_cast<rbtree_node<Value>* >(_node_ptr)->_value);
 		}
 // 
 // 		//  ARITHMETIC OPERATORS
@@ -64,11 +100,11 @@ namespace ft
 // 			++(*this);
 // 			return temp;
 // 		}
-// 		map_iter& operator--()
-// 		{
-// 			_ptr--;
-// 			return *this;
-// 		}
+		// map_iter& operator--()
+		// {
+		// 	_ptr--;
+		// 	return *this;
+		// }
 // 		map_iter operator--(int)
 // 		{
 // 			map_iter temp = *this;
