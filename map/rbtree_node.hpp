@@ -9,7 +9,6 @@ typedef enum color_t e_color;
 namespace ft 
 {
 
-
 	struct rbtree_node_base
 	{
 		rbtree_node_base*		_parent;
@@ -21,11 +20,11 @@ namespace ft
 	};
 	//Here, we pass the derived class Node<Val> as a template argument to its own base (Node_base).
 	// That allows Node_base to use Node<Val> in its interfaces without even knowing its real name!
-	template <class Key, class T>
+	template <typename Value>
 	struct rbtree_node : public rbtree_node_base
 	{
-		ft::pair<const Key, T> 	_value;
-		explicit rbtree_node(const rbtree_node& value): _value(value) {}
+		Value 	_value;
+		explicit rbtree_node(const Value& value): _value(value) {}
 	};
 }
 
