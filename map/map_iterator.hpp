@@ -52,7 +52,8 @@ namespace ft
 	private:
 		rbtree_node_base* _node_ptr;
 
-		bool isSentinel(rbtree_node_base* node_ptr){
+		bool isSentinel(rbtree_node_base* node_ptr) const
+		{
 			return (node_ptr->_left == NULL && node_ptr->_right == NULL);
 		}
 

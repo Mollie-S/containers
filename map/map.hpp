@@ -31,14 +31,12 @@ namespace ft
 		typedef typename allocator_type::difference_type	difference_type;
 
 	private:
-		typedef typename Alloc::template rebind<ft::rbtree_node<const Key, T> >::other node_alloc_type;
-		typedef typename node_alloc_type::pointer 										node_ptr;
-		typedef typename node_alloc_type::const_pointer 								const_node_ptr;
+		typedef typename Alloc::template rebind<ft::rbtree_node<value_type> >::other node_alloc_type;
 
 	public:
 		// TODO:
-		typedef map_iter<node_ptr>                    		iterator;
-		typedef map_iter<const_node_ptr>                    const_iterator;
+		typedef map_iter<value_type>                    		iterator;
+		typedef map_iter<const value_type>                   const_iterator;
 
 
 		// typedef reverse_iterator<iterator>               reverse_iterator;
@@ -67,7 +65,7 @@ namespace ft
 
 		friend class map_iter<pointer>;
 	private:
-		typedef ft::rbtree_node<const Key, T>*	node_pointer;
+		typedef ft::rbtree_node<value_type>*	node_pointer;
 
 		// explanation for rebind: 
 		// The _Alloc template is used to obtain objects of some type. The container may have an internal need to allocate objects of a different type. For example, when you have a std::list<T, A>, the allocator A is meant to allocate objects of type T but the std::list<T, A> actually needs to allocate objects of some node type. Calling the node type _Ty, the std::list<T, A> needs to get hold of an allocator for _Ty objects which is using the allocation mechanism provided by A. Using
@@ -99,9 +97,10 @@ namespace ft
 		{
 			node_pointer new_node = allocate_node(value);
 			new_node->_color = RED;
-			new_node->_parent = NULL;
-			new_node->_left = NULL;
-			new_node->_right = NULL;
+			new_node->_parent = &_sentinel;
+			new_node->_left = &_sentinel;
+			new_node->_right = &_sentinel;
+			return new_node;
 		}
 
 		bool isRed(node_pointer node) 
@@ -158,12 +157,12 @@ public:
 		{
 			rbtree_node_base* node = _root;
 			if (empty())
-        		return iterator(node);
+        		return const_iterator(node);
 			while (node->_left != &_sentinel)
 			{
 				node = node->_left;
 			}
-			return iterator(node);
+			return const_iterator(node);
 		}
 		iterator end()
 		{
@@ -171,7 +170,7 @@ public:
 		}
 		const_iterator end() const
 		{
-			return iterator(&_sentinel);
+			return const_iterator(&_sentinel);
 		}
 
 		// CAPACITY:
@@ -188,6 +187,26 @@ public:
 		{
 			return _size;
 		}
+
+		// // MODIFIERS:
+		// // single element (1)	
+		pair<iterator,bool> insert(const value_type& val)
+		{
+			rbtree_node_base* node = create_node(val);
+			if (empty())
+			{
+				_root = node;
+				_size++;
+				return ft::pair<iterator, bool>(iterator(node), true);
+			}
+			//TODO: finish insert:
+				return ft::pair<iterator, bool>(iterator(_root), true);
+		}
+		// // with hint (2)
+		// iterator insert (iterator position, const value_type& val);
+		// // range (3)
+		// template <class InputIterator>
+		// void insert (InputIterator first, InputIterator last);
 	};
 
 }
