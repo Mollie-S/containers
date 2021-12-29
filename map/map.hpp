@@ -2,6 +2,7 @@
 #define MAP_HPP
 
 #include <memory>
+#include <stddef.h>
 #include <stdbool.h>
 #include <iostream>
 #include "rbtree_node.hpp"
@@ -74,32 +75,22 @@ namespace ft
 		// Since rebind is a member template of _A and _A is a template argument, the rebind becomes a dependent name. To indicate that a dependent name is a template, it needs to be prefixed by template. Without the template keyword the < would be considered to be the less-than operator.
 		// The name other also depends on a template argument, i.e., it is also a dependent name. To indicate that a dependent name is a type, the typename keyword is needed.
 
-		rbtree_node_base*	_root;
 		// we will be using _sentinel as a dummy for node leaves pointing to nil. 
 		//In order to save a marginal amount of execution time, 
 		//these (possibly many) NIL leaves may be implemented as pointers to one unique (and black)
 		// sentinel node (instead of pointers of value NULL). view Thomas H. Cormen introduction to algorithms:
 		rbtree_node_base 	_sentinel;
+		rbtree_node_base*	_root;
 		allocator_type 		_alloc;
 		node_alloc_type		_node_alloc;
 		size_type       	_size;
 		value_compare		_comp;
 
-		
-		node_pointer allocate_node(const value_type& value)
+
+		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
 		{
 			node_pointer new_node = _node_alloc.allocate(1); //Attempts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
-			_node_alloc.construct(new_node, value);
-			return new_node;
-		}
-
-		node_pointer create_node(const value_type& value)
-		{
-			node_pointer new_node = allocate_node(value);
-			new_node->_color = RED;
-			new_node->_parent = &_sentinel;
-			new_node->_left = &_sentinel;
-			new_node->_right = &_sentinel;
+			_node_alloc.construct(new_node, parent_ptr, child_ptr, value);
 			return new_node;
 		}
 
@@ -108,7 +99,45 @@ namespace ft
 			if (node == NULL) 
 				return false;
 			return node->_color == RED;
-		} 
+		}
+
+		pair<rbtree_node_base*, bool> insert_node_into_appropriate_position(const value_type& value)
+		{
+			bool isUniqueKey = true;
+			rbtree_node_base* trailing_ptr = &_sentinel;
+			rbtree_node_base* current = _root;
+			const key_type key = value.first;
+			while(current != &_sentinel)
+			{
+				trailing_ptr = current;
+				if (key == static_cast<node_pointer>(current)->_value.first){
+					isUniqueKey = false;
+					return ft::pair<rbtree_node_base *, bool>(current, isUniqueKey);
+				}
+				if (key < static_cast<node_pointer>(current)->_value.first){
+					current = current->_left;
+				} 
+				else{
+					current = current->_right;
+				}
+			}
+			rbtree_node_base* new_node = create_node(trailing_ptr, &_sentinel, value);
+			if (trailing_ptr == &_sentinel)
+			{
+				_root = new_node;
+				current->_color = BLACK;
+			}
+			else if (key < static_cast<node_pointer>(trailing_ptr)->_value.first)
+			{
+				trailing_ptr->_left = new_node;
+			}
+			else
+			{
+				trailing_ptr->_right = new_node;
+			}
+			_size++;
+			return ft::pair<rbtree_node_base *, bool>(new_node, isUniqueKey);
+		}
 
 public:
 		// // TODO:
@@ -117,7 +146,15 @@ public:
 		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
 		explicit map (const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-					 : _size(0), _alloc(alloc), _node_alloc(alloc), _comp(comp), _root(&_sentinel) {}
+					 : _sentinel(NULL,NULL)
+					 , _root(&_sentinel)
+					 , _size(0)
+					 , _alloc(alloc)
+					 , _node_alloc(alloc)
+					 , _comp(comp)
+					 {
+						 _sentinel._color = BLACK;
+					 }
 
 		// // range (2)
 		// template <class InputIterator>
@@ -191,16 +228,11 @@ public:
 		// // MODIFIERS:
 		// // single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
-		{
-			rbtree_node_base* node = create_node(val);
-			if (empty())
-			{
-				_root = node;
-				_size++;
-				return ft::pair<iterator, bool>(iterator(node), true);
-			}
+		{	
+			ft::pair<rbtree_node_base*, bool> i_pair = insert_node_into_appropriate_position(val); // returns a pointer to a node with key k if one exists; otherwise, it returns pointer to the sentinel.
+
 			//TODO: finish insert:
-				return ft::pair<iterator, bool>(iterator(_root), true);
+				return i_pair;
 		}
 		// // with hint (2)
 		// iterator insert (iterator position, const value_type& val);
