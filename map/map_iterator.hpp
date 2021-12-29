@@ -81,7 +81,7 @@ namespace ft
 		reference operator*() const
 		{
 			assert(!isSentinel(_node_ptr));
-			return (static_cast<rbtree_node<Value>* >(_node_ptr)->_value);		
+			return (static_cast<rbtree_node<Value>* >(_node_ptr)->_value); // we can downcast here as we are sure that it's not the base node(only sentinels are base ones)
 		}
 		pointer operator->() const
 		{
