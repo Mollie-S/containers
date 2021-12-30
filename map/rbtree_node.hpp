@@ -15,12 +15,16 @@ namespace ft
 		rbtree_node_base*		_left;
 		rbtree_node_base*		_right;
 		e_color 				_color;
+		// TODO: remove temp key from base and derived class
+		int _key;
 
 		rbtree_node_base(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr)
 			: _parent(parent_ptr)
 			, _left(child_ptr)
 			, _right(child_ptr)
-			, _color(RED) {}
+			, _color(RED)
+			, _key(-1000)
+			{}
 	};
 
 	//Here, we pass the derived class Node<Val> as a template argument to its own base (Node_base).
@@ -29,10 +33,8 @@ namespace ft
 	struct rbtree_node : public rbtree_node_base
 	{
 		Value 	_value;
-		explicit rbtree_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const Value& value)
-			: rbtree_node_base(parent_ptr, child_ptr)
-			, _value(value)
-			{}
+		explicit rbtree_node(rbtree_node_base *parent_ptr, rbtree_node_base *child_ptr, const Value &value)
+			: rbtree_node_base(parent_ptr, child_ptr), _value(value) { _key = value.first; }
 	};
 }
 
