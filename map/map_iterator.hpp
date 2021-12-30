@@ -63,13 +63,6 @@ namespace ft
 		map_iter(const map_iter& other) : _node_ptr(other._node_ptr) {}
 		~map_iter(){};
 
-		// difference_type	distance(map_iter first, map_iter last)
-		// {
-		// 	difference_type count = 0;
-		// 	while (first + count != last)
-		// 		count++;
-		// 	return count;
-		// }
 		map_iter& operator=(const map_iter& other)
 		{
 			if (*this != other)
@@ -186,49 +179,13 @@ namespace ft
 			--(*this);
 			return temp;
 		}
-// 		map_iter& operator+=(const int &val)
-// 		{
-// 			_ptr += val;
-// 			return (*this);
-// 		}
-// 		map_iter& operator-=(const int &val)
-// 		{
-// 			_ptr -= val;
-// 			return (*this);
-// 		}
-// 		// RELATIONAL OPERATORS
-// 		bool operator<(const map_iter& rhs) const
-// 		{
-// 			return _ptr < rhs._ptr;
-// 		}
-// 		bool operator>(const map_iter& rhs)
-// 		{
-// 			return _ptr > rhs._ptr;
-// 		}
-// 		bool operator<=(const map_iter& rhs) const
-// 		{
-// 			return _ptr <= rhs._ptr;
-// 		}
-// 		bool operator>=(const map_iter& rhs)
-// 		{
-// 			return _ptr >= rhs._ptr;
-// 		}
-// 		friend map_iter operator+(const map_iter& lhs, const int rhs)
-// 		{
-// 			return (lhs._ptr + rhs);
-// 		}
-// 		friend map_iter operator-(const map_iter& lhs, const int rhs)
-// 		{
-// 			return (lhs._ptr - rhs);
-// 		}
-// 		friend difference_type operator-(const map_iter& lhs, const map_iter& rhs)
-// 		{
-// 			return (lhs._ptr - rhs._ptr);
-// 		}
-// 		friend bool operator==(const map_iter& lhs, const map_iter& rhs)
-// 		{
-// 			return (lhs._ptr == rhs._ptr);
-// 		}
+
+		// EQUALITY/INEQUALITY OPERATORS:
+
+		friend bool operator==(const map_iter& lhs, const map_iter& rhs)
+		{
+			return (lhs._ptr == rhs._ptr);
+		}
 		friend bool operator!=(const map_iter& lhs, const map_iter& rhs) { return !(lhs._node_ptr == rhs._node_ptr); }
 	};
 
