@@ -96,12 +96,12 @@ namespace ft
 		pair<rbtree_node_base*, bool> insert_node_at_position(const value_type& value)
 		{
 			bool isUniqueKey = true;
-			rbtree_node_base* trailing_ptr = &_sentinel;
+			rbtree_node_base* position = &_sentinel;
 			rbtree_node_base* current = _root;
 			const key_type key = value.first;
 			while(current != &_sentinel)
 			{
-				trailing_ptr = current;
+				position = current;
 				if (key == static_cast<node_pointer>(current)->_value.first){
 					isUniqueKey = false;
 					return ft::pair<rbtree_node_base *, bool>(current, isUniqueKey);
@@ -114,21 +114,20 @@ namespace ft
 					current = current->_right;
 				}
 			}
-	
-			rbtree_node_base* new_node = create_node(trailing_ptr, &_sentinel, value);
-			if (trailing_ptr == &_sentinel)
+			rbtree_node_base* new_node = create_node(position, &_sentinel, value);
+			if (position == &_sentinel)
 			{
 				_root = new_node;
 				_root->_parent = &_sentinel;
 				_root->_color = BLACK;
 			}
-			else if (_compare(key, static_cast<node_pointer>(trailing_ptr)->_value.first))
+			else if (_compare(key, static_cast<node_pointer>(position)->_value.first))
 			{
-				trailing_ptr->_left = new_node;
+				position->_left = new_node;
 			}
 			else
 			{
-				trailing_ptr->_right = new_node;
+				position->_right = new_node;
 			}
 			_size++;
 			return ft::pair<rbtree_node_base *, bool>(new_node, isUniqueKey);
