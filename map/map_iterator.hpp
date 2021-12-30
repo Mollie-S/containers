@@ -114,18 +114,20 @@ namespace ft
 			}
 			return node_ptr;
 		}
-		rbtree_node_base* _move_up(rbtree_node_base* node_ptr, std::string moving_direction)
+
+
+		rbtree_node_base* _move_up_left(rbtree_node_base* node_ptr)
 		{
-			rbtree_node_base* side_leading_to_visited_parent;
-			if (moving_direction == "right")
+			while (node_ptr == node_ptr->_parent->_left) // means that we have already visited that parent node before and need to move up again
 			{
-				side_leading_to_visited_parent = node_ptr->_parent->_right;
+				node_ptr = node_ptr->_parent; // returning to the visited parent
 			}
-			else
-			{
-				side_leading_to_visited_parent = node_ptr->_parent->_left;
-			}
-			while (node_ptr == side_leading_to_visited_parent) // means that we have already visited that parent node before and need to move up again
+			node_ptr = node_ptr->_parent; // moving up to the non-visited parent
+			return node_ptr;
+		}
+		rbtree_node_base* _move_up_right(rbtree_node_base* node_ptr)
+		{
+			while (node_ptr == node_ptr->_parent->_right) // means that we have already visited that parent node before and need to move up again
 			{
 				node_ptr = node_ptr->_parent; // returning to the visited parent
 			}
@@ -143,7 +145,7 @@ namespace ft
 			}
 			else
 			{
-				_node_ptr = _move_up(_node_ptr, "right");
+				_node_ptr = _move_up_right(_node_ptr);
 			}
 			return *this;
 		}
@@ -174,7 +176,7 @@ namespace ft
 			}
 			else
 			{
-				_node_ptr = _move_up(_node_ptr, "left");
+				_node_ptr = _move_up_left(_node_ptr);
 			}
 			return *this;
 		}
