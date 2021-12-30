@@ -120,6 +120,7 @@ namespace ft
 				_root = new_node;
 				_root->_parent = &_sentinel;
 				_root->_color = BLACK;
+				_sentinel._parent = _root;
 			}
 			else if (_compare(key, static_cast<node_pointer>(position)->_value.first))
 			{
@@ -145,6 +146,7 @@ namespace ft
 			if (node->_parent == &_sentinel)
 			{
 				_root = temp;
+				_sentinel._parent = _root;
 			}
 			else if (node == node->_parent->_left)
 			{
@@ -170,6 +172,7 @@ namespace ft
 			if (node->_parent == &_sentinel)
 			{
 				_root = temp;
+				_sentinel._parent = _root;
 			}
 			else if (node == node->_parent->_left)
 			{

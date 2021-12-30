@@ -157,17 +157,17 @@ namespace ft
 
 		map_iter& operator--()
 		{
-			// // if we're decrementing an iterator pointing to end():
-			// if (isSentinel(_node_ptr))
-			// {
-			// 	rbtree_node_base *node = _root;
-			// 	while (!isSentinel(_node_ptr->_right)) // iterating until the left are not pointing to the NIL that is the sentinel node
-			// 	{
-			// 		node = node->_right;
-			// 	}
-			// 	_node_ptr = node;
-			// 	return *this;
-			// }
+			// if we're decrementing an iterator pointing to end():
+			if (isSentinel(_node_ptr))
+			{
+				rbtree_node_base *node = _node_ptr->_parent; // sentinel's parent is always pointing to the root
+				while (!isSentinel(node->_right)) // iterating until the left are not pointing to the NIL that is the sentinel node
+				{
+					node = node->_right;
+				}
+				_node_ptr = node;
+				return *this;
+			}
 			if (!isSentinel(_node_ptr->_left))
 			{
 				_node_ptr = _move_down_left(_node_ptr);
