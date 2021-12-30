@@ -35,11 +35,11 @@ namespace ft
 		typedef typename Alloc::template rebind<ft::rbtree_node<value_type> >::other node_alloc_type;
 
 	public:
-		// TODO:
 		typedef map_iter<value_type>                    		iterator;
 		typedef map_iter<const value_type>                   const_iterator;
 
 
+		// TODO: reverse iterator
 		// typedef reverse_iterator<iterator>               reverse_iterator;
 		// typedef reverse_iterator<const_iterator>         const_reverse_iterator;
 
@@ -84,7 +84,7 @@ namespace ft
 		allocator_type 		_alloc;
 		node_alloc_type		_node_alloc;
 		size_type       	_size;
-		value_compare		_comp;
+		key_compare			_compare;
 
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
 		{
@@ -100,7 +100,7 @@ namespace ft
 			return node->_color == RED;
 		}
 
-		pair<rbtree_node_base*, bool> insert_node_into_appropriate_position(const value_type& value)
+		pair<rbtree_node_base*, bool> insert_node_at_position(const value_type& value)
 		{
 			bool isUniqueKey = true;
 			rbtree_node_base* trailing_ptr = &_sentinel;
@@ -113,13 +113,15 @@ namespace ft
 					isUniqueKey = false;
 					return ft::pair<rbtree_node_base *, bool>(current, isUniqueKey);
 				}
-				if (key < static_cast<node_pointer>(current)->_value.first){
+				if (_compare(key, static_cast<node_pointer>(current)->_value.first))
+				{
 					current = current->_left;
 				} 
 				else{
 					current = current->_right;
 				}
 			}
+	
 			rbtree_node_base* new_node = create_node(trailing_ptr, &_sentinel, value);
 			if (trailing_ptr == &_sentinel)
 			{
@@ -127,7 +129,7 @@ namespace ft
 				_root->_parent = &_sentinel;
 				_root->_color = BLACK;
 			}
-			else if (key < static_cast<node_pointer>(trailing_ptr)->_value.first)
+			else if (_compare(key, static_cast<node_pointer>(trailing_ptr)->_value.first))
 			{
 				trailing_ptr->_left = new_node;
 			}
@@ -187,7 +189,6 @@ namespace ft
 			}
 			temp->_right = node;
 			node->_parent = temp;
-
 		}
 
 		rbtree_node_base* recolor_grandparent_and_children(rbtree_node_base* grandparent)
@@ -258,16 +259,16 @@ public:
 					 , _size(0)
 					 , _alloc(alloc)
 					 , _node_alloc(alloc)
-					 , _comp(comp)
+					 , _compare(comp)
 					 {
 						_sentinel._color = BLACK;
 					 }
 
 		// // range (2)
-		// template <class InputIterator>
-		// map (InputIterator first, InputIterator last,
-		// 	const key_compare& comp = key_compare(),˜
-		// 	const allocator_type& alloc = allocator_type());
+		template <class InputIterator>
+		map (InputIterator first, InputIterator last,
+			const key_compare& comp = key_compare(),
+			const allocator_type& alloc = allocator_type());
 		// // copy (3)
 		// map (const map& x);
 
@@ -336,12 +337,13 @@ public:
 		// // single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
 		{
-			ft::pair<rbtree_node_base*, bool> i_pair = insert_node_into_appropriate_position(val); // returns a pointer to a node with key k if one exists; otherwise, it returns pointer to the sentinel.
+			ft::pair<rbtree_node_base *, bool> i_pair;
+			i_pair = insert_node_at_position(val);
 			if (i_pair.second != false) // if the key didn't exist before and the new node has been inserted
 			{
 				rbtree_insert_fixup(i_pair.first);
 			}
-				return i_pair;
+			return i_pair;
 		}
 		// // with hint (2)
 		// iterator insert (iterator position, const value_type& val);
