@@ -37,7 +37,7 @@ namespace ft
     	// typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
     	// typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
 
-		typedef map_iter<Value>							                      			iterator_type;
+		typedef map_iter<Value>							                      		iterator_type;
 		typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
 		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
@@ -88,30 +88,102 @@ namespace ft
 			assert(!isSentinel(_node_ptr));
 			return (&static_cast<rbtree_node<Value>* >(_node_ptr)->_value);
 		}
-// 
-// 		//  ARITHMETIC OPERATORS
-// 		map_iter& operator++()
-// 		{
-// 			_ptr++;
-// 			return *this;
-// 		}
-// 		map_iter operator++(int) // postfix operator as it accepts an argument
-// 		{
-// 			map_iter temp = *this;
-// 			++(*this);
-// 			return temp;
-// 		}
-		// map_iter& operator--()
-		// {
-		// 	_ptr--;
-		// 	return *this;
-		// }
-// 		map_iter operator--(int)
-// 		{
-// 			map_iter temp = *this;
-// 			--(*this);
-// 			return temp;
-// 		}
+
+	private:
+		rbtree_node_base* _move_down_right(rbtree_node_base* node_ptr)
+		{
+			if (!isSentinel(node_ptr->_right))
+			{
+				node_ptr = node_ptr->_right;
+				while (!isSentinel(node_ptr->_left))
+				{
+					node_ptr = node_ptr->_left;
+				}
+			}
+			return node_ptr;
+		}
+		rbtree_node_base* _move_down_left(rbtree_node_base* node_ptr)
+		{
+			if (!isSentinel(node_ptr->_left))
+			{
+				node_ptr = node_ptr->_left;
+				while (!isSentinel(node_ptr->_right))
+				{
+					node_ptr = node_ptr->_right;
+				}
+			}
+			return node_ptr;
+		}
+		rbtree_node_base* _move_up(rbtree_node_base* node_ptr, std::string moving_direction)
+		{
+			rbtree_node_base* side_leading_to_visited_parent;
+			if (moving_direction == "right")
+			{
+				side_leading_to_visited_parent = node_ptr->_parent->_right;
+			}
+			else
+			{
+				side_leading_to_visited_parent = node_ptr->_parent->_left;
+			}
+			while (node_ptr == side_leading_to_visited_parent) // means that we have already visited that parent node before and need to move up again
+			{
+				node_ptr = node_ptr->_parent; // returning to the visited parent
+			}
+			node_ptr = node_ptr->_parent; // moving up to the non-visited parent
+			return node_ptr;
+		}
+
+	public:
+ 		//  ARITHMETIC OPERATORS
+		map_iter& operator++()
+		{
+			if (!isSentinel(_node_ptr->_right))
+			{
+				_node_ptr = _move_down_right(_node_ptr);
+			}
+			else
+			{
+				_node_ptr = _move_up(_node_ptr, "right");
+			}
+			return *this;
+		}
+
+		map_iter operator++(int) // postfix operator as it accepts an argument
+		{
+			map_iter temp = *this;
+			++(*this);
+			return temp;
+		}
+
+		map_iter& operator--()
+		{
+			// // if we're decrementing an iterator pointing to end():
+			// if (isSentinel(_node_ptr))
+			// {
+			// 	rbtree_node_base *node = _root;
+			// 	while (!isSentinel(_node_ptr->_right)) // iterating until the left are not pointing to the NIL that is the sentinel node
+			// 	{
+			// 		node = node->_right;
+			// 	}
+			// 	_node_ptr = node;
+			// 	return *this;
+			// }
+			if (!isSentinel(_node_ptr->_left))
+			{
+				_node_ptr = _move_down_left(_node_ptr);
+			}
+			else
+			{
+				_node_ptr = _move_up(_node_ptr, "left");
+			}
+			return *this;
+		}
+		map_iter operator--(int)
+		{
+			map_iter temp = *this;
+			--(*this);
+			return temp;
+		}
 // 		map_iter& operator+=(const int &val)
 // 		{
 // 			_ptr += val;
@@ -155,7 +227,7 @@ namespace ft
 // 		{
 // 			return (lhs._ptr == rhs._ptr);
 // 		}
-// 		friend bool operator!=(const map_iter& lhs, const map_iter& rhs) { return !(lhs._ptr == rhs._ptr); }
+		friend bool operator!=(const map_iter& lhs, const map_iter& rhs) { return !(lhs._node_ptr == rhs._node_ptr); }
 	};
 
 }
