@@ -64,7 +64,7 @@ namespace ft
 			}
 		};
 
-		friend class map_iter<pointer>;
+		friend class map_iter<value_type>;
 	private:
 		typedef ft::rbtree_node<value_type>*	node_pointer;
 
@@ -124,6 +124,7 @@ namespace ft
 			if (trailing_ptr == &_sentinel)
 			{
 				_root = new_node;
+				_root->_parent = &_sentinel;
 				_root->_color = BLACK;
 			}
 			else if (key < static_cast<node_pointer>(trailing_ptr)->_value.first)
@@ -189,26 +190,12 @@ namespace ft
 
 		}
 
-		rbtree_node_base* case_1(rbtree_node_base* grandparent)
+		rbtree_node_base* recolor_grandparent_and_children(rbtree_node_base* grandparent)
 		{
 			grandparent->_left->_color = BLACK;
 			grandparent->_right->_color = BLACK;
 			grandparent->_color = RED;
 			return grandparent;
-		}
-
-		void case_2(rbtree_node_base* node)
-		{
-			node = node->_parent;
-			rotate_left(node);
-		}
-		void case_3(rbtree_node_base* node)
-		{
-			rbtree_node_base* parent = node->_parent;
-			rbtree_node_base* grandparent = parent->_parent;
-			parent->_color = BLACK;
-			grandparent->_color = RED;
-			rotate_right(grandparent);
 		}
 
 		void rbtree_insert_fixup(rbtree_node_base* node)
@@ -222,32 +209,39 @@ namespace ft
 					rbtree_node_base* uncle = grandparent->_right;
 					if (uncle->_color == RED)
 					{
-						node = case_1(grandparent);
+						node = recolor_grandparent_and_children(grandparent);
 					}
-					else if (node == parent->_right)
+					else 
 					{
-						case_2(node);
+						if (node == parent->_right)
+						{
+							node = node->_parent;
+							rotate_left(node);
+						}
+						node->_parent->_color = BLACK;
+						node->_parent->_parent->_color = RED;
+						rotate_right(node->_parent->_parent);
 					}
-					case_3(node);
 				}
 				else
 				{
 					rbtree_node_base* uncle = grandparent->_left;
 					if (uncle->_color == RED)
 					{
-						node = case_1(grandparent);
+						node = recolor_grandparent_and_children(grandparent);
 					}
-					else if (node == parent->_left)
+					else 
 					{
-                        node = node->_parent;
-						rotate_right(node);
+						if (node == parent->_left)
+						{
+							node = node->_parent;
+							rotate_right(node);
+						}
+						node->_parent->_color = BLACK;
+						node->_parent->_parent->_color = RED;
+						rotate_left(node->_parent->_parent);
 					}
-                    node->_parent->_color = BLACK;
-                    node->_parent->_parent->_color = RED;
-					rotate_left(node->_parent->_parent);
 				}
-				if (node == _root)
-					break;
 			}
 			_root->_color = BLACK;
 		}
@@ -341,14 +335,12 @@ public:
 		// // MODIFIERS:
 		// // single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
-		{	
+		{
 			ft::pair<rbtree_node_base*, bool> i_pair = insert_node_into_appropriate_position(val); // returns a pointer to a node with key k if one exists; otherwise, it returns pointer to the sentinel.
 			if (i_pair.second != false) // if the key didn't exist before and the new node has been inserted
 			{
-			//TODO: finish fixup:
 				rbtree_insert_fixup(i_pair.first);
 			}
-
 				return i_pair;
 		}
 		// // with hint (2)
