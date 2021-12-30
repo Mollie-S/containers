@@ -93,13 +93,6 @@ namespace ft
 			return new_node;
 		}
 
-		bool isRed(node_pointer node) 
-		{  
-			if (node == NULL) 
-				return false;
-			return node->_color == RED;
-		}
-
 		pair<rbtree_node_base*, bool> insert_node_at_position(const value_type& value)
 		{
 			bool isUniqueKey = true;
@@ -268,7 +261,20 @@ public:
 		template <class InputIterator>
 		map (InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type());
+			const allocator_type& alloc = allocator_type())
+			 		: _sentinel(NULL,NULL)
+					 , _root(&_sentinel)
+					 , _size(0)
+					 , _alloc(alloc)
+					 , _node_alloc(alloc)
+					 , _compare(comp)
+					 {
+						_sentinel._color = BLACK;
+						for (InputIterator iter = first; iter != last; ++iter)
+						{
+							insert(*iter);
+						}
+					 }
 		// // copy (3)
 		// map (const map& x);
 
