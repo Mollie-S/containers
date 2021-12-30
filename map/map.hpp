@@ -379,14 +379,14 @@ public:
 		iterator find(const Key& key )
 		{
 			iterator iter = lower_bound(key);		
-			if (iter != end() && !_compare(key, static_cast<node_pointer>(current)->_value.first))
+			if (iter != end() && !_compare(key, static_cast<node_pointer>(iter->_node_ptr)->_value.first))
 				return iter;
 			return end();
 		}
 		const_iterator find(const key_type& key) const
 		{
 			const_iterator iter = lower_bound(key);		
-			if (iter != end() && !_compare(key, static_cast<node_pointer>(current)->_value.first))
+			if (iter != end() && !_compare(key, static_cast<node_pointer>(iter->_node_ptr)->_value.first))
 				return iter;
 			return end();
 		}
@@ -399,7 +399,7 @@ public:
 			rbtree_node_base* node_ptr = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (!_compare(key, static_cast<node_pointer>(current)->_value.first))
+				if (!_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
 					node_ptr = node_ptr->_left;
 				}
@@ -413,7 +413,7 @@ public:
 			rbtree_node_base* node_ptr = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (!_compare(key, static_cast<node_pointer>(current)->_value.first))
+				if (!_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
 					node_ptr = node_ptr->_left;
 				}
@@ -423,12 +423,12 @@ public:
 			return const_iterator(node_ptr);
 		}
 		// returns the iterator pointing to the element > than the key
-		iterator upper_bound (const key_type& k)
+		iterator upper_bound (const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(key, static_cast<node_pointer>(current)->_value.first))
+				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
 					node_ptr = node_ptr->_left;
 				}
@@ -437,12 +437,12 @@ public:
 			}
 			return iterator(node_ptr);
 		}
-		const_iterator upper_bound (const key_type& k) const
+		const_iterator upper_bound (const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(key, static_cast<node_pointer>(current)->_value.first))
+				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
 					node_ptr = node_ptr->_left;
 				}
