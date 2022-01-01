@@ -83,3 +83,27 @@ TEST_CASE("Range map constructor must create the same amount of the pairs as std
 	CHECK(s_i->first == f_i->first);
 
 }
+
+TEST_CASE("Map of string - keys ", "[string keys]")
+{
+	std::map<std::string,std::string> s_map;
+	ft::map<std::string, std::string> f_map;
+
+	SECTION("Constructing map of strings")
+	{
+		const char* args1[] = {"drill", "ice", "hat", "arm", "is", "the", "cheese", "root", "pea","more"};
+		const char* args2[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09","10"};
+		size_t length1 = sizeof(args1) / sizeof(args1[0]);
+		size_t length2 = sizeof(args2) / sizeof(args2[0]);
+		for (int i = 0; i < length1 && i < length2; ++i)
+		{
+			std::pair<std::string, std::string> s_pair(args1[i], args2[i]);
+			ft::pair<std::string, std::string> f_pair(args1[i], args2[i]);
+			s_map.insert(s_pair);
+			f_map.insert(f_pair);
+		}
+		CHECK(s_map.count("pea") == f_map.count("pea"));
+		CHECK(s_map.count("is") == f_map.count("is"));
+		CHECK(s_map.count("dress") == f_map.count("dress"));
+	}
+}
