@@ -35,8 +35,8 @@ namespace ft
 		typedef typename Alloc::template rebind<ft::rbtree_node<value_type> >::other node_alloc_type;
 
 	public:
-		typedef map_iter<value_type>                    		iterator;
-		typedef map_iter<const value_type>                   const_iterator;
+		typedef map_iter<value_type, rbtree_node_base*, rbtree_node<value_type>* >                   		iterator;
+		typedef map_iter<value_type, const rbtree_node_base*, const rbtree_node<value_type>* >              const_iterator;
 
 
 		// TODO: reverse iterator
@@ -64,7 +64,6 @@ namespace ft
 			}
 		};
 
-		friend class map_iter<value_type>;
 	private:
 		typedef ft::rbtree_node<value_type>*	node_pointer;
 
@@ -379,14 +378,14 @@ public:
 		iterator find(const Key& key )
 		{
 			iterator iter = lower_bound(key);		
-			if (iter != end() && !_compare(key, static_cast<node_pointer>(iter->_node_ptr)->_value.first))
+			if (iter != end() && !_compare(key, iter->first))
 				return iter;
 			return end();
 		}
 		const_iterator find(const key_type& key) const
 		{
 			const_iterator iter = lower_bound(key);		
-			if (iter != end() && !_compare(key, static_cast<node_pointer>(iter->_node_ptr)->_value.first))
+			if (iter != end() && !_compare(key, iter->first))
 				return iter;
 			return end();
 		}
@@ -397,59 +396,67 @@ public:
 		iterator lower_bound(const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
+			rbtree_node_base* node_with_lower_value = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (!_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
+				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
+					node_with_lower_value = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
 				else
 					node_ptr = node_ptr->_right;
 			}
-			return iterator(node_ptr);
+			return iterator(node_with_lower_value);
 		}
 		const_iterator lower_bound(const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
+			rbtree_node_base* node_with_lower_value = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (!_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
+				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
+					node_with_lower_value = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
 				else
 					node_ptr = node_ptr->_right;
 			}
-			return const_iterator(node_ptr);
+			return const_iterator(node_with_lower_value);
 		}
 		// returns the iterator pointing to the element > than the key
 		iterator upper_bound (const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
+			rbtree_node_base* equal_or_higher = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
+				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
+					equal_or_higher = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
 				else
 					node_ptr = node_ptr->_right;
 			}
-			return iterator(node_ptr);
+			return iterator(equal_or_higher);
 		}
 		const_iterator upper_bound (const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
+			rbtree_node_base* equal_or_higher = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
+				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
+					equal_or_higher = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
 				else
 					node_ptr = node_ptr->_right;
 			}
-			return const_iterator(node_ptr);
+			return const_iterator(equal_or_higher);
 		}
 	};
 
