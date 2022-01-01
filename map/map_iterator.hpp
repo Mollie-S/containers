@@ -6,13 +6,22 @@
 // TODO : remove when iterator_traits implemented
 namespace ft
 {
-	template <class Value>
+	template <class Value, typename NodeBasePtr, typename NodePtr>
 	class map_iter;
 }
 
 namespace std {
-	template<typename Value> 
-	struct iterator_traits<ft::map_iter<Value> >
+	template<typename Value, typename T1, typename T2> 
+	struct iterator_traits<ft::map_iter<Value, const T1*, const T2*> >
+	{
+		typedef Value        	value_type;
+    	typedef std::size_t   	difference_type;
+    	typedef const Value*    pointer;
+    	typedef const Value&    reference;
+	};
+
+	template<typename Value, typename T1, typename T2> 
+	struct iterator_traits<ft::map_iter<Value, T1*, T2*> >
 	{
 		typedef Value        	value_type;
     	typedef std::size_t   	difference_type;
@@ -23,21 +32,17 @@ namespace std {
 
 namespace ft
 {
-	template <class Value>
+
+	template <class Value, typename NodeBasePtr, typename NodePtr>
 	class map_iter // Iterator base class
 	{
+	
 		//TODO
 		// replace std with ft when iterator_traits implemented:
 	public:
-		
-		// typedef Value							                      			iterator_type;
-		// typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
-		// typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
-    	// typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
-    	// typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
-    	// typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
 
-		typedef map_iter<Value>							                      		iterator_type;
+
+		typedef map_iter<Value, NodeBasePtr, NodePtr>	                      		iterator_type;
 		typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
 		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
@@ -50,16 +55,16 @@ namespace ft
     	// typedef Value&         	reference;
 
 	private:
-		rbtree_node_base* _node_ptr;
+		NodeBasePtr _node_ptr;
 
-		bool isSentinel(rbtree_node_base* node_ptr) const
+		bool isSentinel(NodeBasePtr node_ptr) const
 		{
 			return (node_ptr->_left == NULL && node_ptr->_right == NULL);
 		}
 
 	public:
 		map_iter() : _node_ptr(NULL) {}
-		map_iter(rbtree_node_base* node_ptr) : _node_ptr(node_ptr) {}
+		map_iter(NodeBasePtr node_ptr) : _node_ptr(node_ptr) {}
 		map_iter(const map_iter& other) : _node_ptr(other._node_ptr) {}
 		~map_iter(){};
 
@@ -74,16 +79,16 @@ namespace ft
 		reference operator*() const
 		{
 			assert(!isSentinel(_node_ptr));
-			return (static_cast<rbtree_node<Value>* >(_node_ptr)->_value); // we can downcast here as we are sure that it's not the base node(only sentinels are base ones)
+			return (static_cast<NodePtr>(_node_ptr)->_value); // we can downcast here as we are sure that it's not the base node(only sentinels are base ones)
 		}
 		pointer operator->() const
 		{
 			assert(!isSentinel(_node_ptr));
-			return (&static_cast<rbtree_node<Value>* >(_node_ptr)->_value);
+			return (&static_cast<NodePtr>(_node_ptr)->_value);
 		}
 
 	private:
-		rbtree_node_base* _move_down_right(rbtree_node_base* node_ptr)
+		NodeBasePtr _move_down_right(NodeBasePtr node_ptr)
 		{
 			if (!isSentinel(node_ptr->_right))
 			{
@@ -95,7 +100,7 @@ namespace ft
 			}
 			return node_ptr;
 		}
-		rbtree_node_base* _move_down_left(rbtree_node_base* node_ptr)
+		NodeBasePtr _move_down_left(NodeBasePtr node_ptr)
 		{
 			if (!isSentinel(node_ptr->_left))
 			{
@@ -109,7 +114,7 @@ namespace ft
 		}
 
 
-		rbtree_node_base* _move_up_left(rbtree_node_base* node_ptr)
+		NodeBasePtr _move_up_left(NodeBasePtr node_ptr)
 		{
 			while (node_ptr == node_ptr->_parent->_left) // means that we have already visited that parent node before and need to move up again
 			{
@@ -118,7 +123,7 @@ namespace ft
 			node_ptr = node_ptr->_parent; // moving up to the non-visited parent
 			return node_ptr;
 		}
-		rbtree_node_base* _move_up_right(rbtree_node_base* node_ptr)
+		NodeBasePtr _move_up_right(NodeBasePtr node_ptr)
 		{
 			while (node_ptr == node_ptr->_parent->_right) // means that we have already visited that parent node before and need to move up again
 			{
@@ -184,7 +189,7 @@ namespace ft
 
 		friend bool operator==(const map_iter& lhs, const map_iter& rhs)
 		{
-			return (lhs._ptr == rhs._ptr);
+			return (lhs._node_ptr == rhs._node_ptr);
 		}
 		friend bool operator!=(const map_iter& lhs, const map_iter& rhs) { return !(lhs._node_ptr == rhs._node_ptr); }
 	};
