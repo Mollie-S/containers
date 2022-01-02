@@ -43,12 +43,6 @@ namespace ft
 		// typedef reverse_iterator<iterator>               reverse_iterator;
 		// typedef reverse_iterator<const_iterator>         const_reverse_iterator;
 
-
-		// static_assert(sizeof(__diagnose_non_const_comparator<_Key, _Compare>()), "");
-		// static_assert((is_same<typename allocator_type::value_type, value_type>::value),
-		// 			"Allocator::value_type must be same type as value_type");
-
-
 		class value_compare // Nested function class to compare elements
 			: public ::std::binary_function<value_type, value_type, bool> { //  // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 			friend class map;
@@ -306,16 +300,18 @@ public:
 			return _alloc;
 		}
 		
-// 		//TODO:
+// 		//TODO: operator[] 
 // 		// ELEMENT ACCESS:
 // 		mapped_type& operator[] (const key_type& k)
 // 		{
 // 
 // 		}
 
+
+
 		// ITERATORS:
 	private:
-		rbtree_node_base* rbtree_min(rbtree_node_base* node)
+		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
 		{
 			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
 			{
@@ -562,12 +558,20 @@ public:
 			}
 			return i_pair;
 		}
-		//TODO: insert
+		// // TODO: insert
 		// // with hint (2)
 		// iterator insert (iterator position, const value_type& val);
-		// // range (3)
-		// template <class InputIterator>
-		// void insert (InputIterator first, InputIterator last);
+		// range (3)
+		// // TODO: add enableif to check if it's iterator:
+		template <class InputIterator>
+		void insert(InputIterator first, InputIterator last)
+		{
+			for (InputIterator iter = first; iter != last; ++iter)
+			{
+				insert(*iter);
+			}
+		}
+
 
 		//LOOKUP:
 		size_type count(const key_type& key) const
@@ -576,7 +580,7 @@ public:
 				return (0);
 			return (1);
 		}
-		//TODO:
+
 		//The range is defined by two iterators,
 		// one pointing to the first element that is not less than key 
 		//and another pointing to the first element greater than key. 
@@ -677,6 +681,16 @@ public:
 					node_ptr = node_ptr->_right;
 			}
 			return const_iterator(equal_or_higher);
+		}
+		
+		// OBSERVERS:
+		key_compare key_comp() const
+		{
+			return _compare;
+		}
+		value_compare value_comp() const
+		{
+			return value_compare(_compare);
 		}
 	};
 
