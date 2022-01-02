@@ -277,7 +277,7 @@ public:
 					 }
 
 		// copy (3)
-		map(const map& x)
+		map(const map& x) : _sentinel(NULL, NULL), _root(&_sentinel)
 		{
 			*this = x;
 		}
