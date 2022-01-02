@@ -108,7 +108,7 @@ namespace ft
         //  the destructor shall not be implicitly called and any program that depends on the side effects
         //  produced by the destructor has undeﬁned behavior.
 
-        void ft_destroy(pointer destroy_start, pointer destroy_end)
+        void destroy_range(pointer destroy_start, pointer destroy_end)
         {
             for (; destroy_start != destroy_end; ++destroy_start)
             {
@@ -338,7 +338,7 @@ namespace ft
         }
         // Linear complexity: the number of calls to the destructor of T is the same as the number of elements erased,
         // the assignment operator of T is called the number of times equal to the number of elements in the vector after the erased elements
-        iterator erase (iterator position)
+        iterator erase(iterator position)
         {
             size_type offset = position - begin();
             iterator it_end = end();
@@ -354,25 +354,21 @@ namespace ft
             return position;
         }
         //TODO: check for buffer overflow
-        iterator erase (iterator first, iterator last)
+        iterator erase(iterator first, iterator last)
         {
-            iterator it_start = begin();
-            difference_type followingLastRemovedElement = first - it_start;
-
-            size_type first_offset = first - it_start;
-            size_type last_offset = last - it_start;
-            ft_destroy(_elements + first_offset, _elements + last_offset);
-
-            iterator it_end = end();
-            if (last != it_end)
+            if (first == last)
             {
-                for (iterator it = first; it + 1 !=it_end; ++it, ++last)
-                {
-                    *it = *(last);
-                }
+                return first;
             }
-            _size -= (last_offset - first_offset);
-            return begin() + followingLastRemovedElement;
+            difference_type offset = first - begin();
+            difference_type num_to_erase = last - first;
+            destroy_range(_elements + offset, _elements + offset + num_to_erase);
+            for (iterator iter = first; iter != last; ++iter)
+            {
+                *iter = *(iter + num_to_erase);
+            }
+            _size -= num_to_erase;
+            return first;
         }
 
         // TODO: REWRITE WITH ASSIGN 1 ELEMENT AND REVERSE OPERATOR:
@@ -434,7 +430,7 @@ namespace ft
             }
             else
             {
-                ft_destroy(_elements + n, _elements + _size);
+                destroy_range(_elements + n, _elements + _size);
                 _size = n;
             }
         }
