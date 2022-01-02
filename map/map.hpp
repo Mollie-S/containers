@@ -247,11 +247,10 @@ namespace ft
 		}
 
 public:
-		// // TODO:
-		// // CONSTRUCTORS:
-		// //empty (1)
+		// CONSTRUCTORS:
+		//empty (1)
 		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
-		explicit map (const key_compare& comp = key_compare(),
+		explicit map(const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
 					 : _sentinel(NULL,NULL)
 					 , _root(&_sentinel)
@@ -263,9 +262,9 @@ public:
 						_sentinel._color = BLACK;
 					 }
 
-		// // range (2)
+		// range (2)
 		template <class InputIterator>
-		map (InputIterator first, InputIterator last,
+		map(InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type())
 			 		: _sentinel(NULL,NULL)
@@ -281,15 +280,26 @@ public:
 							insert(*iter);
 						}
 					 }
-					 //TODO: copy constructor:
-		// // copy (3)
-		// map (const map& x);
 
-		 //TODO: operaotor=
-		// map& operator=(const map& x)
-		// {
-		// 	
-		// }
+		// copy (3)
+		map(const map& x)
+		{
+			*this = x;
+		}
+
+		 ~map() { clear(); }
+
+		map& operator=(const map& x)
+		{
+			if (this != &x)
+			{
+				clear();
+				_alloc = x.get_allocator();
+				_compare = x._compare;
+				insert(x.begin(), x.end());
+			}
+            return *this;
+		}
 
 		allocator_type get_allocator() const
 		{
@@ -354,33 +364,24 @@ public:
 		}
 
 		// // MODIFIERS:
-		// TODO; CLEAR
-// 		void clear()
-// 		{
-// 
-// 		}
+		void clear()
+		{
+			iterator start = begin();
+			while (start != &_sentinel)
+			{
+				// need to save the next iterator for the next loop before deleting the node as we're destroying without rebalancing
+				rbtree_node_base* first_node = start.get_node_pointer();
+				start++;
+				delete_without_rebalancing(first_node);
+				_node_alloc.destroy(static_cast<node_pointer>(first_node));
+				_node_alloc.deallocate(static_cast<node_pointer>(first_node), 1);
+				_size--;
+			}
+		}
 
 	private:
 
-	// replaces pointer of the node to delete with the pointer to the replacing node
-		void rb_transplant(rbtree_node_base* node_to_delete, rbtree_node_base* replacing_node)
-		{
-			if (node_to_delete->_parent == &_sentinel)
-			{
-				_root = replacing_node;
-			}
-			else if (node_to_delete == node_to_delete->_parent->_left)
-			{
-				node_to_delete->_parent->_left = replacing_node;
-			}
-			else
-			{
-				node_to_delete->_parent->_right = replacing_node;
-			}
-			replacing_node->_parent = node_to_delete->_parent;
-		}
-
-		void delete_node_pointer(rbtree_node_base* node_to_delete)
+		pair<int, rbtree_node_base*> delete_without_rebalancing(rbtree_node_base* node_to_delete)
 		{
 			rbtree_node_base* successor = node_to_delete;
 			rbtree_node_base* node_to_transplant;
@@ -414,10 +415,36 @@ public:
 				successor->_left = node_to_delete->_left;
 				successor->_left->_parent = successor;
 				successor->_color = node_to_delete->_color;
-				if (successor_original_color == BLACK)
-				{
-					rbtree_delete_fixup(node_to_transplant);
-				}
+			}
+				return make_pair(successor_original_color, node_to_transplant);
+		}
+
+	// replaces pointer of the node to delete with the pointer to the replacing node
+		void rb_transplant(rbtree_node_base* node_to_delete, rbtree_node_base* replacing_node)
+		{
+			if (node_to_delete->_parent == &_sentinel)
+			{
+				_root = replacing_node;
+			}
+			else if (node_to_delete == node_to_delete->_parent->_left)
+			{
+				node_to_delete->_parent->_left = replacing_node;
+			}
+			else
+			{
+				node_to_delete->_parent->_right = replacing_node;
+			}
+			replacing_node->_parent = node_to_delete->_parent;
+		}
+
+		void delete_node_pointer(rbtree_node_base* node_to_delete)
+		{
+			pair<int, rbtree_node_base *> node_color_pair = delete_without_rebalancing(node_to_delete);
+			int successor_original_color = node_color_pair.first;
+			rbtree_node_base* node_to_transplant = node_color_pair.second;
+			if (successor_original_color == BLACK)
+			{
+				rbtree_delete_fixup(node_to_transplant);
 			}
 		}
 
@@ -498,10 +525,31 @@ public:
 			_node_alloc.deallocate(static_cast<node_pointer>(node_ptr), 1);
 			_size--;
 		}
+		// can be implemented with found or equal range. Found also calls 2 functions inside it so the complaxity might be equal;
+		size_type erase(const key_type &key)
+		{
+			pair<iterator, iterator> iterators_pair = equal_range(key);
+			if (iterators_pair.first != iterators_pair.second) // if lower bound is not the same as upper bound then the equal key exists
+			{
+				erase(iterators_pair.first);
+				return 1;
+			}
+			return 0;
+		}
 
-		// size_type erase (const key_type& k);
-
-		//      void erase (iterator first, iterator last);
+		void erase(iterator first, iterator last)
+		{
+			if (first == begin() && last == end())
+			{
+				clear(); // we will be deleting all nodes without tree rebalancing after each deletion. saves execution time
+			}
+			iterator iter = first;
+			while (iter != last)
+			{
+				erase(iter);
+				iter++;
+			}
+		}
 
 		// single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
@@ -529,8 +577,23 @@ public:
 			return (1);
 		}
 		//TODO:
-		// pair<iterator,iterator>             equal_range (const key_type& key);
-		// pair<const_iterator,const_iterator> equal_range (const key_type& key) const;
+		//The range is defined by two iterators,
+		// one pointing to the first element that is not less than key 
+		//and another pointing to the first element greater than key. 
+		//Alternatively, the first iterator may be obtained with lower_bound(), and the second with upper_bound().
+		pair<iterator,iterator> equal_range(const key_type& key)
+		{
+			iterator not_less_than_key = lower_bound(key);
+			iterator greater_than_key = upper_bound(key);
+			return make_pair(not_less_than_key, greater_than_key);
+		}
+		pair<const_iterator,const_iterator> equal_range(const key_type& key) const
+		{
+			const_iterator not_less_than_key = lower_bound(key);
+			const_iterator greater_than_key = upper_bound(key);
+			return make_pair(not_less_than_key, greater_than_key);
+		}
+
 
 		iterator find(const Key& key )
 		{
