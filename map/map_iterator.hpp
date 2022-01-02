@@ -2,33 +2,7 @@
 #define MAP_ITERATOR_HPP
 
 #include "rbtree_node.hpp"
-
-// TODO : remove when iterator_traits implemented
-namespace ft
-{
-	template <class Value, typename NodeBasePtr, typename NodePtr>
-	class map_iter;
-}
-
-namespace std {
-	template<typename Value, typename T1, typename T2> 
-	struct iterator_traits<ft::map_iter<Value, const T1*, const T2*> >
-	{
-		typedef Value        	value_type;
-    	typedef std::size_t   	difference_type;
-    	typedef const Value*    pointer;
-    	typedef const Value&    reference;
-	};
-
-	template<typename Value, typename T1, typename T2> 
-	struct iterator_traits<ft::map_iter<Value, T1*, T2*> >
-	{
-		typedef Value        	value_type;
-    	typedef std::size_t   	difference_type;
-    	typedef Value*         	pointer;
-    	typedef Value&         	reference;
-	};
-}
+#include "iterator_traits.hpp"
 
 namespace ft
 {
@@ -36,34 +10,20 @@ namespace ft
 	template <class Value, typename NodeBasePtr, typename NodePtr>
 	class map_iter // Iterator base class
 	{
-	
-		//TODO
-		// replace std with ft when iterator_traits implemented:
 	public:
 
 
-		typedef map_iter<Value, NodeBasePtr, NodePtr>	                      		iterator_type;
-		typedef typename ::std::bidirectional_iterator_tag                      	iterator_category;
-		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
-    	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
-    	typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
-    	typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
-
-		// typedef Value        	value_type;
-    	// typedef std::size_t   	difference_type;
-    	// typedef Value*         	pointer;
-    	// typedef Value&         	reference;
-
+		typedef map_iter<Value, NodeBasePtr, NodePtr>	                      	iterator_type;
+		typedef typename std::bidirectional_iterator_tag                      	iterator_category;
+		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
+    	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
+    	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
+    	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
 	
 	NodeBasePtr get_node_pointer() const
 	{
 		return _node_ptr;
 	}
-	//TODO: do I ever use it?
-	// void set_node_pointer(NodeBasePtr ptr)
-	// {
-	// 	_node_ptr = ptr;
-	// }
 
 	private:
 		NodeBasePtr _node_ptr;
