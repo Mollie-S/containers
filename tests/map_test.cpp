@@ -102,8 +102,20 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 			s_map.insert(s_pair);
 			f_map.insert(f_pair);
 		}
+		CHECK(s_map.begin()->first == f_map.begin()->first);
 		CHECK(s_map.count("pea") == f_map.count("pea"));
 		CHECK(s_map.count("is") == f_map.count("is"));
 		CHECK(s_map.count("dress") == f_map.count("dress"));
+
+		SECTION("Erasing an element with an iterator argument")
+		{
+			std::map<std::string, std::string>::iterator s_it = s_map.begin();
+			ft::map<std::string, std::string>::iterator f_it = f_map.begin();
+			s_map.erase(s_it);
+			f_map.erase(f_it);
+
+			CHECK(s_map.begin()->first == f_map.begin()->first);
+
+		}
 	}
 }
