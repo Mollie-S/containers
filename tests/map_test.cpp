@@ -8,6 +8,47 @@
 
 // clang++ tests/map_test.cpp -std=c++11 -o testMap && ./testMap
 
+namespace ft {
+	template <typename T1,typename T2>
+	bool operator==(const ft::map<T1,T2>& my_map, const std::map<T1,T2>& stl_map)
+	{
+		typename ft::map<T1, T2>::const_iterator my_iter_start = my_map.begin();
+		typename ft::map<T1, T2>::const_iterator my_iter_end = my_map.end();
+		typename std::map<T1, T2>::const_iterator stl_iter_start = stl_map.begin();
+		typename std::map<T1, T2>::const_iterator stl_iter_end = stl_map.end();
+		if (my_map.size() != stl_map.size())
+			return false;
+		while (my_iter_start != my_iter_end && stl_iter_start != stl_iter_end)
+		{
+			if (my_iter_start->first != stl_iter_start->first)
+			{
+				return false;
+			}
+			my_iter_start++;
+			stl_iter_start++;
+		}
+		return true;
+	}
+
+	template <typename T1,typename T2>
+	bool operator==(const std::map<T1,T2>& stl_map, const ft::map<T1,T2>& my_map)
+	{
+		return my_map == stl_map;
+	}
+
+	template <typename T1,typename T2>
+	bool operator!=(const std::map<T1,T2>& stl_map, const ft::map<T1,T2>& my_map)
+	{
+		return !(stl_map == my_map);
+	}
+
+	template <typename T1,typename T2>
+	bool operator!=(const ft::map<T1,T2>& my_map, const std::map<T1,T2>& stl_map)
+	{
+		return !(my_map == stl_map);
+	}
+}
+
 TEST_CASE("Testing map constructors", "[integer keys]")
 {
 	std::map<int,int> s_map;
@@ -114,7 +155,7 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 			s_map.erase(s_it);
 			f_map.erase(f_it);
 
-			CHECK(s_map.begin()->first == f_map.begin()->first);
+			CHECK(s_map == f_map);
 
 		}
 	}
