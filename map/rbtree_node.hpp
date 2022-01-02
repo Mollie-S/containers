@@ -16,14 +16,14 @@ namespace ft
 		rbtree_node_base*		_right;
 		e_color 				_color;
 		// TODO: remove temp key from base and derived class
-		int _key;
+		std::string _key;
 
 		rbtree_node_base(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr)
 			: _parent(parent_ptr)
 			, _left(child_ptr)
 			, _right(child_ptr)
 			, _color(RED)
-			, _key(-1000)
+			, _key("nothing")
 			{}
 	};
 
