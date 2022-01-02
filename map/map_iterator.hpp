@@ -54,6 +54,17 @@ namespace ft
     	// typedef Value*         	pointer;
     	// typedef Value&         	reference;
 
+	
+	NodeBasePtr get_node_pointer() const
+	{
+		return _node_ptr;
+	}
+	//TODO: do I ever use it?
+	// void set_node_pointer(NodeBasePtr ptr)
+	// {
+	// 	_node_ptr = ptr;
+	// }
+
 	private:
 		NodeBasePtr _node_ptr;
 
