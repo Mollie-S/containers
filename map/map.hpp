@@ -84,10 +84,11 @@ namespace ft
 		node_alloc_type		_node_alloc;
 		size_type       	_size;
 		key_compare			_compare;
-		
+	
+	private:
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
 		{
-			node_pointer new_node = _node_alloc.allocate(1); //Attempts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
+			node_pointer new_node = _node_alloc.allocate(1); //Atsuccessorts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
 			_node_alloc.construct(new_node, parent_ptr, child_ptr, value);
 			return new_node;
 		}
@@ -193,6 +194,12 @@ namespace ft
 			return grandparent;
 		}
 
+		void recolor_node_and_parent(rbtree_node_base* node, rbtree_node_base* parent)
+		{
+			node->_color = BLACK;
+			parent->_color = RED;
+		}
+
 		void rbtree_insert_fixup(rbtree_node_base* node)
 		{
 			while (node->_parent->_color == RED)
@@ -213,8 +220,7 @@ namespace ft
 							node = node->_parent;
 							rotate_left(node);
 						}
-						node->_parent->_color = BLACK;
-						node->_parent->_parent->_color = RED;
+							recolor_node_and_parent(node->_parent, node->_parent->_parent);
 						rotate_right(node->_parent->_parent);
 					}
 				}
@@ -232,8 +238,7 @@ namespace ft
 							node = node->_parent;
 							rotate_right(node);
 						}
-						node->_parent->_color = BLACK;
-						node->_parent->_parent->_color = RED;
+						recolor_node_and_parent(node->_parent, node->_parent->_parent);
 						rotate_left(node->_parent->_parent);
 					}
 				}
@@ -299,27 +304,29 @@ public:
 // 		}
 
 		// ITERATORS:
-		iterator begin()
+	private:
+		rbtree_node_base* rbtree_min(rbtree_node_base* node)
 		{
-			rbtree_node_base* node = _root;
-			if (empty())
-        		return iterator(node);
 			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
 			{
 				node = node->_left;
 			}
+			return node;
+		}
+	public:
+		iterator begin()
+		{
+			if (empty())
+				return iterator(_root);
+			rbtree_node_base *node = rbtree_min(_root);
 			return iterator(node);
 		}
 		
 		const_iterator begin() const
 		{
-			rbtree_node_base* node = _root;
 			if (empty())
-        		return const_iterator(node);
-			while (node->_left != &_sentinel)
-			{
-				node = node->_left;
-			}
+				return const_iterator(_root);
+			rbtree_node_base *node = rbtree_min(_root);
 			return const_iterator(node);
 		}
 		iterator end()
@@ -347,7 +354,156 @@ public:
 		}
 
 		// // MODIFIERS:
-		// // single element (1)	
+		// TODO; CLEAR
+// 		void clear()
+// 		{
+// 
+// 		}
+
+	private:
+
+	// replaces pointer of the node to delete with the pointer to the replacing node
+		void rb_transplant(rbtree_node_base* node_to_delete, rbtree_node_base* replacing_node)
+		{
+			if (node_to_delete->_parent == &_sentinel)
+			{
+				_root = replacing_node;
+			}
+			else if (node_to_delete == node_to_delete->_parent->_left)
+			{
+				node_to_delete->_parent->_left = replacing_node;
+			}
+			else
+			{
+				node_to_delete->_parent->_right = replacing_node;
+			}
+			replacing_node->_parent = node_to_delete->_parent;
+		}
+
+		void delete_node_pointer(rbtree_node_base* node_to_delete)
+		{
+			rbtree_node_base* successor = node_to_delete;
+			rbtree_node_base* node_to_transplant;
+			int successor_original_color = successor->_color;
+			if (node_to_delete->_left == &_sentinel)
+			{
+				node_to_transplant = node_to_delete->_right;
+				rb_transplant(node_to_delete, node_to_delete->_right);
+			}
+			else if (node_to_delete->_right == &_sentinel)
+			{
+				node_to_transplant = node_to_delete->_left;
+				rb_transplant(node_to_delete, node_to_delete->_left);
+			}
+			else
+			{
+				successor = rbtree_min(node_to_delete->_right); //  successor must be the node in that subtree with the smallest key; hence the call to tree_min
+				successor_original_color = successor->_color;
+				node_to_transplant = successor->_right;
+				if (successor->_parent == node_to_delete)
+				{
+					node_to_transplant->_parent = successor;
+				}
+				else
+				{
+					rb_transplant(successor, node_to_transplant);
+					successor->_right = node_to_delete->_right;
+					successor->_right->_parent = successor;
+				}
+				rb_transplant(node_to_delete, successor);
+				successor->_left = node_to_delete->_left;
+				successor->_left->_parent = successor;
+				successor->_color = node_to_delete->_color;
+				if (successor_original_color == BLACK)
+				{
+					rbtree_delete_fixup(node_to_transplant);
+				}
+			}
+		}
+
+		void rbtree_delete_fixup(rbtree_node_base* node)
+		{
+			while (node != _root && node->_color == BLACK)
+			{
+				rbtree_node_base* sibling;
+				if (node == node->_parent->_left)
+				{
+					sibling = node->_parent->_right;
+					if (sibling->_color == RED)
+					{
+						recolor_node_and_parent(sibling, node->_parent);
+						rotate_left(node->_parent);
+						sibling = node->_parent->_right;
+					}
+					if (sibling->_left->_color == BLACK && sibling->_right->_color == BLACK)
+					{
+						sibling->_color = RED;
+						node = node->_parent;
+					}
+					else 
+					{
+						if (sibling->_right->_color == BLACK)
+						{
+							recolor_node_and_parent(sibling->_left, sibling);
+							rotate_right(sibling);
+							sibling = node->_parent->_right;
+						}
+						sibling->_color = node->_parent->_color;
+						node->_parent->_color = BLACK;
+						sibling->_right->_color = BLACK;
+						rotate_left(node->_parent);
+						node = _root;
+					}
+				}
+				else
+				{
+					sibling = node->_parent->_left;
+					if (sibling->_color == RED)
+					{
+						recolor_node_and_parent(sibling, node->_parent);
+						rotate_right(node->_parent);
+						sibling = node->_parent->_left;
+					}
+					if (sibling->_left->_color == BLACK && sibling->_right->_color == BLACK)
+					{
+						sibling->_color = RED;
+						node = node->_parent;
+					}
+					else
+					{
+						if (sibling->_left->_color == BLACK)
+						{
+							recolor_node_and_parent(sibling->_right, sibling);
+							rotate_left(sibling);
+							sibling = node->_parent->_left;
+						}
+						sibling->_color = node->_parent->_color;
+						node->_parent->_color = BLACK;
+						sibling->_right->_color = BLACK;
+						rotate_right(node->_parent);
+						node = _root;
+					}
+				}
+			}
+			node->_color = BLACK;
+		}
+
+	public:
+
+		void erase(iterator position)
+		{
+			rbtree_node_base* node_ptr = position.get_node_pointer();
+			delete_node_pointer(node_ptr);
+			_node_alloc.destroy(static_cast<node_pointer>(node_ptr));
+			_node_alloc.deallocate(static_cast<node_pointer>(node_ptr), 1);
+			_size--;
+		}
+
+		// size_type erase (const key_type& k);
+
+		//      void erase (iterator first, iterator last);
+
+		// single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
 		{
 			ft::pair<rbtree_node_base *, bool> i_pair;
@@ -358,6 +514,7 @@ public:
 			}
 			return i_pair;
 		}
+		//TODO: insert
 		// // with hint (2)
 		// iterator insert (iterator position, const value_type& val);
 		// // range (3)
@@ -372,8 +529,8 @@ public:
 			return (1);
 		}
 		//TODO:
-		pair<iterator,iterator>             equal_range (const key_type& key);
-		pair<const_iterator,const_iterator> equal_range (const key_type& key) const;
+		// pair<iterator,iterator>             equal_range (const key_type& key);
+		// pair<const_iterator,const_iterator> equal_range (const key_type& key) const;
 
 		iterator find(const Key& key )
 		{
