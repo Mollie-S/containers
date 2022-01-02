@@ -8,6 +8,7 @@
 #include "utils.hpp"
 #include "vector_iterator.hpp"
 #include "reverse_iterator.hpp"
+#include "../utility/lexicographical_compare.hpp"
 namespace ft
 {
     template <class T, class Alloc = ::std::allocator<T> > // generic template
@@ -80,7 +81,7 @@ namespace ft
         }
 
       
-
+        // TODO: check if it's needed
         iterator ft_insert(iterator position, size_type n, const value_type& val)
         {
             iterator it_end = end();
@@ -352,6 +353,7 @@ namespace ft
             _size--;
             return position;
         }
+        //TODO: check for buffer overflow
         iterator erase (iterator first, iterator last)
         {
             iterator it_start = begin();
@@ -474,11 +476,10 @@ namespace ft
     {
         return !(lhs == rhs);
     }
-    //TODO: ::std::lexicographical_compare misy be reimplemented
     template <class T, class Alloc>
     bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
-        return (::std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+        return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
     }
     template <class T, class Alloc>
     bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
