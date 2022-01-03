@@ -2,7 +2,7 @@
 #define MAP_ITERATOR_HPP
 
 #include "rbtree_node.hpp"
-#include "iterator_traits.hpp"
+#include "../utility/iterator_traits.hpp"
 
 namespace ft
 {
@@ -14,7 +14,7 @@ namespace ft
 
 
 		typedef map_iter<Value, NodeBasePtr, NodePtr>	                      	iterator_type;
-		typedef typename std::bidirectional_iterator_tag                      	iterator_category;
+		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
 		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
     	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
