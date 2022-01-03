@@ -4,11 +4,14 @@
 #include <memory> //needed for allocator
 #include <iostream>
 #include <cmath>
-#include "enable_if.hpp"
+
+#include "../utility/is_iterator.hpp"
+#include "../utility/enable_if.hpp"
+#include "../utility/reverse_iterator.hpp"
+#include "../utility/lexicographical_compare.hpp"
+
 #include "utils.hpp"
 #include "vector_iterator.hpp"
-#include "reverse_iterator.hpp"
-#include "../utility/lexicographical_compare.hpp"
 namespace ft
 {
     template <class T, class Alloc = ::std::allocator<T> > // generic template
@@ -28,8 +31,8 @@ namespace ft
 		typedef typename allocator_type::const_pointer  const_pointer;
 		typedef std::ptrdiff_t                          difference_type;
 		typedef size_t                                  size_type;
-        typedef vector_iter<pointer>                    iterator;
-        typedef vector_iter<const_pointer>              const_iterator;
+        typedef vector_iter<value_type>                 iterator;
+        typedef vector_iter<const value_type>           const_iterator;
         typedef ft::reverse_iterator<iterator>          reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
@@ -72,6 +75,27 @@ namespace ft
                 catch (...) // (...)will be catching any exception
                 {
                     for (; dest != dest_ptr; ++dest)
+                    {
+                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
+                    }
+                    throw;
+                }
+            }
+        }
+
+        template <class InputIterator> 
+        void uninitialized_copy(pointer dest, InputIterator src_first, InputIterator src_last)
+        {
+            pointer dest_start = dest; // needed for destruction in case the alloc is throwing the exception 
+            for (InputIterator it = src_first; it != src_last; ++it, ++dest)
+            {
+                try
+                {
+                    _alloc.construct(dest, *it);
+                }
+                catch (...) // (...)will be catching any exception
+                {
+                    for (; dest_start != dest; ++dest_start)
                     {
                         _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
                     }
@@ -148,8 +172,6 @@ namespace ft
                 _alloc.deallocate(_elements, n);
                 throw;
             }
-
-            std::cout << "Fill constructor called\n";
         }
 
         // the standard says that if the range constructor gets selected by overload resolution
@@ -163,12 +185,11 @@ namespace ft
 
         //	range constructor(3)
         template <class InputIterator>
-        vector (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0,
+        vector (typename ft::enable_if<ft::is_input_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last,
                 const allocator_type& alloc = allocator_type())
                     : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
         {
-            for (; first != last; ++first)
-                push_back(*first);
+            assign(first, last);
         }
 
         // copy (4)
@@ -274,14 +295,42 @@ namespace ft
     public:
         // assign() and operator= are pretty much equivalent. 
         //The reason for the second is that you might have types which need (implicit) conversion:
+        // Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
+       
         // range (1)
-        // TODO enableif with input iterarator?????
         template <class InputIterator> 
-        void assign(InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
+        void assign(typename ft::enable_if<ft::is_forward_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last)
         {
-			clear();
-			for (; first != last; ++first)
-			push_back(*first);
+            if (first == last)
+                return;
+            difference_type diff = std::distance(first, last);
+            if (diff > _capacity)
+            {
+                pointer temp = _alloc.allocate(diff);
+                uninitialized_copy(temp, first, last);
+                destroy_elements();
+                _elements = temp;
+                _capacity = diff;
+            }
+            else
+            {
+                clear();
+                uninitialized_copy(_elements, first, last);
+            }
+            _size = diff;
+        }
+
+         // overload if the iterator is an input_iterator and not at least a forward iterator
+        template <class InputIterator> 
+        void assign(typename ft::enable_if<
+            ft::is_input_iterator<InputIterator>::value && !ft::is_forward_iterator<InputIterator>::value, 
+            InputIterator>::type first, InputIterator last)
+        {
+            clear();
+			for (; first != last; ++first) 
+            {
+			    push_back(*first);
+            }
         }
 
         // fill (2)
@@ -326,7 +375,7 @@ namespace ft
             }
             pointer temp = _alloc.allocate(new_cap);
             uninitialized_copy(temp, _elements);
-            destroy_elements();
+            destroy_elements(); // destroys them on current instance
             _elements = temp;
             _capacity = new_cap;
         }
@@ -353,7 +402,7 @@ namespace ft
             _size--;
             return position;
         }
-        //TODO: check for buffer overflow
+
         iterator erase(iterator first, iterator last)
         {
             if (first == last)
@@ -363,7 +412,8 @@ namespace ft
             difference_type offset = first - begin();
             difference_type num_to_erase = last - first;
             destroy_range(_elements + offset, _elements + offset + num_to_erase);
-            for (iterator iter = first; iter != last; ++iter)
+            iterator it_end = end();
+            for (iterator iter = first; iter + num_to_erase != it_end; ++iter)
             {
                 *iter = *(iter + num_to_erase);
             }
