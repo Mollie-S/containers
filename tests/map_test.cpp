@@ -66,27 +66,66 @@ TEST_CASE("Testing map constructors", "[integer keys]")
 		CHECK(s_it->first == f_it->first);
 		CHECK(s_it->second == f_it->second);
 		
-
-		SECTION("Inserting more elements")
+		SECTION("Map copy constructor")
 		{
-			std::pair<int, int> s_pair1(120,1200);
-			ft::pair<int, int> f_pair1(120,1200);
-			std::pair<int, int> s_pair2(3,300);
-			ft::pair<int, int> f_pair2(3,300);
-			std::pair<int, int> s_pair3(-3,-300);
-			ft::pair<int, int> f_pair3(-3,-300);
-			s_map.insert(s_pair1);
-			f_map.insert(f_pair1);
-			s_map.insert(s_pair2);
-			f_map.insert(f_pair2);
-			s_map.insert(s_pair3);
-			f_map.insert(f_pair3);
+			std::map<int, int> s_map_copy(s_map);
+			ft::map<int, int> f_map_copy(f_map);
+			SECTION("Inserting more elements to the original map")
+			{
+				std::pair<int, int> s_pair1(120,1200);
+				ft::pair<int, int> f_pair1(120,1200);
+				std::pair<int, int> s_pair2(3,300);
+				ft::pair<int, int> f_pair2(3,300);
+				std::pair<int, int> s_pair3(-3,-300);
+				ft::pair<int, int> f_pair3(-3,-300);
+				s_map.insert(s_pair1);
+				f_map.insert(f_pair1);
+				s_map.insert(s_pair2);
+				f_map.insert(f_pair2);
+				s_map.insert(s_pair3);
+				f_map.insert(f_pair3);
 
-			std::map<int, int>::iterator s_it = s_map.begin();
-			ft::map<int, int>::iterator f_it = f_map.begin();
-			CHECK(s_it->first == f_it->first);
-			CHECK(s_it->second == f_it->second);
-			
+				std::map<int, int>::iterator s_it = s_map.begin();
+				ft::map<int, int>::iterator f_it = f_map.begin();
+				CHECK(s_it->first == f_it->first);
+				CHECK(s_it->second == f_it->second);
+				CHECK(s_map == f_map);
+				
+				SECTION("Clearing the map")
+				{
+					f_map.clear();
+					s_map.clear();
+					CHECK(s_map == f_map);
+
+					SECTION("Insertion")
+					{
+						s_map.insert(std::make_pair<int, int>(41, 400));
+						f_map.insert(ft::make_pair<int, int>(41, 400));
+						s_map.insert(std::make_pair<int, int>(38, 400));
+						f_map.insert(ft::make_pair<int, int>(38, 400));
+						s_map.insert(std::make_pair<int, int>(31, 400));
+						f_map.insert(ft::make_pair<int, int>(31, 400));
+						s_map.insert(std::make_pair<int, int>(12, 400));
+						f_map.insert(ft::make_pair<int, int>(12, 400));
+						s_map.insert(std::make_pair<int, int>(19, 400));
+						f_map.insert(ft::make_pair<int, int>(19, 400));
+						s_map.insert(std::make_pair<int, int>(8, 400));
+						f_map.insert(ft::make_pair<int, int>(8, 400));
+						CHECK(s_map == f_map);
+
+					}
+				}
+			}
+			SECTION("Erase method")
+			{
+				s_map_copy.erase(8);
+				f_map_copy.erase(8);
+				CHECK(s_map_copy == f_map_copy);
+				s_map_copy.erase(1);
+				f_map_copy.erase(1);
+				CHECK(s_map_copy == f_map_copy);
+
+			}
 		}
 	}
 }
@@ -122,6 +161,8 @@ TEST_CASE("Range map constructor must create the same amount of the pairs as std
 	std::map<int, int>::iterator s_i = s_map.begin();
 	ft::map<int, int>::iterator f_i = f_map.begin();
 	CHECK(s_i->first == f_i->first);
+	CHECK(s_map == f_map);
+
 
 }
 
