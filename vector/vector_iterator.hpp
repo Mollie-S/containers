@@ -1,6 +1,8 @@
 #ifndef VECTOR_ITERATOR_HPP
 #define VECTOR_ITERATOR_HPP
 
+#include "../utility/iterator_traits.hpp"
+
 namespace ft
 {
 		// This base class only provides some member types,
@@ -10,18 +12,17 @@ namespace ft
 		//since they define the members needed for the default iterator_traits class template
 		//to generate the appropriate instantiation automatically
 		//(and such instantiation is required to be valid for all iterator types).
-	template <class Iterator>
+	template <class Value>
 	class vector_iter // Iterator base class
 	{
 	
-	//TODO
-	// replace std with ft when iterator_traits implemented:
 	public:
-		typedef Iterator                                                      		iterator_type;
-		typedef typename ::std::iterator_traits<iterator_type>::value_type        	value_type;
-    	typedef typename ::std::iterator_traits<iterator_type>::difference_type   	difference_type;
-    	typedef typename ::std::iterator_traits<iterator_type>::pointer           	pointer;
-    	typedef typename ::std::iterator_traits<iterator_type>::reference         	reference;
+		typedef vector_iter<Value>                                              iterator_type;
+		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
+		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
+    	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
+    	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
+    	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
 
 			// random_access_iterator -  Empty class to identify the category of an iterator as a random-access iterator:
 
@@ -29,7 +30,7 @@ namespace ft
 			// difference_type, the type denoted by std::iterator_traits<It>::difference_type
 			// reference, the type denoted by std::iterator_traits<It>::reference
 	private:
-		iterator_type _ptr;
+		pointer _ptr;
 
 	public:
 		vector_iter() : _ptr(NULL) {}
