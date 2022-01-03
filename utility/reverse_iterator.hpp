@@ -1,18 +1,20 @@
 #ifndef REVERSE_ITERATOR_HPP
 #define REVERSE_ITERATOR_HPP
 
+#include "iterator_traits.hpp"
+
 namespace ft
 {
 	template <class Iterator> 
 	class reverse_iterator
 	{
 	public:
-		typedef Iterator                                           		iterator_type;
-		//TODO iterator_traits must be reimplemented, std must be removed:
-		typedef typename ::std::iterator_traits<iterator_type>::value_type   value_type;
-		typedef typename ::std::iterator_traits<iterator_type>::difference_type 	difference_type;
-		typedef typename ::std::iterator_traits<iterator_type>::reference       	reference;
-		typedef typename ::std::iterator_traits<iterator_type>::pointer         	pointer;
+		typedef Iterator                                           				iterator_type;
+		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
+		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
+    	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
+    	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
+    	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
 
 	private:
 		iterator_type _current;
