@@ -5,10 +5,13 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <iostream>
+
+#include "../utility/lexicographical_compare.hpp"
+#include "../utility/pair.hpp"
+#include "../utility/reverse_iterator.hpp"
+
 #include "rbtree_node.hpp"
 #include "map_iterator.hpp"
-#include "../utility/lexicographical_compare.hpp"
-
 
 namespace ft
 {
@@ -38,11 +41,8 @@ namespace ft
 	public:
 		typedef map_iter<value_type, rbtree_node_base*, rbtree_node<value_type>* >                   		iterator;
 		typedef map_iter<value_type, const rbtree_node_base*, const rbtree_node<value_type>* >              const_iterator;
-
-
-		// TODO: reverse iterator
-		// typedef reverse_iterator<iterator>               reverse_iterator;
-		// typedef reverse_iterator<const_iterator>         const_reverse_iterator;
+        typedef ft::reverse_iterator<iterator>          													reverse_iterator;
+        typedef ft::reverse_iterator<const_iterator>    													const_reverse_iterator;
 
 		class value_compare // Nested function class to compare elements
 			: public ::std::binary_function<value_type, value_type, bool> { //  // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
@@ -320,11 +320,14 @@ public:
 			}
 			return node;
 		}
+
 	public:
 		iterator begin()
 		{
 			if (empty())
-				return iterator(_root);
+			{
+				return end();
+			}
 			rbtree_node_base *node = rbtree_min(_root);
 			return iterator(node);
 		}
@@ -332,17 +335,49 @@ public:
 		const_iterator begin() const
 		{
 			if (empty())
+			{
 				return const_iterator(_root);
+			}
 			rbtree_node_base *node = rbtree_min(_root);
 			return const_iterator(node);
 		}
+
 		iterator end()
 		{
 			return iterator(&_sentinel);		
 		}
+
 		const_iterator end() const
 		{
 			return const_iterator(&_sentinel);
+		}
+
+		reverse_iterator rbegin()
+		{
+			if (empty())
+			{
+				return rend();
+			}
+			return reverse_iterator(end()--);
+		}
+
+		const_reverse_iterator rbegin() const
+		{
+			if (empty())
+			{
+				return rend();
+			}
+			return const_reverse_iterator(end()--);
+		}
+
+		reverse_iterator rend()
+		{
+			return reverse_iterator(&_sentinel);		
+		}
+
+		const_reverse_iterator rend() const
+		{
+			return const_reverse_iterator(&_sentinel);
 		}
 
 		// CAPACITY:
@@ -588,15 +623,11 @@ public:
 		{
 			return ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
 		}
-		// TODO: why call to make_pair is ambiguous?
+
 		pair<const_iterator,const_iterator> equal_range(const key_type& key) const
 		{
-			// const_iterator not_less_than_key = lower_bound(key);
-			// const_iterator greater_than_key = upper_bound(key);
-			// return make_pair(not_less_than_key, greater_than_key);
 			return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
 		}
-
 
 		iterator find(const Key& key )
 		{
@@ -605,6 +636,7 @@ public:
 				return iter;
 			return end();
 		}
+
 		const_iterator find(const key_type& key) const
 		{
 			const_iterator iter = lower_bound(key);		
@@ -612,6 +644,7 @@ public:
 				return iter;
 			return end();
 		}
+		
 		//A similar member function, upper_bound, has the same behavior as lower_bound,
 		// except in the case that the map contains an element with a key equivalent to k:
 		// In this case, lower_bound returns an iterator pointing to that element,
@@ -632,6 +665,7 @@ public:
 			}
 			return iterator(node_with_lower_value);
 		}
+		
 		const_iterator lower_bound(const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
@@ -648,6 +682,7 @@ public:
 			}
 			return const_iterator(node_with_lower_value);
 		}
+		
 		// returns the iterator pointing to the element > than the key
 		iterator upper_bound (const key_type& key)
 		{
@@ -665,6 +700,7 @@ public:
 			}
 			return iterator(larger);
 		}
+		
 		const_iterator upper_bound (const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
