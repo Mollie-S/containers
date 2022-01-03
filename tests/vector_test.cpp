@@ -17,20 +17,20 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
     {
         ft::vector<int> ftVectorInts;
         std::vector<int> stdVectorInts;
-        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+        CHECK(ftVectorInts.empty() == stdVectorInts.empty());
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());
     }
 
     SECTION("Creating a container with fill constructor")
     {
         ft::vector<int> ftVectorInts(5, 10);
         std::vector<int> stdVectorInts(5, 10);
-        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        REQUIRE(ftVectorInts.max_size() == stdVectorInts.max_size());
-        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
-        REQUIRE(ftVectorInts.size() == 5);
+        CHECK(ftVectorInts.empty() == stdVectorInts.empty());
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        CHECK(ftVectorInts.max_size() == stdVectorInts.max_size());
+        CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());
+        CHECK(ftVectorInts.size() == 5);
     }
 
     SECTION("Creating a container with the range constructor")
@@ -39,10 +39,10 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
         size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
         ft::vector<int> ftVectorInts(intArray, intArray + arraySize);
         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
-        REQUIRE(ftVectorInts.empty() == stdVectorInts.empty());
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        REQUIRE(ftVectorInts.max_size() == stdVectorInts.max_size());
-        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+        CHECK(ftVectorInts.empty() == stdVectorInts.empty());
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        CHECK(ftVectorInts.max_size() == stdVectorInts.max_size());
+        CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());
     }
 }
 TEST_CASE("Iterators test", "[integers]")
@@ -56,7 +56,7 @@ TEST_CASE("Iterators test", "[integers]")
         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
         ft::vector<int>::iterator ftIt = ftVectorInts.begin();
         std::vector<int>::iterator stdIt  = stdVectorInts.begin();
-        REQUIRE(*ftIt == *stdIt);
+        CHECK(*ftIt == *stdIt);
     }
         SECTION("Iterator end()")
     {
@@ -66,7 +66,7 @@ TEST_CASE("Iterators test", "[integers]")
         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
         ft::vector<int>::iterator ftIt = ftVectorInts.end();
         std::vector<int>::iterator stdIt  = stdVectorInts.end();
-        REQUIRE(*(ftIt - 1) == *(stdIt - 1));
+        CHECK(*(ftIt - 1) == *(stdIt - 1));
     }
 }
 
@@ -81,8 +81,8 @@ TEST_CASE("Reserve() method", "[integers]")
         ftVectorInts.reserve(100);
         stdVectorInts.reserve(100);
         size_t capacity_2 = ftVectorInts.capacity();
-        REQUIRE(capacity_1 != capacity_2);
-        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
+        CHECK(capacity_1 != capacity_2);
+        CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());
     
     }
 }
@@ -99,7 +99,7 @@ TEST_CASE("Testing erase method", "[integers]")
         std::vector<int>::iterator stdItEnd  = stdVectorInts.end();
         ftVectorInts.erase(ftItEnd - 1);
         stdVectorInts.erase(stdItEnd - 1);
-        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+        CHECK(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
     }
     SECTION("Erasing the first element")
     {
@@ -111,8 +111,8 @@ TEST_CASE("Testing erase method", "[integers]")
         std::vector<int>::iterator stdIt  = stdVectorInts.begin();
         ftVectorInts.erase(ftIt);
         stdVectorInts.erase(stdIt);
-        REQUIRE(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
-        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+        CHECK(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
+        CHECK(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
     }
     SECTION("Erasing the range")
     {
@@ -124,11 +124,11 @@ TEST_CASE("Testing erase method", "[integers]")
         std::vector<int>::iterator stdIt  = stdVectorInts.begin();
         ft::vector<int>::iterator ftReturnedIt =  ftVectorInts.erase(ftIt + 5, ftIt + 10);
         std::vector<int>::iterator stdReturnedIt  = stdVectorInts.erase(stdIt + 5, stdIt + 10);
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        // REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity()); // // uncomment when iterator traits ready
-        REQUIRE(*(ftVectorInts.begin() + 5) == *(stdVectorInts.begin() + 5));
-        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
-        REQUIRE(*(ftReturnedIt) == *(stdReturnedIt));
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        // CHECK(ftVectorInts.capacity() == stdVectorInts.capacity()); // // uncomment when iterator traits ready
+        CHECK(*(ftVectorInts.begin() + 5) == *(stdVectorInts.begin() + 5));
+        CHECK(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+        CHECK(*(ftReturnedIt) == *(stdReturnedIt));
     }
 }
 TEST_CASE("Resize method", "[integers]")
@@ -143,10 +143,10 @@ TEST_CASE("Resize method", "[integers]")
         std::vector<int>::iterator stdItEnd  = stdVectorInts.end();
         ftVectorInts.resize(3);
         stdVectorInts.resize(3);
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        // REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity()); // uncomment when iterator traits ready
-        REQUIRE(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
-        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        // CHECK(ftVectorInts.capacity() == stdVectorInts.capacity()); // uncomment when iterator traits ready
+        CHECK(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
+        CHECK(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
     }
     SECTION("Resize to larger size")
     {
@@ -156,10 +156,10 @@ TEST_CASE("Resize method", "[integers]")
         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
         ftVectorInts.resize(30);
         stdVectorInts.resize(30);
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());
-        REQUIRE(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
-        REQUIRE(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());
+        CHECK(*(ftVectorInts.begin()) == *(stdVectorInts.begin()));
+        CHECK(*(ftVectorInts.end() - 1) == *(stdVectorInts.end() - 1));
     }
     SECTION("Resize to 0")
     {
@@ -169,8 +169,8 @@ TEST_CASE("Resize method", "[integers]")
         std::vector<int> stdVectorInts(intArray, intArray + arraySize);
         ftVectorInts.resize(0);
         stdVectorInts.resize(0);
-        REQUIRE(ftVectorInts.size() == stdVectorInts.size());
-        // REQUIRE(ftVectorInts.capacity() == stdVectorInts.capacity());// uncomment when iterator traits ready
+        CHECK(ftVectorInts.size() == stdVectorInts.size());
+        // CHECK(ftVectorInts.capacity() == stdVectorInts.capacity());// uncomment when iterator traits ready
         // no iterators check as there are no elements
     }
 }
@@ -190,7 +190,7 @@ TEST_CASE("Swap() method", "[integers]")
         std::swap(stdVectorInts,stdVectorInts1);
         ft::vector<int>::iterator ftIt = ftVectorInts.begin();
         std::vector<int>::iterator stdIt = stdVectorInts.begin();
-        REQUIRE(*(ftIt) == *(stdIt));
+        CHECK(*(ftIt) == *(stdIt));
 
     }
     SECTION("ft::vector::swap - member function")
@@ -209,7 +209,7 @@ TEST_CASE("Swap() method", "[integers]")
         ft::vector<int>::iterator ftIt = ftVectorInts.begin();
         std::vector<int>::iterator stdIt = stdVectorInts.begin();
 
-        REQUIRE(*(ftIt) == *(stdIt));
+        CHECK(*(ftIt) == *(stdIt));
     }
 }
 
@@ -229,7 +229,7 @@ TEST_CASE("Copy Constructor", "[integers]")
     //     ft::vector<int>::iterator ftIt = newFtVec.begin();
     //     std::vector<int>::iterator stdIt = newStdVec.begin();
 
-    //     REQUIRE(*(ftIt) == *(stdIt));
+    //     CHECK(*(ftIt) == *(stdIt));
     // }
 
     // SECTION("copy constructor")
@@ -243,6 +243,6 @@ TEST_CASE("Copy Constructor", "[integers]")
     //     ft::vector<int>::iterator ftIt = newFtVec.begin();
     //     std::vector<int>::iterator stdIt = newStdVec.begin();
 
-    //     REQUIRE(*(ftIt) == *(stdIt));
+    //     CHECK(*(ftIt) == *(stdIt));
     // }
 }
