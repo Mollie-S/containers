@@ -525,13 +525,11 @@ public:
 		// can be implemented with found or equal range. Found also calls 2 functions inside it so the complaxity might be equal;
 		size_type erase(const key_type &key)
 		{
-			pair<iterator, iterator> iterators_pair = equal_range(key);
-			if (iterators_pair.first != iterators_pair.second) // if lower bound is not the same as upper bound then the equal key exists
-			{
-				erase(iterators_pair.first);
-				return 1;
-			}
-			return 0;
+			iterator iter = find(key);
+			if (iter == end())
+				return 0;
+			erase(iter);
+			return 1;
 		}
 
 		void erase(iterator first, iterator last)
@@ -588,15 +586,15 @@ public:
 		//Alternatively, the first iterator may be obtained with lower_bound(), and the second with upper_bound().
 		pair<iterator,iterator> equal_range(const key_type& key)
 		{
-			iterator not_less_than_key = lower_bound(key);
-			iterator greater_than_key = upper_bound(key);
-			return make_pair(not_less_than_key, greater_than_key);
+			return ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
 		}
+		// TODO: why call to make_pair is ambiguous?
 		pair<const_iterator,const_iterator> equal_range(const key_type& key) const
 		{
-			const_iterator not_less_than_key = lower_bound(key);
-			const_iterator greater_than_key = upper_bound(key);
-			return make_pair(not_less_than_key, greater_than_key);
+			// const_iterator not_less_than_key = lower_bound(key);
+			// const_iterator greater_than_key = upper_bound(key);
+			// return make_pair(not_less_than_key, greater_than_key);
+			return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
 		}
 
 
@@ -621,7 +619,7 @@ public:
 		iterator lower_bound(const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
-			rbtree_node_base* node_with_lower_value = _root;
+			rbtree_node_base* node_with_lower_value = &_sentinel;
 			while (node_ptr != &_sentinel)
 			{
 				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
@@ -654,18 +652,18 @@ public:
 		iterator upper_bound (const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
-			rbtree_node_base* equal_or_higher = _root;
+			rbtree_node_base* larger = &_sentinel;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
-					equal_or_higher = node_ptr;
+					larger = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
 				else
 					node_ptr = node_ptr->_right;
 			}
-			return iterator(equal_or_higher);
+			return iterator(larger);
 		}
 		const_iterator upper_bound (const key_type& key) const
 		{
@@ -673,7 +671,7 @@ public:
 			rbtree_node_base* equal_or_higher = _root;
 			while (node_ptr != &_sentinel)
 			{
-				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
 					equal_or_higher = node_ptr;
 					node_ptr = node_ptr->_left;
