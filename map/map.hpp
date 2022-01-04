@@ -7,8 +7,11 @@
 #include <iostream>
 
 #include "../utility/lexicographical_compare.hpp"
+#include "../utility/equal.hpp"
 #include "../utility/pair.hpp"
 #include "../utility/reverse_iterator.hpp"
+#include "../utility/is_integral.hpp"
+#include "../utility/enable_if.hpp"
 
 #include "rbtree_node.hpp"
 #include "map_iterator.hpp"
@@ -88,7 +91,7 @@ namespace ft
 			return new_node;
 		}
 
-		pair<rbtree_node_base*, bool> insert_node_at_position(const value_type& value)
+		pair<rbtree_node_base*, bool> get_position_for_insertion(const value_type& value)
 		{
 			bool isUniqueKey = true;
 			rbtree_node_base* position = &_sentinel;
@@ -97,9 +100,10 @@ namespace ft
 			while(current != &_sentinel)
 			{
 				position = current;
-				if (key == static_cast<node_pointer>(current)->_value.first){
+				if (key == static_cast<node_pointer>(current)->_value.first)
+				{
 					isUniqueKey = false;
-					return ft::pair<rbtree_node_base *, bool>(current, isUniqueKey);
+					return ft::pair<rbtree_node_base*, bool>(current, isUniqueKey);
 				}
 				if (_compare(key, static_cast<node_pointer>(current)->_value.first))
 				{
@@ -109,7 +113,14 @@ namespace ft
 					current = current->_right;
 				}
 			}
-			rbtree_node_base* new_node = create_node(position, &_sentinel, value);
+			return ft::pair<rbtree_node_base *, bool>(position, isUniqueKey);
+		}
+
+		pair<rbtree_node_base*, bool> insert_node_at_position(ft::pair<rbtree_node_base *, bool> position_pair,
+														const value_type& value)
+		{
+			rbtree_node_base *position = position_pair.first;
+			rbtree_node_base *new_node = create_node(position, &_sentinel, value);
 			if (position == &_sentinel)
 			{
 				_root = new_node;
@@ -117,7 +128,7 @@ namespace ft
 				_root->_color = BLACK;
 				_sentinel._parent = _root;
 			}
-			else if (_compare(key, static_cast<node_pointer>(position)->_value.first))
+			else if (_compare(value.first, static_cast<node_pointer>(position)->_value.first))
 			{
 				position->_left = new_node;
 			}
@@ -126,7 +137,7 @@ namespace ft
 				position->_right = new_node;
 			}
 			_size++;
-			return ft::pair<rbtree_node_base *, bool>(new_node, isUniqueKey);
+			return ft::pair<rbtree_node_base *, bool>(new_node, position_pair.second);
 		}
 
 		void rotate_left(rbtree_node_base* node)
@@ -240,178 +251,7 @@ namespace ft
 			}
 			_root->_color = BLACK;
 		}
-
-public:
-		// CONSTRUCTORS:
-		//empty (1)
-		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
-		explicit map(const key_compare& comp = key_compare(),
-					const allocator_type& alloc = allocator_type())
-					 : _sentinel(NULL,NULL)
-					 , _root(&_sentinel)
-					 , _size(0)
-					 , _alloc(alloc)
-					 , _node_alloc(alloc)
-					 , _compare(comp)
-					 {
-						_sentinel._color = BLACK;
-					 }
-
-		// range (2)
-		template <class InputIterator>
-		map(InputIterator first, InputIterator last,
-			const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type())
-			 		: _sentinel(NULL,NULL)
-					 , _root(&_sentinel)
-					 , _size(0)
-					 , _alloc(alloc)
-					 , _node_alloc(alloc)
-					 , _compare(comp)
-					 {
-						_sentinel._color = BLACK;
-						for (InputIterator iter = first; iter != last; ++iter)
-						{
-							insert(*iter);
-						}
-					 }
-
-		// copy (3)
-		map(const map& x) : _sentinel(NULL, NULL), _root(&_sentinel)
-		{
-			*this = x;
-		}
-
-		 ~map() { clear(); }
-
-		map& operator=(const map& x)
-		{
-			if (this != &x)
-			{
-				clear();
-				_alloc = x.get_allocator();
-				_compare = x._compare;
-				insert(x.begin(), x.end());
-			}
-            return *this;
-		}
-
-		allocator_type get_allocator() const
-		{
-			return _alloc;
-		}
-		
-// 		//TODO: operator[] 
-// 		// ELEMENT ACCESS:
-// 		mapped_type& operator[] (const key_type& k)
-// 		{
-// 
-// 		}
-
-
-
-		// ITERATORS:
-	private:
-		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
-		{
-			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
-			{
-				node = node->_left;
-			}
-			return node;
-		}
-
-	public:
-		iterator begin()
-		{
-			if (empty())
-			{
-				return end();
-			}
-			rbtree_node_base *node = rbtree_min(_root);
-			return iterator(node);
-		}
-		
-		const_iterator begin() const
-		{
-			if (empty())
-			{
-				return const_iterator(_root);
-			}
-			rbtree_node_base *node = rbtree_min(_root);
-			return const_iterator(node);
-		}
-
-		iterator end()
-		{
-			return iterator(&_sentinel);		
-		}
-
-		const_iterator end() const
-		{
-			return const_iterator(&_sentinel);
-		}
-
-		reverse_iterator rbegin()
-		{
-			if (empty())
-			{
-				return rend();
-			}
-			return reverse_iterator(end()--);
-		}
-
-		const_reverse_iterator rbegin() const
-		{
-			if (empty())
-			{
-				return rend();
-			}
-			return const_reverse_iterator(end()--);
-		}
-
-		reverse_iterator rend()
-		{
-			return reverse_iterator(&_sentinel);		
-		}
-
-		const_reverse_iterator rend() const
-		{
-			return const_reverse_iterator(&_sentinel);
-		}
-
-		// CAPACITY:
-
-		bool empty() const
-		{
-			return (_root == &_sentinel);
-		}
-		size_type max_size() const
-		{
-			return _node_alloc.max_size();
-		}
-		size_type size() const
-		{
-			return _size;
-		}
-
-		// // MODIFIERS:
-		void clear()
-		{
-			iterator start = begin();
-			while (start != &_sentinel)
-			{
-				// need to save the next iterator for the next loop before deleting the node as we're destroying without rebalancing
-				rbtree_node_base* first_node = start.get_node_pointer();
-				start++;
-				delete_without_rebalancing(first_node);
-				_node_alloc.destroy(static_cast<node_pointer>(first_node));
-				_node_alloc.deallocate(static_cast<node_pointer>(first_node), 1);
-				_size--;
-			}
-		}
-
-	private:
+private:
 
 		pair<int, rbtree_node_base*> delete_without_rebalancing(rbtree_node_base* node_to_delete)
 		{
@@ -547,7 +387,176 @@ public:
 			node->_color = BLACK;
 		}
 
+public:
+		// CONSTRUCTORS:
+		//empty (1)
+		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
+		explicit map(const key_compare& comp = key_compare(),
+					const allocator_type& alloc = allocator_type())
+					 : _sentinel(NULL,NULL)
+					 , _root(&_sentinel)
+					 , _size(0)
+					 , _alloc(alloc)
+					 , _node_alloc(alloc)
+					 , _compare(comp)
+					 {
+						_sentinel._color = BLACK;
+					 }
+
+		// range (2)
+		template <class InputIterator>
+		map(InputIterator first, InputIterator last,
+			const key_compare& comp = key_compare(),
+			const allocator_type& alloc = allocator_type())
+			 		: _sentinel(NULL,NULL)
+					 , _root(&_sentinel)
+					 , _size(0)
+					 , _alloc(alloc)
+					 , _node_alloc(alloc)
+					 , _compare(comp)
+					 {
+						_sentinel._color = BLACK;
+						for (InputIterator iter = first; iter != last; ++iter)
+						{
+							insert(*iter);
+						}
+					 }
+
+		// copy (3)
+		map(const map& x) : _sentinel(NULL, NULL), _root(&_sentinel)
+		{
+			*this = x;
+		}
+
+		 ~map() { clear(); }
+
+		map& operator=(const map& x)
+		{
+			if (this != &x)
+			{
+				clear();
+				_alloc = x.get_allocator();
+				_compare = x._compare;
+				insert(x.begin(), x.end());
+				_size = x._size;
+			}
+			return *this;
+		}
+
+		allocator_type get_allocator() const
+		{
+			return _alloc;
+		}
+		
+// 		//TODO: operator[] 
+// 		// ELEMENT ACCESS:
+// 		mapped_type& operator[] (const key_type& k)
+// 		{
+// 
+// 		}
+
+
+
+		// ITERATORS:
+	private:
+		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
+		{
+			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
+			{
+				node = node->_left;
+			}
+			return node;
+		}
+
 	public:
+		iterator begin()
+		{
+			if (empty())
+			{
+				return end();
+			}
+			rbtree_node_base *node = rbtree_min(_root);
+			return iterator(node);
+		}
+		
+		const_iterator begin() const
+		{
+			if (empty())
+			{
+				return const_iterator(_root);
+			}
+			rbtree_node_base *node = rbtree_min(_root);
+			return const_iterator(node);
+		}
+
+		iterator end()
+		{
+			return iterator(&_sentinel);		
+		}
+
+		const_iterator end() const
+		{
+			return const_iterator(&_sentinel);
+		}
+
+		reverse_iterator rbegin()
+		{
+			if (empty())
+			{
+				return rend();
+			}
+			return reverse_iterator(end()--);
+		}
+
+		const_reverse_iterator rbegin() const
+		{
+			if (empty())
+			{
+				return rend();
+			}
+			return const_reverse_iterator(end()--);
+		}
+
+		reverse_iterator rend()
+		{
+			return reverse_iterator(&_sentinel);		
+		}
+
+		const_reverse_iterator rend() const
+		{
+			return const_reverse_iterator(&_sentinel);
+		}
+
+		// CAPACITY:
+
+		bool empty() const
+		{
+			return (_root == &_sentinel);
+		}
+		size_type max_size() const
+		{
+			return _node_alloc.max_size();
+		}
+		size_type size() const
+		{
+			return _size;
+		}
+
+		// // MODIFIERS:
+		void clear()
+		{
+			iterator start = begin();
+			while (start != &_sentinel)
+			{
+				// need to save the next iterator for the next loop before deleting the node as we're destroying without rebalancing
+				rbtree_node_base* first_node = start.get_node_pointer();
+				start++;
+				delete_without_rebalancing(first_node);
+				_node_alloc.destroy(static_cast<node_pointer>(first_node));
+				_node_alloc.deallocate(static_cast<node_pointer>(first_node), 1);
+				_size--;
+			}
+		}
 
 		void erase(iterator position)
 		{
@@ -581,31 +590,71 @@ public:
 			}
 		}
 
+		void tree_print_helper()
+		{
+			ft::map<int, int>::iterator f_it = begin();
+			ft::map<int, int>::iterator itEnd = end();
+			int n = 1;
+			for (ft::map<int, int>::iterator i = f_it; i != itEnd; ++i, ++n)
+			{
+				std::cout << n << ": " << i->first <<"  " << i.get_node_pointer()->_color << std::endl;
+				if (i.get_node_pointer() == _root)
+				{
+
+					std::cout << " this is the root: " << i->first << std::endl;
+				}
+				
+			}
+		}
+
+		// insert():
 		// single element (1)	
 		pair<iterator,bool> insert(const value_type& val)
 		{
-			ft::pair<rbtree_node_base *, bool> i_pair;
-			i_pair = insert_node_at_position(val);
-			if (i_pair.second != false) // if the key didn't exist before and the new node has been inserted
+			pair<rbtree_node_base *, bool> position_pair;
+			position_pair = get_position_for_insertion(val);
+			if (position_pair.second != false) // if the key didn't exist before and the new node has been inserted
 			{
-				rbtree_insert_fixup(i_pair.first);
+				pair<rbtree_node_base *, bool> insert_pair;
+				insert_pair = insert_node_at_position(position_pair, val);
+				rbtree_insert_fixup(insert_pair.first);
+				return insert_pair;
 			}
-			return i_pair;
+			return position_pair;
 		}
-		// // TODO: insert
-		// // with hint (2)
-		// iterator insert (iterator position, const value_type& val);
+
+		//TODO: insert()
+		// with hint (2)
+		iterator insert (iterator position, const value_type& val)
+		{
+			key_type key = val.first;
+			pair<rbtree_node_base *, bool> insert_pair;
+			if (_compare(key, (position - 1)->first) && !_compare(key, position->first))
+			{
+				if (key == position->first)
+				{
+					return position;
+				}
+				pair<rbtree_node_base *, bool> position_pair = make_pair(position, true);
+				insert_pair = insert_node_at_position(position_pair, val);
+				rbtree_insert_fixup(insert_pair.first);
+			}
+			else
+			{
+				insert_pair = insert(val);
+			}
+			return iterator(insert_pair.first);
+		}
+
 		// range (3)
-		// // TODO: add enableif to check if it's iterator:
 		template <class InputIterator>
-		void insert(InputIterator first, InputIterator last)
+		void insert(typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
 		{
 			for (InputIterator iter = first; iter != last; ++iter)
 			{
 				insert(*iter);
 			}
 		}
-
 
 		//LOOKUP:
 		size_type count(const key_type& key) const
@@ -735,8 +784,7 @@ public:
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator==( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 	{
-		 //TODO  equal meeds to be implemented:
-        if (::std::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
+        if (ft::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
         {
             return true;
         }
