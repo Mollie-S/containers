@@ -34,6 +34,7 @@ namespace ft
         typedef vector_iter<value_type>                 iterator;
         typedef vector_iter<const value_type>           const_iterator;
         typedef ft::reverse_iterator<iterator>          reverse_iterator;
+        //TODO: const reverse iterator!
         typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
     private:
@@ -104,21 +105,27 @@ namespace ft
             }
         }
 
-      
-        // TODO: check if it's needed
-        iterator ft_insert(iterator position, size_type n, const value_type& val)
+        // returns the pointer to the poaition that will be filled with the new value
+        pointer move_elements_forward(iterator position, size_type n)
         {
-            iterator it_end = end();
-            // do I replace it with unitia;ized copy???
-            for (iterator current = it_end, prev = (current - n); current != (position - 1); --current, --prev)
+            const size_type newsize = _size + n;
+            difference_type distance = position - begin();
+            if (newsize > _capacity) // no more free space; relocate:
             {
-                *prev = *current;
+                reserve(newsize);
+                position = begin() + distance;
             }
-            size_type fill_start = position - begin();
-            size_type fill_end = fill_start + n;
-            uninitialized_fill(_elements + fill_start, _elements + fill_end, val);
-            _size += n;
-            return position;
+            iterator it = position;
+            if (!empty())
+            {
+                it = end() - 1;
+                for (; it != (position - 1); --it) // moving from the last element to the position(included)
+                {
+                    *(it + n) = *(it);
+                }
+            }
+            pointer start = data() + distance;
+            return start;
         }
 
         // WHY TO USE DESTRUCT AND DEALLOCATE:
@@ -208,8 +215,12 @@ namespace ft
 			return *this;
         }
 
-     
-        // ELEMENT ACCESS:
+        allocator_type get_allocator() const
+        {
+            return _alloc;
+        }
+
+             // ELEMENT ACCESS:
         reference at(size_type pos)
         {
             if (pos >= _size)
@@ -421,36 +432,33 @@ namespace ft
             return first;
         }
 
-        // TODO: REWRITE WITH ASSIGN 1 ELEMENT AND REVERSE OPERATOR:
         iterator insert(iterator position, const value_type& val)
         {
-            ft_insert(position,1,val);
+            pointer start = move_elements_forward(position, 1);
+            uninitialized_fill(start, start + 1, val);
+            _size++;
+            return iterator(start);
         }
-        // TODO: use assign with reverse iterator!
+
+
         // fill (2)	//  (return: Iterator pointing to the first element inserted, or pos if count==0) how is it possible if return type is void?
         void insert(iterator position, size_type n, const value_type& val)
         {
-            const size_type newsize = _size + n;
-            if (newsize > _capacity) // no more free space; relocate:
-            {
-                reserve(newsize);
-            }
-            ft_insert(position,n,val);
+            pointer start = move_elements_forward(position, n);
+            uninitialized_fill(start, start + n, val);
+            _size += n;
         }
 
-        // TODO:
         // range (3)	
-        // template <class InputIterator>
-        // void insert (iterator position, InputIterator first, InputIterator last)
-        // {
-        //     size_type distance = last - first;
-        //     const size_type newsize = _size + distance;
-        //     if (newsize > _capacity)
-        //     {
-        //         reserve(newsize);
-        //     }
-                
-        // }
+        template <class InputIterator>
+        void insert (iterator position, typename ft::enable_if<ft::is_input_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last)
+        {
+            size_type distance = last - first;
+            pointer start = move_elements_forward(position, distance);
+            uninitialized_copy(start, first, last);
+            _size += distance;
+        }
+
         void pop_back()
         {
             // If the container is not empty, the function never throws exceptions (no-throw guarantee).
