@@ -6,9 +6,11 @@
 #include <cmath>
 
 #include "../utility/is_iterator.hpp"
+#include "../utility/is_integral.hpp"
 #include "../utility/enable_if.hpp"
 #include "../utility/reverse_iterator.hpp"
 #include "../utility/lexicographical_compare.hpp"
+#include "../utility/equal.hpp"
 
 #include "utils.hpp"
 #include "vector_iterator.hpp"
@@ -160,10 +162,8 @@ namespace ft
     public:
         //default constructor(1):
         explicit vector<T, Alloc>(const allocator_type &alloc = allocator_type())
-            : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
-        {
-            std::cout << "Default constructor called\n";
-        }
+            : _elements(NULL), _capacity(0), _size(0), _alloc(alloc) {}
+            
         //fill constructor(2)
         explicit vector<T, Alloc>(size_type n, const value_type &val = value_type(),
                                   const allocator_type &alloc = allocator_type())
@@ -192,7 +192,7 @@ namespace ft
 
         //	range constructor(3)
         template <class InputIterator>
-        vector (typename ft::enable_if<ft::is_input_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last,
+        vector (typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last,
                 const allocator_type& alloc = allocator_type())
                     : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
         {
@@ -451,7 +451,7 @@ namespace ft
 
         // range (3)	
         template <class InputIterator>
-        void insert (iterator position, typename ft::enable_if<ft::is_input_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last)
+        void insert (iterator position, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
         {
             size_type distance = last - first;
             pointer start = move_elements_forward(position, distance);
@@ -517,8 +517,7 @@ namespace ft
     template <class T, class Alloc>
     bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
-        //TODO  equal meeds to be implemented:
-        if (::std::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
+        if (ft::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
         {
             return true;
         }
@@ -543,7 +542,7 @@ namespace ft
     template <class T, class Alloc>
     bool operator> (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
-        return rhs < lhs; // reusing operator<() but changing the sides
+        return rhs < lhs;
     }
     template <class T, class Alloc>
     bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
