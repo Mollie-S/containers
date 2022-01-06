@@ -25,7 +25,8 @@ namespace ft
 		// initialization (2)	
 		explicit reverse_iterator (iterator_type it) : _current(it) {}
 		// copy (3)	
-		reverse_iterator (const reverse_iterator<Iterator>& rev_it) : _current(rev_it.base()) {}
+		template<typename Iter>
+		reverse_iterator (const reverse_iterator<Iter>& rev_it) : _current(rev_it.base()) {}
 
 
 		//Returns a copy of the base iterator.
@@ -105,37 +106,38 @@ namespace ft
 
 	// NON_MEMBER OVERLOADS:
 		
-template <class Iterator>
-bool operator== (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+template <class Iterator1, typename Iterator2>
+bool operator== (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() == rhs.base();
 }
 
-template <class Iterator>
-bool operator!= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+template <class Iterator1, typename Iterator2>
+bool operator!= (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() != rhs.base();
 }
 
-template <class Iterator>
-bool operator<  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+template <class Iterator1, typename Iterator2>
+bool operator<  (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() > rhs.base(); // not <!!!
 }
 
-template <class Iterator>
-bool operator<= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+template <class Iterator1, typename Iterator2>
+bool operator<= (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() >= rhs.base(); // not <=!!!
 }
-template <class Iterator>
-bool operator>  (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+
+template <class Iterator1, typename Iterator2>
+bool operator>  (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() < rhs.base();
 }
 
-template <class Iterator>
-bool operator>= (const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+template <class Iterator1, typename Iterator2>
+bool operator>= (const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs)
 {
 	return lhs.base() <= rhs.base();
 }
