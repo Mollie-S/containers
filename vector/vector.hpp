@@ -11,8 +11,8 @@
 #include "../utility/reverse_iterator.hpp"
 #include "../utility/lexicographical_compare.hpp"
 #include "../utility/equal.hpp"
+#include "../utility/ft_swap.hpp"
 
-#include "utils.hpp"
 #include "vector_iterator.hpp"
 namespace ft
 {
@@ -36,7 +36,6 @@ namespace ft
         typedef vector_iter<value_type>                 iterator;
         typedef vector_iter<const value_type>           const_iterator;
         typedef ft::reverse_iterator<iterator>          reverse_iterator;
-        //TODO: const reverse iterator!
         typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
     private:
@@ -208,7 +207,10 @@ namespace ft
         {
             if (this == &other)
                 return *this;
-			clear();
+                if (!empty())
+                {
+                    clear();
+                }
 			_alloc.deallocate(_elements, _capacity);
 			_alloc = other._alloc;
 			assign(other.begin(), other.end());
@@ -267,7 +269,10 @@ namespace ft
         {
             return _elements[pos];
         }
-
+        const_reference operator[] (size_type pos) const
+        {
+            return _elements[pos];
+        }
 
         // ITERATORS:
         iterator begin()
