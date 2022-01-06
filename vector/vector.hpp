@@ -20,7 +20,7 @@ namespace ft
     class vector
     {
     public:
-        //  iterators are an abstraction of pointers
+     //  iterators are an abstraction of pointers
 
     //  vector<string>::const_iterator   iter;     // is an iterator that refers to things that are constant, while
     // const vector<string>::iterator   iter;       // would make the iterator itself constant, but allow you to modify the object it refers to.
@@ -207,11 +207,14 @@ namespace ft
         {
             if (this == &other)
                 return *this;
-                if (!empty())
-                {
-                    clear();
-                }
-			_alloc.deallocate(_elements, _capacity);
+            if (!empty())
+            {
+                clear();
+            }
+            if (other._size > _capacity)
+            {
+                _alloc.deallocate(_elements, _capacity);
+            }
 			_alloc = other._alloc;
 			assign(other.begin(), other.end());
 			return *this;
