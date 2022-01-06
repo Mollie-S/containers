@@ -13,13 +13,11 @@ namespace ft
 			  >
 	class map;
 
-	template <class Value, typename NodeBasePtr, typename NodePtr>
+	template <class Value, typename NodeBase, typename Node>
 	class map_iter // Iterator base class
 	{
 	public:
-
-
-		typedef map_iter<Value, NodeBasePtr, NodePtr>	                      	iterator_type;
+		typedef map_iter<Value, NodeBase, Node>			                      	iterator_type;
 		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
 		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
@@ -27,15 +25,15 @@ namespace ft
     	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
 
 		// maps of any specialization are allowed to see private members
+		// sort of the module level incapsulation
 		template<typename T1, typename T2, typename T3, typename T4>
 		friend class map;
 
-		// means that map_iter specialized for any types can get access to the map iter of these types
-		// crazy
-		template<typename T1, typename T2, typename T3>
-		friend class map_iter;
-
 	private:
+		typedef NodeBase* NodeBasePtr;
+		typedef Node* NodePtr;
+		typedef map_iter<const Value, const NodeBase, const Node> const_iterator_type;
+
 		NodeBasePtr _node_ptr;
 
 		bool isSentinel(NodeBasePtr node_ptr) const
@@ -46,12 +44,13 @@ namespace ft
 	public:
 		map_iter() : _node_ptr(NULL) {}
 		map_iter(NodeBasePtr node_ptr) : _node_ptr(node_ptr) {}
-		
-		// template function inside of a template accepting map_iter for the same value type but with different node pointers
-		// this allows to cast from non-const to const
-		template <typename T1, typename T2>
-		map_iter(const map_iter<Value, T1, T2> &other) : _node_ptr(other._node_ptr) {}
+		map_iter(const iterator_type& other) : _node_ptr(other._node_ptr) {}
 		~map_iter(){};
+
+		// type conversion operator
+		operator const_iterator_type() const {
+			return const_iterator_type(_node_ptr);
+		}
 
 		map_iter& operator=(const map_iter& other)
 		{
@@ -174,6 +173,7 @@ namespace ft
 			}
 			return *this;
 		}
+		
 		map_iter operator--(int)
 		{
 			map_iter temp = *this;
@@ -181,17 +181,17 @@ namespace ft
 			return temp;
 		}
 
-		// EQUALITY/INEQUALITY OPERATORS:
-		template<typename T1, typename T2>
-		bool operator==(const map_iter<Value, T1, T2>& other) const
+	// will be able to convert non-const to const due to conversion operator
+		friend
+		bool operator==(const iterator_type& lhs, const iterator_type& rhs)
 		{
-			return (_node_ptr == other._node_ptr);
+			return (lhs._node_ptr == rhs._node_ptr);
 		}
 
-		template<typename T1, typename T2>
-		bool operator!=(const map_iter<Value, T1, T2>& other) const
+		friend
+		bool operator!=(const iterator_type& lhs, const iterator_type& rhs)
 		{
-			return (_node_ptr != other._node_ptr);
+			return (lhs._node_ptr != rhs._node_ptr);
 		}
 	};
 }
