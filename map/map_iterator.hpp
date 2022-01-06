@@ -6,6 +6,12 @@
 
 namespace ft
 {
+	template <class Key,
+			  class T,		
+			  class Compare,
+			  class Alloc
+			  >
+	class map;
 
 	template <class Value, typename NodeBasePtr, typename NodePtr>
 	class map_iter // Iterator base class
@@ -19,11 +25,15 @@ namespace ft
     	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
     	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
     	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
-	
-	NodeBasePtr get_node_pointer() const
-	{
-		return _node_ptr;
-	}
+
+		// maps of any specialization are allowed to see private members
+		template<typename T1, typename T2, typename T3, typename T4>
+		friend class map;
+
+		// means that map_iter specialized for any types can get access to the map iter of these types
+		// crazy
+		template<typename T1, typename T2, typename T3>
+		friend class map_iter;
 
 	private:
 		NodeBasePtr _node_ptr;
@@ -36,7 +46,11 @@ namespace ft
 	public:
 		map_iter() : _node_ptr(NULL) {}
 		map_iter(NodeBasePtr node_ptr) : _node_ptr(node_ptr) {}
-		map_iter(const map_iter& other) : _node_ptr(other._node_ptr) {}
+		
+		// template function inside of a template accepting map_iter for the same value type but with different node pointers
+		// this allows to cast from non-const to const
+		template <typename T1, typename T2>
+		map_iter(const map_iter<Value, T1, T2> &other) : _node_ptr(other._node_ptr) {}
 		~map_iter(){};
 
 		map_iter& operator=(const map_iter& other)
@@ -108,6 +122,17 @@ namespace ft
  		//  ARITHMETIC OPERATORS
 		map_iter& operator++()
 		{
+			// if we're incrementing a reverse_iterator pointing to rend():
+			if (isSentinel(_node_ptr))
+			{
+				rbtree_node_base *node = _node_ptr->_parent; // sentinel's parent is always pointing to the root
+				while (!isSentinel(node->_left)) // iterating until the right is not pointing to the NIL that is the sentinel node
+				{
+					node = node->_left;
+				}
+				_node_ptr = node;
+				return *this;
+			}
 			if (!isSentinel(_node_ptr->_right))
 			{
 				_node_ptr = _move_down_right(_node_ptr);
@@ -132,7 +157,7 @@ namespace ft
 			if (isSentinel(_node_ptr))
 			{
 				rbtree_node_base *node = _node_ptr->_parent; // sentinel's parent is always pointing to the root
-				while (!isSentinel(node->_right)) // iterating until the left are not pointing to the NIL that is the sentinel node
+				while (!isSentinel(node->_right)) // iterating until the right is not pointing to the NIL that is the sentinel node
 				{
 					node = node->_right;
 				}
@@ -157,13 +182,17 @@ namespace ft
 		}
 
 		// EQUALITY/INEQUALITY OPERATORS:
-
-		friend bool operator==(const map_iter& lhs, const map_iter& rhs)
+		template<typename T1, typename T2>
+		bool operator==(const map_iter<Value, T1, T2>& other) const
 		{
-			return (lhs._node_ptr == rhs._node_ptr);
+			return (_node_ptr == other._node_ptr);
 		}
-		friend bool operator!=(const map_iter& lhs, const map_iter& rhs) { return !(lhs._node_ptr == rhs._node_ptr); }
-	};
 
+		template<typename T1, typename T2>
+		bool operator!=(const map_iter<Value, T1, T2>& other) const
+		{
+			return (_node_ptr != other._node_ptr);
+		}
+	};
 }
 #endif
