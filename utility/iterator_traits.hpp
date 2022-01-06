@@ -16,17 +16,7 @@ namespace ft
 	struct iterator_traits {};
 
 	template<typename Value, typename T1, typename T2> 
-	struct iterator_traits<ft::map_iter<Value, const T1*, const T2*> >
-	{
-		typedef Value        	value_type;
-    	typedef std::size_t   	difference_type;
-    	typedef const Value*    pointer;
-    	typedef const Value&    reference;
-		typedef std::bidirectional_iterator_tag	iterator_category;
-	};
-
-	template<typename Value, typename T1, typename T2> 
-	struct iterator_traits<ft::map_iter<Value, T1*, T2*> >
+	struct iterator_traits<ft::map_iter<Value, T1, T2> >
 	{
 		typedef Value        	value_type;
     	typedef std::size_t   	difference_type;
@@ -35,15 +25,6 @@ namespace ft
 		typedef std::bidirectional_iterator_tag	iterator_category;
 	};
 
-	template<typename Value> 
-	struct iterator_traits<ft::vector_iter<const Value> >
-	{
-		typedef Value        	value_type;
-    	typedef std::size_t   	difference_type;
-    	typedef const Value*    pointer;
-    	typedef const Value&    reference;
-		typedef std::random_access_iterator_tag	iterator_category;
-	};
 
 	template<typename Value> 
 	struct iterator_traits<ft::vector_iter<Value> >
