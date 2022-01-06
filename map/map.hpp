@@ -44,8 +44,8 @@ namespace ft
 		typedef typename Alloc::template rebind<ft::rbtree_node_base>::other node_base_alloc_type;
 
 	public:
-		typedef map_iter<value_type, rbtree_node_base*, rbtree_node<value_type>* >                   		iterator;
-		typedef map_iter<value_type, const rbtree_node_base*, const rbtree_node<value_type>* >              const_iterator;
+		typedef map_iter<value_type, rbtree_node_base, rbtree_node<value_type> >                   		iterator;
+		typedef map_iter<const value_type, const rbtree_node_base, const rbtree_node<value_type> >              const_iterator;
         typedef ft::reverse_iterator<iterator>          													reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>    													const_reverse_iterator;
 
@@ -422,11 +422,10 @@ namespace ft
 			return make_pair(node, parent);
 		}
 
-		// replacing_pair.first is the node
-		// replacing_pair.second is its parent
+		// replacing_pair.first  == the node
+		// replacing_pair.second == node's parent
 		void rbtree_delete_fixup(pair<rbtree_node_base*, rbtree_node_base*> replacing_pair)
 		{
-			// TODO: remove if condition()???
 			if (replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel)
 			{
 				return;
@@ -447,7 +446,7 @@ namespace ft
 
 		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
 		{
-			while (node->_left != _sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
+			while (node->_left != _sentinel) // iterating until the left is pointing to the NIL that is the sentinel node
 			{
 				node = node->_left;
 			}
@@ -456,7 +455,7 @@ namespace ft
 
 		rbtree_node_base* create_sentinel_node()
 		{
-			rbtree_node_base* null_base_node = _node_base_alloc.allocate(1); //Atsuccessorts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
+			rbtree_node_base* null_base_node = _node_base_alloc.allocate(1);
 			_node_base_alloc.construct(null_base_node);
 			return null_base_node;
 		}
@@ -627,6 +626,7 @@ public:
 		}
 
 		// // MODIFIERS:
+		// TODO: add parameter for skipping the delete fixup as clear removes all the elements
 		void clear()
 		{
 			iterator start = begin();
@@ -678,7 +678,6 @@ public:
 				}
 			}
 		}
-
 
 		// insert():
 		// single element (1)	
