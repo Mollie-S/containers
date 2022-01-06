@@ -16,14 +16,16 @@ namespace ft
 		rbtree_node_base*		_right;
 		e_color 				_color;
 		// TODO: remove temp key from base and derived class
+		// int _key;
 		std::string _key;
 
+		rbtree_node_base() : _parent(NULL), _left(NULL), _right(NULL), _color(BLACK), _key() {}
 		rbtree_node_base(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr)
 			: _parent(parent_ptr)
 			, _left(child_ptr)
 			, _right(child_ptr)
 			, _color(RED)
-			, _key("nothing")
+			, _key()
 			{}
 	};
 
@@ -34,7 +36,10 @@ namespace ft
 	{
 		Value 	_value;
 		explicit rbtree_node(rbtree_node_base *parent_ptr, rbtree_node_base *child_ptr, const Value &value)
-			: rbtree_node_base(parent_ptr, child_ptr), _value(value) { _key = value.first; }
+			: rbtree_node_base(parent_ptr, child_ptr), _value(value) {
+		// TODO: remove assignment
+				 _key = value.first;
+				 }
 	};
 }
 
