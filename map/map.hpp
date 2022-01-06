@@ -12,6 +12,7 @@
 #include "../utility/reverse_iterator.hpp"
 #include "../utility/is_integral.hpp"
 #include "../utility/enable_if.hpp"
+#include "../utility/ft_swap.hpp"
 
 #include "rbtree_node.hpp"
 #include "map_iterator.hpp"
@@ -40,6 +41,7 @@ namespace ft
 
 	private:
 		typedef typename Alloc::template rebind<ft::rbtree_node<value_type> >::other node_alloc_type;
+		typedef typename Alloc::template rebind<ft::rbtree_node_base>::other node_base_alloc_type;
 
 	public:
 		typedef map_iter<value_type, rbtree_node_base*, rbtree_node<value_type>* >                   		iterator;
@@ -76,12 +78,14 @@ namespace ft
 		//In order to save a marginal amount of execution time, 
 		//these (possibly many) NIL leaves may be implemented as pointers to one unique (and black)
 		// sentinel node (instead of pointers of value NULL). view Thomas H. Cormen introduction to algorithms:
-		rbtree_node_base 	_sentinel;
-		rbtree_node_base*	_root;
-		allocator_type 		_alloc;
-		node_alloc_type		_node_alloc;
-		size_type       	_size;
-		key_compare			_compare;
+
+		rbtree_node_base*		_sentinel;
+		rbtree_node_base*		_root;
+		allocator_type 			_alloc;
+		node_alloc_type			_node_alloc;
+		node_base_alloc_type	_node_base_alloc;
+		size_type       		_size;
+		key_compare				_compare;
 	
 	private:
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
@@ -94,10 +98,10 @@ namespace ft
 		pair<rbtree_node_base*, bool> get_position_for_insertion(const value_type& value)
 		{
 			bool isUniqueKey = true;
-			rbtree_node_base* position = &_sentinel;
+			rbtree_node_base* position = _sentinel;
 			rbtree_node_base* current = _root;
 			const key_type key = value.first;
-			while(current != &_sentinel)
+			while(current != _sentinel)
 			{
 				position = current;
 				if (key == static_cast<node_pointer>(current)->_value.first)
@@ -120,13 +124,13 @@ namespace ft
 														const value_type& value)
 		{
 			rbtree_node_base *position = position_pair.first;
-			rbtree_node_base *new_node = create_node(position, &_sentinel, value);
-			if (position == &_sentinel)
+			rbtree_node_base *new_node = create_node(position, _sentinel, value);
+			if (position == _sentinel)
 			{
 				_root = new_node;
-				_root->_parent = &_sentinel;
+				_root->_parent = _sentinel;
 				_root->_color = BLACK;
-				_sentinel._parent = _root;
+				_sentinel->_parent = _root;
 			}
 			else if (_compare(value.first, static_cast<node_pointer>(position)->_value.first))
 			{
@@ -140,56 +144,52 @@ namespace ft
 			return ft::pair<rbtree_node_base *, bool>(new_node, position_pair.second);
 		}
 
-		void rotate_left(rbtree_node_base* node)
+		void assign_subnode_to_new_parent(rbtree_node_base* node, rbtree_node_base* subnode)
 		{
-			rbtree_node_base* temp = node->_right;
-			node->_right = temp->_left;
-			if (temp->_left != &_sentinel)
+			if (node->_parent == _sentinel)
 			{
-				temp->_left->_parent = node; //linking left child of the temp to the node
-			}
-			temp->_parent = node->_parent; //linking node's parent to the temp
-			if (node->_parent == &_sentinel)
-			{
-				_root = temp;
-				_sentinel._parent = _root;
+				_root = subnode;
+				_sentinel->_parent = _root;
 			}
 			else if (node == node->_parent->_left)
 			{
-				node->_parent->_left = temp; // left child of the node's parent points to the temp now
+				node->_parent->_left = subnode; // left child of the node's parent points to the subnode now
 			}
 			else
 			{
-				node->_parent->_right = temp; // or the right child of the node's parent points to the temp now
+				node->_parent->_right = subnode; // or the right child of the node's parent points to the subnode now
 			}
-			temp->_left = node;
-			node->_parent = temp;
+		}
+
+		// we're rotating left so that the right_subnode(right child) of the node becomes the parent of the current node
+		// current node will become the left child of te current subnode
+		// and left child of the subnode becomes the right child of the current node
+		void rotate_left(rbtree_node_base* node)
+		{
+			rbtree_node_base* subnode = node->_right;
+			node->_right = subnode->_left;
+			if (subnode->_left != _sentinel)
+			{
+				subnode->_left->_parent = node; //linking left child of the subnode to the node
+			}
+			subnode->_parent = node->_parent; //linking node's parent to the subnode
+			assign_subnode_to_new_parent(node, subnode);
+			subnode->_left = node;
+			node->_parent = subnode;
 		}
 
 		void rotate_right(rbtree_node_base* node)
 		{
-			rbtree_node_base* temp = node->_left;
-			node->_left = temp->_right;
-			if (temp->_right != &_sentinel)
+			rbtree_node_base* subnode = node->_left;
+			node->_left = subnode->_right;
+			if (subnode->_right != _sentinel)
 			{
-				temp->_right->_parent = node; //linking left child of the temp to the node
+				subnode->_right->_parent = node; //linking left child of the subnode to the node
 			}
-			temp->_parent = node->_parent; //linking node's parent to the temp
-			if (node->_parent == &_sentinel)
-			{
-				_root = temp;
-				_sentinel._parent = _root;
-			}
-			else if (node == node->_parent->_left)
-			{
-				node->_parent->_left = temp; // left child of the node's parent points to the temp now
-			}
-			else
-			{
-				node->_parent->_right = temp; // or the right child of the node's parent points to the temp now
-			}
-			temp->_right = node;
-			node->_parent = temp;
+			subnode->_parent = node->_parent; //linking node's parent to the subnode
+			assign_subnode_to_new_parent(node, subnode);
+			subnode->_right = node;
+			node->_parent = subnode;
 		}
 
 		rbtree_node_base* recolor_grandparent_and_children(rbtree_node_base* grandparent)
@@ -200,191 +200,271 @@ namespace ft
 			return grandparent;
 		}
 
-		void recolor_node_and_parent(rbtree_node_base* node, rbtree_node_base* parent)
+		void swap_colors(rbtree_node_base* node, rbtree_node_base* parent)
 		{
 			node->_color = BLACK;
 			parent->_color = RED;
+		}
+
+		void rbtree_insert_fixup_right(rbtree_node_base* node, rbtree_node_base* grandparent)
+		{
+			rbtree_node_base* uncle = grandparent->_left;
+			if (uncle->_color == RED)
+			{
+				node = recolor_grandparent_and_children(grandparent);
+			}
+			else 
+			{
+				if (node == node->_parent->_left)
+				{
+					node = node->_parent;
+					rotate_right(node);
+				}
+				swap_colors(node->_parent, node->_parent->_parent);
+				rotate_left(node->_parent->_parent);
+			}
+		}
+
+		void rbtree_insert_fixup_left(rbtree_node_base* node, rbtree_node_base* grandparent)
+		{
+			rbtree_node_base *uncle = grandparent->_right;
+			if (uncle->_color == RED)
+			{
+				node = recolor_grandparent_and_children(grandparent);
+			}
+			else 
+			{
+				if (node == node->_parent->_right)
+				{
+					node = node->_parent;
+					rotate_left(node);
+				}
+					swap_colors(node->_parent, node->_parent->_parent);
+				rotate_right(node->_parent->_parent);
+			}
 		}
 
 		void rbtree_insert_fixup(rbtree_node_base* node)
 		{
 			while (node->_parent->_color == RED)
 			{
-				rbtree_node_base* parent = node->_parent;
-				rbtree_node_base* grandparent = parent->_parent;
-				if (parent == grandparent->_left)
+				rbtree_node_base* grandparent = node->_parent->_parent;
+				if (node->_parent == grandparent->_left)
 				{
-					rbtree_node_base* uncle = grandparent->_right;
-					if (uncle->_color == RED)
-					{
-						node = recolor_grandparent_and_children(grandparent);
-					}
-					else 
-					{
-						if (node == parent->_right)
-						{
-							node = node->_parent;
-							rotate_left(node);
-						}
-							recolor_node_and_parent(node->_parent, node->_parent->_parent);
-						rotate_right(node->_parent->_parent);
-					}
+					rbtree_insert_fixup_left(node, grandparent);
 				}
 				else
 				{
-					rbtree_node_base* uncle = grandparent->_left;
-					if (uncle->_color == RED)
-					{
-						node = recolor_grandparent_and_children(grandparent);
-					}
-					else 
-					{
-						if (node == parent->_left)
-						{
-							node = node->_parent;
-							rotate_right(node);
-						}
-						recolor_node_and_parent(node->_parent, node->_parent->_parent);
-						rotate_left(node->_parent->_parent);
-					}
+					rbtree_insert_fixup_right(node, grandparent);
 				}
 			}
 			_root->_color = BLACK;
 		}
-private:
 
-		pair<int, rbtree_node_base*> delete_without_rebalancing(rbtree_node_base* node_to_delete)
+		pair<rbtree_node_base*, rbtree_node_base*> delete_node_with_null_child(rbtree_node_base* node_to_delete)
 		{
-			rbtree_node_base* successor = node_to_delete;
-			rbtree_node_base* node_to_transplant;
-			int successor_original_color = successor->_color;
-			if (node_to_delete->_left == &_sentinel)
+			rbtree_node_base* replacement;
+			if (node_to_delete->_left == _sentinel)
 			{
-				node_to_transplant = node_to_delete->_right;
+				replacement = node_to_delete->_right;
 				rb_transplant(node_to_delete, node_to_delete->_right);
 			}
-			else if (node_to_delete->_right == &_sentinel)
+			else if (node_to_delete->_right == _sentinel)
 			{
-				node_to_transplant = node_to_delete->_left;
+				replacement = node_to_delete->_left;
 				rb_transplant(node_to_delete, node_to_delete->_left);
+			}
+			return ft::make_pair(replacement, node_to_delete);
+		}
+
+		pair<rbtree_node_base*, rbtree_node_base*>  delete_node_with_two_children(rbtree_node_base* node_to_delete, rbtree_node_base* successor)
+		{
+			rbtree_node_base *replacement;
+			replacement = successor->_right;
+			rbtree_node_base* replacement_parent = successor->_parent;
+			if (successor->_parent == node_to_delete)
+			{
+				replacement->_parent = successor;
+				replacement_parent = successor->_parent;
 			}
 			else
 			{
-				successor = rbtree_min(node_to_delete->_right); //  successor must be the node in that subtree with the smallest key; hence the call to tree_min
-				successor_original_color = successor->_color;
-				node_to_transplant = successor->_right;
-				if (successor->_parent == node_to_delete)
-				{
-					node_to_transplant->_parent = successor;
-				}
-				else
-				{
-					rb_transplant(successor, node_to_transplant);
-					successor->_right = node_to_delete->_right;
-					successor->_right->_parent = successor;
-				}
-				rb_transplant(node_to_delete, successor);
-				successor->_left = node_to_delete->_left;
-				successor->_left->_parent = successor;
-				successor->_color = node_to_delete->_color;
+				rb_transplant(successor, replacement);
+				successor->_right = node_to_delete->_right;
+				successor->_right->_parent = successor;
 			}
-				return make_pair(successor_original_color, node_to_transplant);
+			rb_transplant(node_to_delete, successor);
+			successor->_left = node_to_delete->_left;
+			successor->_left->_parent = successor;
+			successor->_color = node_to_delete->_color;
+			return ft::make_pair(replacement, replacement_parent);
 		}
 
 	// replaces pointer of the node to delete with the pointer to the replacing node
-		void rb_transplant(rbtree_node_base* node_to_delete, rbtree_node_base* replacing_node)
+		void rb_transplant(rbtree_node_base* node, rbtree_node_base* replacement)
 		{
-			if (node_to_delete->_parent == &_sentinel)
+			if (node->_parent == _sentinel)
 			{
-				_root = replacing_node;
+				_root = replacement;
+				_sentinel->_parent = _root;
 			}
-			else if (node_to_delete == node_to_delete->_parent->_left)
+			else if (node == node->_parent->_left)
 			{
-				node_to_delete->_parent->_left = replacing_node;
+				node->_parent->_left = replacement;
 			}
 			else
 			{
-				node_to_delete->_parent->_right = replacing_node;
+				node->_parent->_right = replacement;
 			}
-			replacing_node->_parent = node_to_delete->_parent;
+			if (replacement != _sentinel)
+			{
+				replacement->_parent = node->_parent;
+			}
 		}
 
+	// replacing pair will hold the pointer to the replacing node and its parent
+	// (parent is needed for the case the replacement is sentinel and its parent pointing to the root)
 		void delete_node_pointer(rbtree_node_base* node_to_delete)
 		{
-			pair<int, rbtree_node_base *> node_color_pair = delete_without_rebalancing(node_to_delete);
-			int successor_original_color = node_color_pair.first;
-			rbtree_node_base* node_to_transplant = node_color_pair.second;
-			if (successor_original_color == BLACK)
+			pair<rbtree_node_base*, rbtree_node_base*> replacing_pair;
+			int original_color = node_to_delete->_color;
+			if (node_to_delete->_left == _sentinel 
+				|| node_to_delete->_right == _sentinel)
 			{
-				rbtree_delete_fixup(node_to_transplant);
+				replacing_pair = delete_node_with_null_child(node_to_delete);
+			}
+			else
+			{
+				// if both children are not nil:
+				rbtree_node_base* successor;
+				// successor must be the node with the smallest key in that subtree; hence the call to tree_min
+				successor = rbtree_min(node_to_delete->_right); 
+				original_color = successor->_color;
+				replacing_pair = delete_node_with_two_children(node_to_delete, successor);
+			}
+			if (original_color == BLACK)
+			{
+				rbtree_delete_fixup(replacing_pair);
 			}
 		}
 
-		void rbtree_delete_fixup(rbtree_node_base* node)
+		pair<rbtree_node_base*, rbtree_node_base*> rbtree_delete_fixup_right(pair<rbtree_node_base*, rbtree_node_base*> replacing_pair)
 		{
-			while (node != _root && node->_color == BLACK)
+			rbtree_node_base* node = replacing_pair.first;
+			rbtree_node_base* parent = replacing_pair.second;
+			rbtree_node_base* sibling;
+			sibling = parent->_left;
+			if (sibling->_color == RED)
 			{
-				rbtree_node_base* sibling;
-				if (node == node->_parent->_left)
+				swap_colors(sibling, parent);
+				rotate_right(parent);
+				sibling = parent->_left;
+			}
+			if (sibling->_left->_color == BLACK 
+			&& sibling->_right->_color == BLACK)
+			{
+				sibling->_color = RED;
+				node = parent;
+				parent = parent->_parent;
+			}
+			else
+			{
+				if (sibling->_left->_color == BLACK)
 				{
-					sibling = node->_parent->_right;
-					if (sibling->_color == RED)
-					{
-						recolor_node_and_parent(sibling, node->_parent);
-						rotate_left(node->_parent);
-						sibling = node->_parent->_right;
-					}
-					if (sibling->_left->_color == BLACK && sibling->_right->_color == BLACK)
-					{
-						sibling->_color = RED;
-						node = node->_parent;
-					}
-					else 
-					{
-						if (sibling->_right->_color == BLACK)
-						{
-							recolor_node_and_parent(sibling->_left, sibling);
-							rotate_right(sibling);
-							sibling = node->_parent->_right;
-						}
-						sibling->_color = node->_parent->_color;
-						node->_parent->_color = BLACK;
-						sibling->_right->_color = BLACK;
-						rotate_left(node->_parent);
-						node = _root;
-					}
+					swap_colors(sibling->_right, sibling);
+					rotate_left(sibling);
+					sibling = parent->_left;
+				}
+				sibling->_color = parent->_color;
+				parent->_color = BLACK;
+				sibling->_right->_color = BLACK;
+				rotate_right(parent);
+				node = _root;
+				parent = _root->_parent;
+			}
+			return make_pair(node, parent);
+		}
+
+		pair<rbtree_node_base*, rbtree_node_base*> rbtree_delete_fixup_left(pair<rbtree_node_base*, rbtree_node_base*> replacing_pair)
+		{
+			rbtree_node_base *node = replacing_pair.first;
+			rbtree_node_base *parent = replacing_pair.second;
+			rbtree_node_base *sibling;
+			sibling = parent->_right;
+			if (sibling->_color == RED)
+			{
+				swap_colors(sibling, parent);
+				rotate_left(parent);
+				sibling = parent->_right;
+			}
+			if (sibling->_left->_color == BLACK 
+			&& sibling->_right->_color == BLACK)
+			{
+				sibling->_color = RED;
+				node = parent;
+				parent = parent->_parent;
+			}
+			else 
+			{
+				if (sibling->_right->_color == BLACK)
+				{
+					swap_colors(sibling->_left, sibling);
+					rotate_right(sibling);
+					sibling = parent->_right;
+				}
+				sibling->_color = parent->_color;
+				parent->_color = BLACK;
+				sibling->_right->_color = BLACK;
+				rotate_left(parent);
+				node = _root;
+				parent = _root->_parent;
+			}
+			return make_pair(node, parent);
+		}
+
+		// replacing_pair.first is the node
+		// replacing_pair.second is its parent
+		void rbtree_delete_fixup(pair<rbtree_node_base*, rbtree_node_base*> replacing_pair)
+		{
+			// TODO: remove if condition()???
+			if (replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel)
+			{
+				return;
+			}
+			while (replacing_pair.first != _root && replacing_pair.first->_color == BLACK)
+			{
+				if (replacing_pair.first == replacing_pair.second->_left)
+				{
+					replacing_pair = rbtree_delete_fixup_left(replacing_pair);
 				}
 				else
 				{
-					sibling = node->_parent->_left;
-					if (sibling->_color == RED)
-					{
-						recolor_node_and_parent(sibling, node->_parent);
-						rotate_right(node->_parent);
-						sibling = node->_parent->_left;
-					}
-					if (sibling->_left->_color == BLACK && sibling->_right->_color == BLACK)
-					{
-						sibling->_color = RED;
-						node = node->_parent;
-					}
-					else
-					{
-						if (sibling->_left->_color == BLACK)
-						{
-							recolor_node_and_parent(sibling->_right, sibling);
-							rotate_left(sibling);
-							sibling = node->_parent->_left;
-						}
-						sibling->_color = node->_parent->_color;
-						node->_parent->_color = BLACK;
-						sibling->_right->_color = BLACK;
-						rotate_right(node->_parent);
-						node = _root;
-					}
+					replacing_pair = rbtree_delete_fixup_right(replacing_pair);
 				}
 			}
-			node->_color = BLACK;
+			replacing_pair.first->_color = BLACK;
+		}
+
+		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
+		{
+			while (node->_left != _sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
+			{
+				node = node->_left;
+			}
+			return node;
+		}
+
+		rbtree_node_base* create_sentinel_node()
+		{
+			rbtree_node_base* null_base_node = _node_base_alloc.allocate(1); //Atsuccessorts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
+			_node_base_alloc.construct(null_base_node);
+			return null_base_node;
+		}
+
+		void destroy_sentinel_node()
+		{
+			_node_base_alloc.destroy(_sentinel);
+			_node_base_alloc.deallocate(_sentinel, 1);
 		}
 
 public:
@@ -393,52 +473,67 @@ public:
 		// _alloc(alloc), _node_alloc(alloc): allocator has got a template constructor that allows to construct an instance out of another type
 		explicit map(const key_compare& comp = key_compare(),
 					const allocator_type& alloc = allocator_type())
-					 : _sentinel(NULL,NULL)
-					 , _root(&_sentinel)
-					 , _size(0)
-					 , _alloc(alloc)
-					 , _node_alloc(alloc)
-					 , _compare(comp)
-					 {
-						_sentinel._color = BLACK;
-					 }
+					: _size(0)
+					, _alloc(alloc)
+					, _node_alloc(alloc)
+					, _node_base_alloc(alloc)
+					, _compare(comp)
+					{
+						_sentinel = create_sentinel_node();
+						_root = _sentinel;
+					}
 
 		// range (2)
 		template <class InputIterator>
 		map(InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type())
-			 		: _sentinel(NULL,NULL)
-					 , _root(&_sentinel)
-					 , _size(0)
-					 , _alloc(alloc)
-					 , _node_alloc(alloc)
-					 , _compare(comp)
-					 {
-						_sentinel._color = BLACK;
-						for (InputIterator iter = first; iter != last; ++iter)
-						{
-							insert(*iter);
-						}
-					 }
+					: _size(0)
+					, _alloc(alloc)
+					, _node_alloc(alloc)
+					, _node_base_alloc(alloc)
+					, _compare(comp)
+					{
+						_sentinel = create_sentinel_node();
+						_root = _sentinel;
+						insert(first, last);
+					}
 
 		// copy (3)
-		map(const map& x) : _sentinel(NULL, NULL), _root(&_sentinel)
+		map(const map& x)
+			: _size(0)
+			, _alloc(x._alloc)
+			, _node_alloc(x._alloc)
+			, _node_base_alloc(x._alloc)
+			, _compare(x._compare)
 		{
-			*this = x;
+			_sentinel = create_sentinel_node();
+			_root = _sentinel;
+			insert(x.begin(), x.end());
+		}
+		
+		~map()
+		{
+			clear();
+			destroy_sentinel_node();
 		}
 
-		 ~map() { clear(); }
-
+//TODO: check the following The container preserves its current allocator, which is used to allocate additional storage if needed.
 		map& operator=(const map& x)
 		{
 			if (this != &x)
 			{
-				clear();
+				if (!empty())
+				{
+					clear();
+					destroy_sentinel_node();
+				}
 				_alloc = x.get_allocator();
-				_compare = x._compare;
+				_node_base_alloc = x._node_base_alloc;
+				_node_alloc = x._node_alloc;
+				_sentinel = create_sentinel_node();
+				_root = _sentinel;
 				insert(x.begin(), x.end());
-				_size = x._size;
 			}
 			return *this;
 		}
@@ -448,26 +543,15 @@ public:
 			return _alloc;
 		}
 		
-// 		//TODO: operator[] 
-// 		// ELEMENT ACCESS:
-// 		mapped_type& operator[] (const key_type& k)
-// 		{
-// 
-// 		}
-
-
-
-		// ITERATORS:
-	private:
-		rbtree_node_base* rbtree_min(rbtree_node_base* node) const
+		// ELEMENT ACCESS:
+		mapped_type& operator[](const key_type& k)
 		{
-			while (node->_left != &_sentinel) // iterating until the left are not pointing to the NIL that is the sentinel node
-			{
-				node = node->_left;
-			}
-			return node;
+			pair<key_type, mapped_type> pair = ft::make_pair(k, mapped_type());
+			iterator inserted = insert(pair).first;
+			return inserted->second;;
 		}
 
+		// ITERATORS:
 	public:
 		iterator begin()
 		{
@@ -491,12 +575,12 @@ public:
 
 		iterator end()
 		{
-			return iterator(&_sentinel);		
+			return iterator(_sentinel);		
 		}
 
 		const_iterator end() const
 		{
-			return const_iterator(&_sentinel);
+			return const_iterator(_sentinel);
 		}
 
 		reverse_iterator rbegin()
@@ -505,7 +589,7 @@ public:
 			{
 				return rend();
 			}
-			return reverse_iterator(end()--);
+			return reverse_iterator(end());
 		}
 
 		const_reverse_iterator rbegin() const
@@ -514,24 +598,24 @@ public:
 			{
 				return rend();
 			}
-			return const_reverse_iterator(end()--);
+			return const_reverse_iterator(end());
 		}
 
 		reverse_iterator rend()
 		{
-			return reverse_iterator(&_sentinel);		
+			return reverse_iterator(begin());		
 		}
 
 		const_reverse_iterator rend() const
 		{
-			return const_reverse_iterator(&_sentinel);
+			return const_reverse_iterator(begin());
 		}
 
 		// CAPACITY:
 
 		bool empty() const
 		{
-			return (_root == &_sentinel);
+			return (_root == _sentinel);
 		}
 		size_type max_size() const
 		{
@@ -546,21 +630,21 @@ public:
 		void clear()
 		{
 			iterator start = begin();
-			while (start != &_sentinel)
+			while (start._node_ptr != _sentinel)
 			{
 				// need to save the next iterator for the next loop before deleting the node as we're destroying without rebalancing
-				rbtree_node_base* first_node = start.get_node_pointer();
+				rbtree_node_base* node = start._node_ptr;
 				start++;
-				delete_without_rebalancing(first_node);
-				_node_alloc.destroy(static_cast<node_pointer>(first_node));
-				_node_alloc.deallocate(static_cast<node_pointer>(first_node), 1);
-				_size--;
+				delete_node_pointer(node);
+				_node_alloc.destroy(static_cast<node_pointer>(node));
+				_node_alloc.deallocate(static_cast<node_pointer>(node), 1);
 			}
+			_size = 0;
 		}
 
 		void erase(iterator position)
 		{
-			rbtree_node_base* node_ptr = position.get_node_pointer();
+			rbtree_node_base* node_ptr = position._node_ptr;
 			delete_node_pointer(node_ptr);
 			_node_alloc.destroy(static_cast<node_pointer>(node_ptr));
 			_node_alloc.deallocate(static_cast<node_pointer>(node_ptr), 1);
@@ -582,30 +666,19 @@ public:
 			{
 				clear(); // we will be deleting all nodes without tree rebalancing after each deletion. saves execution time
 			}
-			iterator iter = first;
-			while (iter != last)
+			else
 			{
-				erase(iter);
-				iter++;
-			}
-		}
-
-		void tree_print_helper()
-		{
-			ft::map<int, int>::iterator f_it = begin();
-			ft::map<int, int>::iterator itEnd = end();
-			int n = 1;
-			for (ft::map<int, int>::iterator i = f_it; i != itEnd; ++i, ++n)
-			{
-				std::cout << n << ": " << i->first <<"  " << i.get_node_pointer()->_color << std::endl;
-				if (i.get_node_pointer() == _root)
+				iterator iter = first;
+				iterator next = iter;
+				while (iter != last)
 				{
-
-					std::cout << " this is the root: " << i->first << std::endl;
+					next++;
+					erase(iter);
+					iter = next;
 				}
-				
 			}
 		}
+
 
 		// insert():
 		// single element (1)	
@@ -623,27 +696,27 @@ public:
 			return position_pair;
 		}
 
-		//TODO: insert()
 		// with hint (2)
 		iterator insert (iterator position, const value_type& val)
 		{
 			key_type key = val.first;
-			pair<rbtree_node_base *, bool> insert_pair;
-			if (_compare(key, (position - 1)->first) && !_compare(key, position->first))
+			iterator previous = position;
+			previous--;
+			if (_compare(key, previous->first) && !_compare(key, position->first))
 			{
 				if (key == position->first)
 				{
 					return position;
 				}
-				pair<rbtree_node_base *, bool> position_pair = make_pair(position, true);
-				insert_pair = insert_node_at_position(position_pair, val);
-				rbtree_insert_fixup(insert_pair.first);
+				pair<rbtree_node_base*, bool> position_pair = make_pair(position._node_ptr, true);
+				rbtree_node_base* node = insert_node_at_position(position_pair, val).first;
+				rbtree_insert_fixup(node);
+				return iterator(node);
 			}
 			else
 			{
-				insert_pair = insert(val);
+				return insert(val).first;
 			}
-			return iterator(insert_pair.first);
 		}
 
 		// range (3)
@@ -701,8 +774,8 @@ public:
 		iterator lower_bound(const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
-			rbtree_node_base* node_with_lower_value = &_sentinel;
-			while (node_ptr != &_sentinel)
+			rbtree_node_base* node_with_lower_value = _sentinel;
+			while (node_ptr != _sentinel)
 			{
 				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
@@ -719,7 +792,7 @@ public:
 		{
 			rbtree_node_base* node_ptr = _root;
 			rbtree_node_base* node_with_lower_value = _root;
-			while (node_ptr != &_sentinel)
+			while (node_ptr != _sentinel)
 			{
 				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
 				{
@@ -736,8 +809,8 @@ public:
 		iterator upper_bound (const key_type& key)
 		{
 			rbtree_node_base* node_ptr = _root;
-			rbtree_node_base* larger = &_sentinel;
-			while (node_ptr != &_sentinel)
+			rbtree_node_base* larger = _sentinel;
+			while (node_ptr != _sentinel)
 			{
 				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
@@ -754,7 +827,7 @@ public:
 		{
 			rbtree_node_base* node_ptr = _root;
 			rbtree_node_base* equal_or_higher = _root;
-			while (node_ptr != &_sentinel)
+			while (node_ptr != _sentinel)
 			{
 				if (_compare(key, static_cast<node_pointer>(node_ptr)->_value.first))
 				{
@@ -776,39 +849,106 @@ public:
 		{
 			return value_compare(_compare);
 		}
+
+		void swap( map& other )
+		{
+			ft::swap(other._sentinel, _sentinel);
+            ft::swap(other._root, _root);
+            ft::swap(other._size, _size);
+            ft::swap(other._alloc, _alloc);
+            ft::swap(other._node_alloc, _node_alloc);
+            ft::swap(other._compare, _compare);
+		}
+
+		// TODO: tree print helper must be commented out
+// 		void tree_print_helper()
+// 		{
+// 			typename ft::map<key_type, mapped_type>::iterator f_it = begin();
+// 			typename ft::map<key_type, mapped_type>::iterator itEnd = end();
+// 			int n = 1;
+// 			for (typename ft::map<key_type, mapped_type>::iterator i = f_it; i != itEnd; ++i, ++n)
+// 			{
+// 				if (i._node_ptr == _root)
+// 				{
+// 					std::cout << "ROOT:\n";
+// 					// std::cout << "ROOT: Sentinel is pointing to the key " << (_sentinel->_parent)->_key;
+// 				}
+// 				std::string col = "RED  ";
+// 				if (i._node_ptr->_color == 0)
+// 				{
+// 					col = "BLACK";
+// 				}
+// 				std::cout << n << ":           -----|" << i->first << " " << col ;
+// 				if (i._node_ptr->_parent == _sentinel)
+// 				{
+// 					std::cout << " (parent -  sentinel)|-----\n" ;
+// 				}
+// 				else
+// 				{
+// 					std::cout << " (parent - " << (i._node_ptr->_parent)->_key << ")|-----\n";
+// 				}
+// 
+// 				if (i._node_ptr->_left == _sentinel)
+// 				{
+// 					std::cout << "  left - sentinel|\n" ;
+// 				}
+// 				else
+// 				{
+// 					std::cout << "  left - " << (i._node_ptr->_left)->_key<<  "|\n";
+// 				}
+// 				if (i._node_ptr->_right == _sentinel)
+// 				{
+// 					std::cout << "  right-  sentinel|\n" ;
+// 				}
+// 				else
+// 				{
+// 					std::cout << "  right - " << (i._node_ptr->_right)->_key << "|\n";
+// 				}
+// 
+// 				std::cout << std::endl;
+// 			}
+// 		}
 	};
 
-	// TODO: swap
+
+	template< class Key, class T, class Compare, class Alloc >
+	void swap( ft::map<Key,T,Compare,Alloc>& lhs,
+			ft::map<Key,T,Compare,Alloc>& rhs )
+			{
+				lhs.swap(rhs);
+			}
 
    //relational operators (map):
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator==( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 	{
-        if (ft::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
-        {
-            return true;
-        }
+		return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 	}
+
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator!=( const map<Key,T,Compare,Alloc>& lhs,const map<Key,T,Compare,Alloc>& rhs )
 	{
         return !(lhs == rhs);
 	}
+
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<( const map<Key,T,Compare,Alloc>& lhs,const map<Key,T,Compare,Alloc>& rhs )
 	{
         return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 	}
+
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator<=( const map<Key,T,Compare,Alloc>& lhs,const map<Key,T,Compare,Alloc>& rhs )
 	{
-        return !(rhs < lhs); // reusing operator<() but changing the sides
+        return !(rhs < lhs);
 	}
+
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>( const map<Key,T,Compare,Alloc>& lhs,const map<Key,T,Compare,Alloc>& rhs )
 	{
-        return rhs < lhs; // reusing operator<() but changing the sides
+        return rhs < lhs;
 	}
+
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>=( const map<Key,T,Compare,Alloc>& lhs,const map<Key,T,Compare,Alloc>& rhs )
 	{
