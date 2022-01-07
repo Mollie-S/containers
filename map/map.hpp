@@ -267,14 +267,15 @@ namespace ft
 			if (node_to_delete->_left == _sentinel)
 			{
 				replacement = node_to_delete->_right;
-				rb_transplant(node_to_delete, node_to_delete->_right);
+				rb_transplant(node_to_delete, replacement);
 			}
 			else if (node_to_delete->_right == _sentinel)
 			{
 				replacement = node_to_delete->_left;
-				rb_transplant(node_to_delete, node_to_delete->_left);
+				rb_transplant(node_to_delete, replacement);
 			}
-			return ft::make_pair(replacement, node_to_delete);
+			rbtree_node_base* replacement_parent = node_to_delete->_parent;
+			return ft::make_pair(replacement, replacement_parent);
 		}
 
 		pair<rbtree_node_base*, rbtree_node_base*>  delete_node_with_two_children(rbtree_node_base* node_to_delete, rbtree_node_base* successor)
@@ -284,8 +285,9 @@ namespace ft
 			rbtree_node_base* replacement_parent = successor->_parent;
 			if (successor->_parent == node_to_delete)
 			{
-				replacement->_parent = successor;
-				replacement_parent = successor->_parent;
+				if (replacement != _sentinel)
+					replacement->_parent = successor;
+				replacement_parent = successor;
 			}
 			else
 			{
@@ -360,6 +362,8 @@ namespace ft
 				rotate_right(parent);
 				sibling = parent->_left;
 			}
+			if (sibling == _sentinel)
+				return make_pair(_sentinel, _sentinel);
 			if (sibling->_left->_color == BLACK 
 			&& sibling->_right->_color == BLACK)
 			{
@@ -426,12 +430,12 @@ namespace ft
 		// replacing_pair.second == node's parent
 		void rbtree_delete_fixup(pair<rbtree_node_base*, rbtree_node_base*> replacing_pair)
 		{
-			if (replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel)
-			{
-				return;
-			}
 			while (replacing_pair.first != _root && replacing_pair.first->_color == BLACK)
 			{
+				if (replacing_pair.second == _sentinel || replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel)
+				{
+					break;
+				}
 				if (replacing_pair.first == replacing_pair.second->_left)
 				{
 					replacing_pair = rbtree_delete_fixup_left(replacing_pair);
@@ -626,7 +630,7 @@ public:
 		}
 
 		// // MODIFIERS:
-		// TODO: add parameter for skipping the delete fixup as clear removes all the elements
+		// TODO: add parameter(false) for skipping the delete fixup as clear removes all the elements
 		void clear()
 		{
 			iterator start = begin();
@@ -696,26 +700,9 @@ public:
 		}
 
 		// with hint (2)
-		iterator insert (iterator position, const value_type& val)
+		iterator insert (iterator, const value_type& val)
 		{
-			key_type key = val.first;
-			iterator previous = position;
-			previous--;
-			if (_compare(key, previous->first) && !_compare(key, position->first))
-			{
-				if (key == position->first)
-				{
-					return position;
-				}
-				pair<rbtree_node_base*, bool> position_pair = make_pair(position._node_ptr, true);
-				rbtree_node_base* node = insert_node_at_position(position_pair, val).first;
-				rbtree_insert_fixup(node);
-				return iterator(node);
-			}
-			else
-			{
 				return insert(val).first;
-			}
 		}
 
 		// range (3)
@@ -776,13 +763,15 @@ public:
 			rbtree_node_base* node_with_lower_value = _sentinel;
 			while (node_ptr != _sentinel)
 			{
-				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				{
+					node_ptr = node_ptr->_right;
+				}
+				else
 				{
 					node_with_lower_value = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
-				else
-					node_ptr = node_ptr->_right;
 			}
 			return iterator(node_with_lower_value);
 		}
@@ -790,16 +779,18 @@ public:
 		const_iterator lower_bound(const key_type& key) const
 		{
 			rbtree_node_base* node_ptr = _root;
-			rbtree_node_base* node_with_lower_value = _root;
+			rbtree_node_base* node_with_lower_value = _sentinel;
 			while (node_ptr != _sentinel)
 			{
-				if (!_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				if (_compare(static_cast<node_pointer>(node_ptr)->_value.first, key))
+				{
+					node_ptr = node_ptr->_right;
+				}
+				else
 				{
 					node_with_lower_value = node_ptr;
 					node_ptr = node_ptr->_left;
 				}
-				else
-					node_ptr = node_ptr->_right;
 			}
 			return const_iterator(node_with_lower_value);
 		}
@@ -860,53 +851,56 @@ public:
 		}
 
 		// TODO: tree print helper must be commented out
-// 		void tree_print_helper()
-// 		{
-// 			typename ft::map<key_type, mapped_type>::iterator f_it = begin();
-// 			typename ft::map<key_type, mapped_type>::iterator itEnd = end();
-// 			int n = 1;
-// 			for (typename ft::map<key_type, mapped_type>::iterator i = f_it; i != itEnd; ++i, ++n)
-// 			{
-// 				if (i._node_ptr == _root)
-// 				{
-// 					std::cout << "ROOT:\n";
-// 					// std::cout << "ROOT: Sentinel is pointing to the key " << (_sentinel->_parent)->_key;
-// 				}
-// 				std::string col = "RED  ";
-// 				if (i._node_ptr->_color == 0)
-// 				{
-// 					col = "BLACK";
-// 				}
-// 				std::cout << n << ":           -----|" << i->first << " " << col ;
-// 				if (i._node_ptr->_parent == _sentinel)
-// 				{
-// 					std::cout << " (parent -  sentinel)|-----\n" ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << " (parent - " << (i._node_ptr->_parent)->_key << ")|-----\n";
-// 				}
-// 
-// 				if (i._node_ptr->_left == _sentinel)
-// 				{
-// 					std::cout << "  left - sentinel|\n" ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << "  left - " << (i._node_ptr->_left)->_key<<  "|\n";
-// 				}
-// 				if (i._node_ptr->_right == _sentinel)
-// 				{
-// 					std::cout << "  right-  sentinel|\n" ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << "  right - " << (i._node_ptr->_right)->_key << "|\n";
-// 				}
-// 
-// 				std::cout << std::endl;
-// 			}
-// 		}
+		void tree_print_helper()
+		{
+			typename ft::map<key_type, mapped_type>::iterator f_it = begin();
+			typename ft::map<key_type, mapped_type>::iterator itEnd = end();
+			int n = 1;
+			for (typename ft::map<key_type, mapped_type>::iterator i = f_it; i != itEnd; ++i, ++n)
+			{
+				std::string col = "RED  ";
+				if (i._node_ptr->_color == 0)
+				{
+					col = "BLACK";
+				}
+				std::cout << n << ":           	  -----|" << i->first << " " << col ;
+				if (i._node_ptr->_parent == _sentinel)
+				{
+					std::cout << " (parent -  sentinel)|-----   " ;
+				}
+				else
+				{
+					std::cout << " (parent - " << (i._node_ptr->_parent)->_key << ")|-----  ";
+				}
+
+				if (i._node_ptr == _root)
+				{
+					std::cout << "THIS IS THE ROOT";
+					// std::cout << "ROOT: Sentinel is pointing to the key " << (_sentinel->_parent)->_key;
+				}
+
+				std::cout << std::endl;
+				if (i._node_ptr->_left == _sentinel)
+				{
+					std::cout << "  left - sentinel|\n" ;
+				}
+				else
+				{
+					std::cout << "  left - " << (i._node_ptr->_left)->_key<<  "|\n";
+				}
+				if (i._node_ptr->_right == _sentinel)
+				{
+					std::cout << "  right-  sentinel|\n" ;
+				}
+				else
+				{
+					std::cout << "  right - " << (i._node_ptr->_right)->_key << "|\n";
+				}
+
+				std::cout << std::endl;
+			}
+				std::cout <<"--------------------------------------------------"<<  std::endl;
+		}
 	};
 
 
