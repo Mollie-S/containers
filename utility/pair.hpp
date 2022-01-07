@@ -15,11 +15,24 @@ namespace ft{
         // CONSTRUCTORS:
         // default (1)	
         pair() : first(), second() {}
+        
         // copy (2)	
         template<class U, class V> 
         pair (const pair<U,V>& pr) : first(pr.first), second(pr.second) {}
+
         // initialization (3)	
         pair (const first_type& a, const second_type& b) : first(a), second(b) {}
+
+
+        pair& operator=( const pair& other )
+        {
+            if (*this != other)
+            {
+                first = other.first;
+                second = other.second;
+            }
+            return *this;
+        }
     };
 
     template <class T1, class T2>
