@@ -6,13 +6,6 @@
 
 namespace ft
 {
-	template <class Key,
-			  class T,		
-			  class Compare,
-			  class Alloc
-			  >
-	class map;
-
 	template <class Value, typename NodeBase, typename Node>
 	class map_iter // Iterator base class
 	{
@@ -24,15 +17,12 @@ namespace ft
     	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
     	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
 
-		// maps of any specialization are allowed to see private members
-		// sort of the module level incapsulation
-		template<typename T1, typename T2, typename T3, typename T4>
-		friend class map;
-
 	private:
-		typedef NodeBase* NodeBasePtr;
 		typedef Node* NodePtr;
 		typedef map_iter<const Value, const NodeBase, const Node> const_iterator_type;
+	
+	protected:
+		typedef NodeBase* NodeBasePtr;
 
 		NodeBasePtr _node_ptr;
 
@@ -196,3 +186,4 @@ namespace ft
 	};
 }
 #endif
+

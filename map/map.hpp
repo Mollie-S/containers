@@ -44,8 +44,8 @@ namespace ft
 		typedef typename Alloc::template rebind<ft::rbtree_node_base>::other node_base_alloc_type;
 
 	public:
-		typedef map_iter<value_type, rbtree_node_base, rbtree_node<value_type> >                   		iterator;
-		typedef map_iter<const value_type, const rbtree_node_base, const rbtree_node<value_type> >              const_iterator;
+		typedef map_iter<value_type, rbtree_node_base, rbtree_node<value_type> >                   			iterator;
+		typedef map_iter<const value_type, const rbtree_node_base, const rbtree_node<value_type> >          const_iterator;
         typedef ft::reverse_iterator<iterator>          													reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>    													const_reverse_iterator;
 
@@ -87,6 +87,21 @@ namespace ft
 		size_type       		_size;
 		key_compare				_compare;
 	
+	private:
+		struct map_iterator_accessor : public iterator
+		{
+			inline rbtree_node_base* get_node() const
+			{
+				return this->_node_ptr;
+			}
+		};
+	
+		inline rbtree_node_base* get_node(const iterator& it) const
+		{
+			return static_cast<const map_iterator_accessor&>(it).get_node();
+		}
+
+
 	private:
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
 		{
@@ -634,10 +649,10 @@ public:
 		void clear()
 		{
 			iterator start = begin();
-			while (start._node_ptr != _sentinel)
+			while (get_node(start) != _sentinel) // pseude_call - inline function
 			{
 				// need to save the next iterator for the next loop before deleting the node as we're destroying without rebalancing
-				rbtree_node_base* node = start._node_ptr;
+				rbtree_node_base* node = get_node(start);
 				start++;
 				delete_node_pointer(node);
 				_node_alloc.destroy(static_cast<node_pointer>(node));
@@ -648,7 +663,7 @@ public:
 
 		void erase(iterator position)
 		{
-			rbtree_node_base* node_ptr = position._node_ptr;
+			rbtree_node_base* node_ptr = get_node(position);
 			delete_node_pointer(node_ptr);
 			_node_alloc.destroy(static_cast<node_pointer>(node_ptr));
 			_node_alloc.deallocate(static_cast<node_pointer>(node_ptr), 1);
@@ -859,42 +874,42 @@ public:
 			for (typename ft::map<key_type, mapped_type>::iterator i = f_it; i != itEnd; ++i, ++n)
 			{
 				std::string col = "RED  ";
-				if (i._node_ptr->_color == 0)
+				if (get_node(i)->_color == 0)
 				{
 					col = "BLACK";
 				}
 				std::cout << n << ":           	  -----|" << i->first << " " << col ;
-				if (i._node_ptr->_parent == _sentinel)
+				if (get_node(i)->_parent == _sentinel)
 				{
 					std::cout << " (parent -  sentinel)|-----   " ;
 				}
 				else
 				{
-					std::cout << " (parent - " << (i._node_ptr->_parent)->_key << ")|-----  ";
+					std::cout << " (parent - " << (get_node(i)->_parent)->_key << ")|-----  ";
 				}
 
-				if (i._node_ptr == _root)
+				if (get_node(i) == _root)
 				{
 					std::cout << "THIS IS THE ROOT";
 					// std::cout << "ROOT: Sentinel is pointing to the key " << (_sentinel->_parent)->_key;
 				}
 
 				std::cout << std::endl;
-				if (i._node_ptr->_left == _sentinel)
+				if (get_node(i)->_left == _sentinel)
 				{
 					std::cout << "  left - sentinel|\n" ;
 				}
 				else
 				{
-					std::cout << "  left - " << (i._node_ptr->_left)->_key<<  "|\n";
+					std::cout << "  left - " << (get_node(i)->_left)->_key<<  "|\n";
 				}
-				if (i._node_ptr->_right == _sentinel)
+				if (get_node(i)->_right == _sentinel)
 				{
 					std::cout << "  right-  sentinel|\n" ;
 				}
 				else
 				{
-					std::cout << "  right - " << (i._node_ptr->_right)->_key << "|\n";
+					std::cout << "  right - " << (get_node(i)->_right)->_key << "|\n";
 				}
 
 				std::cout << std::endl;
