@@ -73,7 +73,6 @@ namespace ft
 		
 		~set() {}
 
-//TODO: check the following The container preserves its current allocator, which is used to allocate additional storage if needed.
 		set& operator=(const set& x)
 		{
 			_tree = x._tree;
@@ -256,7 +255,6 @@ namespace ft
 			_tree.swap(other._tree);
 		}
 
-		// // TODO: tree print helper must be commented out
 		// void tree_print_helper()
 		// {
 		// 	_tree.tree_print_helper();

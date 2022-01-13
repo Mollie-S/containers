@@ -105,8 +105,6 @@ namespace ft
 			return (*this);
 		}
 
-
-		// TODO: add templated parameters
 		// RELATIONAL OPERATORS
 		bool operator<(const iterator_type& rhs) const
 		{

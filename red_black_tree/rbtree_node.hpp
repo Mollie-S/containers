@@ -15,17 +15,13 @@ namespace ft
 		rbtree_node_base*		_left;
 		rbtree_node_base*		_right;
 		e_color 				_color;
-		// TODO: remove temp key from base and derived class
-		int _key;
-		// std::string _key;
 
-		rbtree_node_base() : _parent(NULL), _left(NULL), _right(NULL), _color(BLACK), _key() {}
+		rbtree_node_base() : _parent(NULL), _left(NULL), _right(NULL), _color(BLACK){}
 		rbtree_node_base(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr)
 			: _parent(parent_ptr)
 			, _left(child_ptr)
 			, _right(child_ptr)
 			, _color(RED)
-			, _key()
 			{}
 	};
 
@@ -37,11 +33,7 @@ namespace ft
 		Value 	_value;
 		typedef typename Value::first_type key_type;
 		explicit rbtree_node_for_map(rbtree_node_base *parent_ptr, rbtree_node_base* child_ptr, const Value &value)
-			: rbtree_node_base(parent_ptr, child_ptr), _value(value)
-		{
-			// TODO: remove assignment
-			// _key = value.first;
-		}
+			: rbtree_node_base(parent_ptr, child_ptr), _value(value) {}
 
 		static const key_type& get_key_from_value(const Value& _value) // it will be accessible in rbtree as well for insert() for example
 		{
@@ -61,10 +53,7 @@ namespace ft
 		typedef Value key_type;
 
 		explicit rbtree_node_for_set(rbtree_node_base *parent_ptr, rbtree_node_base *child_ptr, const Value &value)
-			: rbtree_node_base(parent_ptr, child_ptr), _value(value) {
-		// TODO: remove assignment
-				 _key = value;
-		}
+			: rbtree_node_base(parent_ptr, child_ptr), _value(value) {}
 
 		static const key_type& get_key_from_value(const Value& _value) // it will be accessible in rbtree as well for insert() for example
 		{

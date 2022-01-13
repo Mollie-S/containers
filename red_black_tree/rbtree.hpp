@@ -402,7 +402,6 @@ namespace ft
             ft::swap(other._compare, _compare);
 		}
 
-// 		// TODO: tree print helper must be commented out
 // 		void tree_print_helper()
 // 		{
 // 			iterator f_it = begin();
