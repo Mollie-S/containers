@@ -1,5 +1,5 @@
-#ifndef MAP_ITERATOR_HPP
-#define MAP_ITERATOR_HPP
+#ifndef RBTREE_ITERATOR_HPP
+#define RBTREE_ITERATOR_HPP
 
 #include "rbtree_node.hpp"
 #include "../utility/iterator_traits.hpp"
@@ -7,10 +7,10 @@
 namespace ft
 {
 	template <class Value, typename NodeBase, typename Node>
-	class map_iter // Iterator base class
+	class rbtree_iter // Iterator base class
 	{
 	public:
-		typedef map_iter<Value, NodeBase, Node>			                      	iterator_type;
+		typedef rbtree_iter<Value, NodeBase, Node>								iterator_type;
 		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
 		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
     	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
@@ -19,7 +19,7 @@ namespace ft
 
 	private:
 		typedef Node* NodePtr;
-		typedef map_iter<const Value, const NodeBase, const Node> const_iterator_type;
+		typedef rbtree_iter<const Value, const NodeBase, const Node> const_iterator_type;
 	
 	protected:
 		typedef NodeBase* NodeBasePtr;
@@ -32,17 +32,12 @@ namespace ft
 		}
 
 	public:
-		map_iter() : _node_ptr(NULL) {}
-		map_iter(NodeBasePtr node_ptr) : _node_ptr(node_ptr) {}
-		map_iter(const iterator_type& other) : _node_ptr(other._node_ptr) {}
-		~map_iter(){};
+		rbtree_iter() : _node_ptr(NULL) {}
+		rbtree_iter(NodeBasePtr node_ptr) : _node_ptr(node_ptr) {}
+		rbtree_iter(const iterator_type& other) : _node_ptr(other._node_ptr) {}
+		~rbtree_iter(){};
 
-		// type conversion operator
-		operator const_iterator_type() const {
-			return const_iterator_type(_node_ptr);
-		}
-
-		map_iter& operator=(const map_iter& other)
+		rbtree_iter& operator=(const rbtree_iter& other)
 		{
 			if (*this != other)
 			{
@@ -59,6 +54,11 @@ namespace ft
 		{
 			assert(!isSentinel(_node_ptr));
 			return (&static_cast<NodePtr>(_node_ptr)->_value);
+		}
+		// type conversion operator
+		operator const_iterator_type() const
+		{
+			return const_iterator_type(_node_ptr);
 		}
 
 	private:
@@ -109,7 +109,7 @@ namespace ft
 
 	public:
  		//  ARITHMETIC OPERATORS
-		map_iter& operator++()
+		rbtree_iter& operator++()
 		{
 			// if we're incrementing a reverse_iterator pointing to rend():
 			if (isSentinel(_node_ptr))
@@ -133,14 +133,14 @@ namespace ft
 			return *this;
 		}
 
-		map_iter operator++(int) // postfix operator as it accepts an argument
+		rbtree_iter operator++(int) // postfix operator as it accepts an argument
 		{
-			map_iter temp = *this;
+			rbtree_iter temp = *this;
 			++(*this);
 			return temp;
 		}
 
-		map_iter& operator--()
+		rbtree_iter& operator--()
 		{
 			// if we're decrementing an iterator pointing to end():
 			if (isSentinel(_node_ptr))
@@ -164,9 +164,9 @@ namespace ft
 			return *this;
 		}
 		
-		map_iter operator--(int)
+		rbtree_iter operator--(int)
 		{
-			map_iter temp = *this;
+			rbtree_iter temp = *this;
 			--(*this);
 			return temp;
 		}

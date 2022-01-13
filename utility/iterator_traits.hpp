@@ -4,7 +4,7 @@
 namespace ft
 {
 	template <class Value, typename NodeBasePtr, typename NodePtr>
-	class map_iter;
+	class rbtree_iter;
 
 	template <class Value>
 	class vector_iter;
@@ -16,7 +16,7 @@ namespace ft
 	struct iterator_traits {};
 
 	template<typename Value, typename T1, typename T2> 
-	struct iterator_traits<ft::map_iter<Value, T1, T2> >
+	struct iterator_traits<ft::rbtree_iter<Value, T1, T2> >
 	{
 		typedef Value        	value_type;
     	typedef std::size_t   	difference_type;
