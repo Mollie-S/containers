@@ -49,6 +49,37 @@ namespace ft {
 	{
 		return !(my_map == stl_map);
 	}
+
+	struct 	 Dummy
+	{
+		static int counter;
+		Dummy() { counter++; }
+		~Dummy() { counter--; }
+	};
+
+	int Dummy::counter=0;
+
+	class NoDefaultDummy
+	{
+	private:
+		int _num;
+
+	public:
+		NoDefaultDummy(int number) : _num(number){}
+		~NoDefaultDummy() {}
+	};
+
+
+	class FatDummy
+	{
+	private:
+		char _fat_data[10000000];
+
+	public:
+		FatDummy(): _fat_data(){}
+		~FatDummy() {}
+	};
+	
 }
 
 TEST_CASE("Testing map constructors", "[integer keys]")
@@ -278,37 +309,98 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 	}
 }
 
-TEST_CASE("Assigning non-const to const is possible")
+TEST_CASE("const and non const ")
 {
 	ft::map<std::string, std::string> my_map;
-	std::map<std::string, std::string> stl_map;
+	my_map.insert(ft::make_pair("tree", "sycamore"));
 	ft::map<std::string, std::string>::iterator it = my_map.begin();
 	ft::map<std::string, std::string>::const_iterator it_const;
 
-	std::map<std::string, std::string>::iterator it_s = stl_map.begin();
-	std::map<std::string, std::string>::const_iterator it_const_s;
-	it_const = it;
-	it_const_s = it_s;
-	CHECK(it_const == it);
-	CHECK(it_const_s == it_s);
-}
 
-TEST_CASE("Comparing const and non const iterators")
-{
-	ft::map<std::string, std::string> my_map;
+	SECTION("Assigning non-const iterator to const is possible")
+	{
+		it_const = it;
+		CHECK(it_const == it);
+	}
+	
 	const ft::map<std::string, std::string> my_map1;
-	ft::map<std::string, std::string>::iterator it = my_map.begin();
 	ft::map<std::string, std::string>::const_iterator itc = my_map1.begin();
-	CHECK(it != itc);
+
+	SECTION("Constructing a copy of a const map")
+	{
+		const ft::map<std::string, std::string> my_const_map(my_map);
+		CHECK(my_const_map == my_map);
+
+		SECTION("Comparing const and non-const maps is possible")
+		{
+			CHECK(my_map1 <= my_map);
+			CHECK(my_const_map  >= my_map1);
+		}
+
+		SECTION("Assigning non-const map to const is possible")
+		{
+			my_map = my_map1;
+			CHECK(my_map == my_map1);
+			CHECK(my_const_map != my_map);
+		}
+	}
 }
 
-// TEST_CASE("Comparison operators", "[string keys, vector values]")
-// {
-// 	ft::map<std::string, ft::vector<int> > my_map1;
-// 	ft::map<std::string, ft::vector<int> > my_map2(my_map1);
-// 	std::map<std::string, std::vector<int> > stl_map1;
-// 	std::map<std::string, std::vector<int> > stl_map2(stl_map1);
-// 
-// 	// CHECK(stl_map1 == stl_map2);
-// 	CHECK(my_map1.begin() != my_map2.begin());
-// }
+TEST_CASE("Comparison", "[string keys, string values]")
+{
+	ft::map<std::string, std::string > my_map1;
+	ft::map<std::string, std::string > my_map2(my_map1);
+	CHECK(my_map1 == my_map2);
+
+	SECTION("Iterator comparison operators")
+	{
+		CHECK(my_map1.begin() != my_map2.begin());
+		my_map1.insert(ft::make_pair("tree", "sycamore"));
+		my_map2.insert(ft::make_pair("flower", "rose"));
+		CHECK(my_map1.begin()->first > my_map2.begin()->first);
+		my_map1.insert(ft::make_pair("flower", "rose"));
+		CHECK(my_map1.begin()->first <= my_map2.begin()->first);
+		my_map1.insert(ft::make_pair("fruit", "banana"));
+		my_map1.insert(ft::make_pair("vegetable", "cucumber"));
+		CHECK(my_map2.rbegin()->first < my_map1.rbegin()->first);
+
+		SECTION("Map relational operators")
+		{
+			CHECK(my_map1 != my_map2);
+			CHECK(my_map1 > my_map2);
+			CHECK(my_map2 < my_map1);
+		}
+	}
+}
+
+
+TEST_CASE("Testing the sentinel node", "[sentinel]")
+{
+	SECTION("Creating the map from a class having no default constructor - should cause no problem")
+	{
+		ft::map<int, ft::NoDefaultDummy> my_map;
+		std::map<int, ft::NoDefaultDummy> stl_map;
+
+		ft::NoDefaultDummy dummy(10);
+		my_map.insert(ft::make_pair(1, dummy));
+		stl_map.insert(std::make_pair(1, dummy));
+
+		CHECK(stl_map == my_map);
+	}
+
+	SECTION("Calculating number of Dummy instances - ")
+	{
+		ft::map<int, ft::Dummy> my_map;
+		std::map<int, ft::Dummy> stl_map;
+
+		CHECK(ft::Dummy::counter == 0);
+	}
+
+	SECTION("Creating the map from a class with big data - no stack overflow ")
+	{
+		ft::map<int, ft::FatDummy> my_map;
+		std::map<int, ft::FatDummy> stl_map;
+
+		CHECK(stl_map == my_map);
+	}
+}
