@@ -140,20 +140,25 @@ TEST_CASE("Testing map constructors", "[integer keys]")
 
 					SECTION("Insertion - new elements are added to the original map")
 					{
-						stl_map.insert(std::make_pair<int, int>(41, 400));
-						my_map.insert(ft::make_pair<int, int>(41, 400));
-						stl_map.insert(std::make_pair<int, int>(38, 400));
-						my_map.insert(ft::make_pair<int, int>(38, 400));
+						stl_map.insert(std::make_pair<int, int>(41, 4));
+						my_map.insert(ft::make_pair<int, int>(41, 4));
+						stl_map.insert(std::make_pair<int, int>(38, 40));
+						my_map.insert(ft::make_pair<int, int>(38, 40));
 						stl_map.insert(std::make_pair<int, int>(31, 400));
 						my_map.insert(ft::make_pair<int, int>(31, 400));
-						stl_map.insert(std::make_pair<int, int>(12, 400));
-						my_map.insert(ft::make_pair<int, int>(12, 400));
-						stl_map.insert(std::make_pair<int, int>(19, 400));
-						my_map.insert(ft::make_pair<int, int>(19, 400));
-						stl_map.insert(std::make_pair<int, int>(8, 400));
-						my_map.insert(ft::make_pair<int, int>(8, 400));
+						stl_map.insert(std::make_pair<int, int>(12, 3));
+						my_map.insert(ft::make_pair<int, int>(12, 3));
+						stl_map.insert(std::make_pair<int, int>(19, 30));
+						my_map.insert(ft::make_pair<int, int>(19, 30));
+						stl_map.insert(std::make_pair<int, int>(8, 300));
+						my_map.insert(ft::make_pair<int, int>(8, 300));
 						CHECK(stl_map == my_map);
-
+					
+						SECTION("Operator[] with existing key will output the value")
+						{
+							CHECK(stl_map[41] == my_map[41]);
+							CHECK(stl_map[8] == my_map[8]);
+						}
 						SECTION("Insert range: inserting original map into the copy")
 						{
 							CHECK(my_map_copy.size() == stl_map_copy.size());
@@ -266,7 +271,7 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 			CHECK(stl_map.count("is") == my_map.count("is"));
 			CHECK(stl_map.count("dress") == my_map.count("dress"));
 
-			SECTION("Erasing an element with an iterator argument removes the element from the map")
+			SECTION("Erasing an element with an iterator argument: the element from the map")
 			{
 				std::map<std::string, std::string>::iterator s_it = stl_map.begin();
 				ft::map<std::string, std::string>::iterator f_it = my_map.begin();
@@ -280,8 +285,6 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 				stl_map.insert(stl_map_to_insert.begin(),stl_map_to_insert.end());
 				my_map.insert(my_map_to_insert.begin(), my_map_to_insert.end());
 				CHECK(stl_map == my_map);
-
-				
 			}
 
 			SECTION("Operator[] with non-existing key adds the element to the map")
@@ -295,6 +298,7 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 					stl_map["berry"] = "strawberry";
 					my_map["berry"] = "strawberry";
 					CHECK(stl_map == my_map);
+					CHECK(stl_map["berry"] == my_map["berry"]);
 				}
 			}
 			SECTION("Swap method swaps pointers to the elements")
@@ -388,7 +392,7 @@ TEST_CASE("Testing the sentinel node", "[sentinel]")
 		CHECK(stl_map == my_map);
 	}
 
-	SECTION("Calculating number of Dummy instances - ")
+	SECTION("Calculating number of Dummy instances - sentinel shouldn't create an additional instance")
 	{
 		ft::map<int, ft::Dummy> my_map;
 		std::map<int, ft::Dummy> stl_map;
@@ -396,7 +400,7 @@ TEST_CASE("Testing the sentinel node", "[sentinel]")
 		CHECK(ft::Dummy::counter == 0);
 	}
 
-	SECTION("Creating the map from a class with big data - no stack overflow ")
+	SECTION("Creating the map from a class with big data - no stack overflow") // sentinel is not created on stack
 	{
 		ft::map<int, ft::FatDummy> my_map;
 		std::map<int, ft::FatDummy> stl_map;

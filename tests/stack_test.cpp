@@ -1,8 +1,10 @@
-#define CATCH_CONFIG_MAIN 
-#include "catch.hpp"
 
+#include "../vector/vector.hpp"
 #include "../stack/stack.hpp"
+#include <vector>
 #include <stack>
+
+#include "catch.hpp"
 
 ft::stack<int> ftStackInts;
 std::stack<int> stdStackInts;

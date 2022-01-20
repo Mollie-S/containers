@@ -84,8 +84,6 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
             my_v.assign(int_arr, int_arr + arr_size);
             stl_v.assign(int_arr, int_arr + arr_size);
             CHECK(my_v == stl_v);
-            CHECK(my_v.empty() == stl_v.empty());
-            CHECK(my_v.size() == stl_v.size());
             CHECK(my_v.size() != size);
 
             SECTION("Element access check")
@@ -93,7 +91,7 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
                 CHECK(my_v.at(4) == stl_v.at(4));
                 CHECK(my_v.front() == stl_v.front());
                 CHECK(my_v.back() == stl_v.back());
-                CHECK(*(my_v.data()) == *(stl_v.data()));
+                // CHECK(*(my_v.data()) == *(stl_v.data())); // c++11
                 CHECK(my_v[6] ==7);
 
             }
@@ -161,7 +159,6 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
             }
         }
     }
-
     SECTION("Creating a container with fill constructor")
     {
         ft::vector<int> my_v(5, 10);
@@ -175,7 +172,7 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
 
     SECTION("Creating a container with the range constructor")
     {
-        int intArray[] = { 1, 2, 9, 10, 11, 12, 13, 14};
+        int intArray[] = { 1, 2, 9, 10, 11, 12, 13, 14, 20, 28, 40, 9000, -9000, -4, -1000000000};
         size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
         ft::vector<int> my_v(intArray, intArray + arraySize);
         std::vector<int> stl_v(intArray, intArray + arraySize);
@@ -186,14 +183,13 @@ TEST_CASE("Creating an integers container", "[integers]") // [] - is a tag used 
     }
 }
 
-
 TEST_CASE("Reserve() method", "[integers]")
 {
     SECTION("Checking capacity after reserve")
     {
         ft::vector<int> my_v(5, 10);
         std::vector<int> stl_v(5,10);
-    
+        CHECK(my_v.capacity() == stl_v.capacity());
     }
 }
 
@@ -280,6 +276,7 @@ TEST_CASE("Resize method", "[integers]")
         CHECK(my_v.size() == stl_v.size());
     }
 }
+
 TEST_CASE("Swap() method", "[integers]")
 {
     SECTION("ft::swap")
@@ -319,45 +316,62 @@ TEST_CASE("Swap() method", "[integers]")
     }
 }
 
-TEST_CASE("assign?", "assign?")
+TEST_CASE("Creating a complex vector: a vector of pairs", "[string, string]")
 {
-    ft::map<int, int> m;
-    m.insert(ft::make_pair(100, 100));
+    std::vector<std::pair<std::string, std::string> > stl_v;
+    ft::vector<ft::pair<std::string, std::string> > my_v;
 
-    ft::vector<ft::pair<int, int> > v;
-    v.assign(m.begin(), m.end());
-}
+    std::pair<std::string, std::string> s_p1 = std::make_pair("tree", "sycamore");
+    ft::pair<std::string, std::string> my_p1 = ft::make_pair("tree", "sycamore");
+    std::pair<std::string, std::string> s_p2 = std::make_pair("flower", "rose");
+    ft::pair<std::string, std::string> my_p2 = ft::make_pair("flower", "rose");
+    std::pair<std::string, std::string> s_p3 = std::make_pair("fruit", "banana");
+    ft::pair<std::string, std::string> my_p3 = ft::make_pair("fruit", "banana");
+    std::pair<std::string, std::string> s_p4 = std::make_pair("vegetable", "cucumber");
+    ft::pair<std::string, std::string> my_p4 = ft::make_pair("vegetable", "cucumber");
 
-TEST_CASE("Copy Constructor", "[integers]")
-{
-    // SECTION("copy constructor")
-    // {
-    //     int intArray[] = { 20000, 2, 9, 10, 11, 12, 13, 14, 89};
-    //     size_t arraySize = sizeof(intArray)/ sizeof(intArray[0]);
-    //     ft::vector<int> my_v(intArray, intArray + arraySize);
-    //     std::vector<int> stl_v(intArray, intArray + arraySize);
+    std::map<std::string, std::string> stl_m;
+    ft::map<std::string, std::string> my_m;
+    stl_m.insert(s_p1);
+    my_m.insert(my_p1);
+    stl_m.insert(s_p2);
+    my_m.insert(my_p2);
+    stl_m.insert(s_p3);
+    my_m.insert(my_p3);
+    stl_m.insert(s_p4);
+    my_m.insert(my_p4);
 
-    //     ft::vector<int> newFtVec(my_v);
-    //     std::vector<int> newStdVec(stl_v);
+    
+    SECTION("Constructing a vector of pairs - map iterators are passed")
+    {
+        std::vector<std::pair<std::string, std::string> > stl_v1(stl_m.begin(), stl_m.end());
+        ft::vector<ft::pair<std::string, std::string> > my_v1(my_m.begin(), my_m.end());
+        CHECK(my_v1.size() == stl_v1.size());
+        CHECK(my_v1.capacity() == stl_v1.capacity());
+        CHECK(my_v1[3].second == stl_v1[3].second);
+    }
 
+    SECTION("Pushing back a map pair into a vector several times")
+    {
 
-    //     ft::vector<int>::iterator my_it = newFtVec.begin();
-    //     std::vector<int>::iterator stl_it = newStdVec.begin();
+        for (int i = 0; i < 100; ++i) 
+        {
+            stl_v.push_back(*(stl_m.begin()));
+            my_v.push_back(*(my_m.begin()));
+        }
+        CHECK(my_v.size() == stl_v.size());
+        CHECK(my_v.capacity() == stl_v.capacity());
+        CHECK(my_v[3].second == stl_v[3].second);
 
-    //     CHECK(*(my_it) == *(stl_it));
-    // }
+    }
 
-    // SECTION("copy constructor")
-    // {
-    //     ft::vector<int> ftVectorInts1(5, 10);
-    //     std::vector<int> stdVectorInts1(5,10);
+    SECTION("Inserting a range into a vector of pairs - map iterators are passed")
+    {
 
-    //     ft::vector<int> newFtVec(ftVectorInts1);
-    //     std::vector<int> newStdVec(stdVectorInts1);
-
-    //     ft::vector<int>::iterator my_it = newFtVec.begin();
-    //     std::vector<int>::iterator stl_it = newStdVec.begin();
-
-    //     CHECK(*(my_it) == *(stl_it));
-    // }
+        stl_v.insert(stl_v.begin(), stl_m.begin(), stl_m.end());
+        my_v.insert(my_v.begin(), my_m.begin(), my_m.end());
+        CHECK(my_v.size() == stl_v.size());
+        CHECK(my_v.capacity() == stl_v.capacity());
+        CHECK(my_v[my_v.size() - 1].second == stl_v[stl_v.size() - 1].second);
+    }
 }
