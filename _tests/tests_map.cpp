@@ -27,40 +27,31 @@ void is_found_output_print(typename ft::map<K,T>::iterator& it, typename ft::map
     else
         std::cout << "The element is not found." << std::endl;
 }
-    
 
-class Maptest
+ft::map<std::string, std::string> create_map_of_strings()
 {
-private:
+    ft::pair<std::string, std::string> my_p1 = ft::make_pair("tree", "sycamore");
+    ft::pair<std::string, std::string> my_p2 = ft::make_pair("flower", "rose");
+    ft::pair<std::string, std::string> my_p3 = ft::make_pair("fruit", "banana");
+    ft::pair<std::string, std::string> my_p4 = ft::make_pair("vegetable", "cucumber");
 
-public:
-	Maptest(){}
-	~Maptest(){}
-	ft::map<std::string, std::string> create_map_of_strings()
-    {
-        ft::pair<std::string, std::string> my_p1 = ft::make_pair("tree", "sycamore");
-        ft::pair<std::string, std::string> my_p2 = ft::make_pair("flower", "rose");
-        ft::pair<std::string, std::string> my_p3 = ft::make_pair("fruit", "banana");
-        ft::pair<std::string, std::string> my_p4 = ft::make_pair("vegetable", "cucumber");
+    ft::map<std::string, std::string> my_m;
+    my_m.insert(my_p1);
+    my_m.insert(my_p2);
+    my_m.insert(my_p3);
+    my_m.insert(my_p4);
+    return my_m;
+}
 
-        ft::map<std::string, std::string> my_m;
-        my_m.insert(my_p1);
-        my_m.insert(my_p2);
-        my_m.insert(my_p3);
-        my_m.insert(my_p4);
-        return my_m;
-    }
-    
-	ft::map<int, int> create_large_map_of_ints()
+ft::map<int, int> create_large_map_of_ints()
+{
+    ft::map<int, int> my_m;
+    for (int i = 0; i < INT_MAX/100000; ++i)
     {
-        ft::map<int, int> my_m;
-        for (int i = 0; i < INT_MAX/100000; ++i)
-        {
-            my_m.insert(ft::make_pair(i,i));
-        }
-        return my_m;
+        my_m.insert(ft::make_pair(i,i));
     }
-};
+    return my_m;
+}
 
 void map_test()
 {
@@ -69,8 +60,6 @@ void map_test()
     size_t length1 = sizeof(args1) / sizeof(args1[0]);
     size_t length2 = sizeof(args2) / sizeof(args2[0]);
  
-
-	Maptest maptest;
     std::cout << "\n\n";
     std::cout << "-----------------------------------------\n";
     std::cout << "|                MAP                    |\n";
@@ -89,7 +78,7 @@ void map_test()
     }
     print_map(m);
     std::cout << "Creating another map of strings." << std::endl;
-    ft::map<std::string, std::string> my_map = maptest.create_map_of_strings();
+    ft::map<std::string, std::string> my_map = create_map_of_strings();
     print_map(my_map);
 
     std::cout << "Element access check:" << std::endl;
@@ -106,9 +95,7 @@ void map_test()
     std::cout << "The dereferenced reverse iterator following the rend()(should be the first element) has the key: " << rl->first << std::endl;
     std::cout << "The dereferenced reverse iterator accessed by rbegin()(should be the last element) has the key: " << my_map.rbegin()->first << std::endl;
 
-
-
-    std::cout << "Inserting another map into original." << std::endl;
+    std::cout << "Inserting another map into the original one." << std::endl;
 	m.insert(my_map.begin(), my_map.end());
     print_map(m);
 
@@ -150,7 +137,7 @@ void map_test()
 
     {
         std::cout << "Creating a large map of ints." << std::endl;
-        ft::map<int, int> m_int = maptest.create_large_map_of_ints();
+        ft::map<int, int> m_int = create_large_map_of_ints();
         std::cout << "The map size is: "<< m_int.size()<< std::endl;
 
         std::cout << "Searching the map of ints." << std::endl;
@@ -163,6 +150,4 @@ void map_test()
         std::cout << "The lower bound key of the key 300 is " << m_int.lower_bound(300)->first << std::endl;
         std::cout << "The upper bound key of the key 300 is " << m_int.upper_bound(300)->first << std::endl;
     }
-
-
 }
