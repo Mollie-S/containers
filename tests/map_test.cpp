@@ -6,8 +6,6 @@
 #include "../vector/vector.hpp"
 #include <vector>
 
-// clang++ tests/map_test.cpp -std=c++11 -o testMap && ./testMap
-
 namespace ft {
 	template <typename T1,typename T2>
 	bool operator==(const ft::map<T1,T2>& my_map, const std::map<T1,T2>& stl_map)
@@ -82,7 +80,7 @@ namespace ft {
 	
 }
 
-TEST_CASE("Testing map constructors", "[integer keys]")
+TEST_CASE("Constructing and manipulating elements in the map with int keys", "[integer keys]")
 {
 	std::map<int,int> stl_map;
 	ft::map<int, int> my_map;
@@ -234,7 +232,7 @@ TEST_CASE("Range map constructor must create the same amount of the pairs as std
 	CHECK(stl_map == my_map);
 }
 
-TEST_CASE("Map of string - keys ", "[string keys]")
+TEST_CASE("Constructing and manipulating elements in the map with string keys", "[string keys]")
 {
 	std::map<std::string,std::string> stl_map;
 	ft::map<std::string, std::string> my_map;
@@ -309,6 +307,23 @@ TEST_CASE("Map of string - keys ", "[string keys]")
 				CHECK(stl_map_to_insert == my_map_to_insert);
 
 			}
+			SECTION("Reverse iterator")
+			{
+				std::map<std::string, std::string>::reverse_iterator ri1 = stl_map.rbegin();
+				ft::map<std::string, std::string>::reverse_iterator ri2 = my_map.rbegin();
+				std::map<std::string, std::string>::reverse_iterator ri3 = stl_map.rend();
+				ft::map<std::string, std::string>::reverse_iterator ri4 = my_map.rend();
+				ri3--;
+				ri4--;
+				CHECK(ri1->first == ri2->first);
+				CHECK(ri3->first == ri4->first);
+			}
+			SECTION("Equal range")
+			{
+				std::pair<std::map<std::string, std::string>::iterator, std::map<std::string, std::string>::iterator> p = stl_map.equal_range("pea");
+				ft::pair<ft::map<std::string, std::string>::iterator, ft::map<std::string, std::string>::iterator> p1 = my_map.equal_range("pea");
+				CHECK(p.first->first == p1.first->first);
+			}
 		}
 	}
 }
@@ -376,7 +391,6 @@ TEST_CASE("Comparison", "[string keys, string values]")
 		}
 	}
 }
-
 
 TEST_CASE("Testing the sentinel node", "[sentinel]")
 {
