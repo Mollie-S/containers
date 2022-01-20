@@ -801,7 +801,7 @@ namespace ft
 		{
 			while (replacing_pair.first != _root && replacing_pair.first->_color == BLACK)
 			{
-				if (replacing_pair.second == _sentinel || replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel)
+				if (replacing_pair.second == _sentinel || (replacing_pair.second->_left == _sentinel && replacing_pair.second->_right == _sentinel))
 				{
 					break;
 				}
