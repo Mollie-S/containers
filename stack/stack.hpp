@@ -8,90 +8,91 @@ namespace ft
     template <class T, class Container = ft::vector<T> >
     class  stack 
     {
+    public:
         typedef T           value_type;
         typedef Container   container_type; //container_type is the type of the underlying container type (defined as an alias of the second class template parameter, Container;
         typedef size_t      size_type;
-    private:
-        container_type _container;
+    protected:
+        container_type c;
     public:
     // Constructs a stack that is empty or that is a copy of a base container object.
-        explicit stack (const container_type& ctnr = container_type()) : _container(ctnr) {} 
-        stack( const stack& other ) : _container(other._container){}
+        explicit stack (const container_type& ctnr = container_type()) : c(ctnr) {} 
+        stack( const stack& other ) : c(other.c){}
         ~stack() {}
 
         stack& operator=( const stack& other )
         {
             if (*this != other)
             {
-                _container = other._container;
+                c = other.c;
             }
             return *this;
         }
 
         bool empty() const
         {
-            return _container.empty();
+            return c.empty();
         }
 
         size_type size() const
         {
-            return _container.size();
+            return c.size();
         }
 
         value_type& top()
         {
-            return _container.back();
+            return c.back();
         }
 
         const value_type& top() const
         {
-            return _container.back();
+            return c.back();
         }
 
         void push(const value_type& val)
         {
-            _container.push_back(val);
+            c.push_back(val);
         }
 
         void pop()
         {
-            _container.pop_back();
+            c.pop_back();
         }
     };
 
         template <class T, class Container>
         bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container == rhs._container;
+            return lhs.c == rhs.c;
         }
 
         template <class T, class Container>
         bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container != rhs._container;
+            return lhs.c != rhs.c;
         }
 
         template <class T, class Container>
         bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container < rhs._container;
+            return lhs.c < rhs.c;
         }
 
         template <class T, class Container>
         bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container <= rhs._container;
+            return lhs.c <= rhs.c;
         }
         template <class T, class Container>
         bool operator>  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container > rhs._container;
+            return lhs.c > rhs.c;
         }
 
         template <class T, class Container>
         bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
         {
-            return lhs._container >= rhs._container;
+            return lhs.c >= rhs.c;
         }
 };
 #endif
