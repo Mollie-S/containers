@@ -61,6 +61,18 @@ namespace ft
 			return const_iterator_type(_node_ptr);
 		}
 
+		difference_type	distance(rbtree_iter first, rbtree_iter last)
+		{
+			difference_type count = 0;
+			rbtree_iter it = first;
+			while (it != last)
+			{
+				count++;
+				it++;
+			}
+			return count;
+		}
+
 	private:
 		NodeBasePtr _move_down_right(NodeBasePtr node_ptr)
 		{

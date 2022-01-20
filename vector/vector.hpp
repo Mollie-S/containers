@@ -44,120 +44,6 @@ namespace ft
         size_type       _capacity;   // capacity of the container
         allocator_type  _alloc; // the type of the allocator used
 
-        void uninitialized_fill(pointer start, pointer end, const value_type& val)
-        {
-            pointer ptr, ptr1; // ptr1 for destructing if construction fails
-            try
-            {
-                for (ptr = start; ptr != end; ++ptr)
-                {
-                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by ptr.
-                }
-            }
-            catch (const std::exception &e)
-            {
-                std::cerr << e.what() << '\n';
-                for (ptr1 = start; ptr1 != ptr; ++ptr1)
-                {
-                    _alloc.destroy(ptr1);
-                    throw; //rethrow
-                }
-            }
-        }
-
-        void uninitialized_copy(pointer dest, pointer src)
-        {
-            pointer dest_ptr = dest, src_ptr = src;
-            for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr)
-            {
-                try // if there are exception from the constructor
-                {
-                    _alloc.construct(dest_ptr, *src_ptr); // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new.
-                }
-                catch (...) // (...)will be catching any exception
-                {
-                    for (; dest != dest_ptr; ++dest)
-                    {
-                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
-                    }
-                    throw;
-                }
-            }
-        }
-
-        template <class InputIterator> 
-        void uninitialized_copy(pointer dest, InputIterator src_first, InputIterator src_last)
-        {
-            pointer dest_start = dest; // needed for destruction in case the alloc is throwing the exception 
-            for (InputIterator it = src_first; it != src_last; ++it, ++dest)
-            {
-                try
-                {
-                    _alloc.construct(dest, *it);
-                }
-                catch (...) // (...)will be catching any exception
-                {
-                    for (; dest_start != dest; ++dest_start)
-                    {
-                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
-                    }
-                    throw;
-                }
-            }
-        }
-
-        // returns the pointer to the poaition that will be filled with the new value
-        pointer move_elements_forward(iterator position, size_type n)
-        {
-            const size_type newsize = _size + n;
-            difference_type distance = position - begin();
-            if (newsize > _capacity) // no more free space; relocate:
-            {
-                reserve(newsize);
-                position = begin() + distance;
-            }
-            iterator it = position;
-            if (!empty())
-            {
-                it = end() - 1;
-                for (; it != (position - 1); --it) // moving from the last element to the position(included)
-                {
-                    *(it + n) = *(it);
-                }
-            }
-            pointer start = data() + distance;
-            return start;
-        }
-
-        // WHY TO USE DESTRUCT AND DEALLOCATE:
-        // A program may end the lifetime of any object by reusing the storage which the object occupies
-        // or by explicitly calling the destructor for an object of a class type with a non-trivial destructor.
-        // For an object of a class type with a non-trivial destructor,
-        //  the program is not required to call the destructor explicitly
-        //  before the storage which the object occupies is reused or released;
-        // however, if there is no explicit call to the destructor
-        // or if a delete-expression (5.3.5) is not used to release the storage,
-        //  the destructor shall not be implicitly called and any program that depends on the side effects
-        //  produced by the destructor has undeﬁned behavior.
-
-        void destroy_range(pointer destroy_start, pointer destroy_end)
-        {
-            for (; destroy_start != destroy_end; ++destroy_start)
-            {
-                _alloc.destroy(destroy_start);
-            }
-        }
-
-        void destroy_elements()
-        {
-            pointer end = _elements + _size;
-            for (pointer ptr = _elements; ptr != end; ++ptr)
-            {
-                _alloc.destroy(ptr); // Calls the destructor of the object
-            }
-            _alloc.deallocate(_elements, _size); // Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call to allocate()
-        }
-
     public:
         //default constructor(1):
         explicit vector<T, Alloc>(const allocator_type &alloc = allocator_type())
@@ -250,13 +136,13 @@ namespace ft
         {
             return _elements[_size - 1];
         }
-
-        pointer data() {
-            return _elements;
-        }
-        const_pointer data() const{
-            return _elements;
-        }
+//  turns out it's c++11:
+//         pointer data() {
+//             return _elements;
+//         }
+//         const_pointer data() const{
+//             return _elements;
+//         }
         reference front()
         {
             return _elements[0];
@@ -461,7 +347,10 @@ namespace ft
         template <class InputIterator>
         void insert (iterator position, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
         {
-            size_type distance = last - first;
+            // size_type distance = last - first;
+
+            difference_type distance = std::distance(first,last);
+            // std::cout << "distance: " << distance << std::endl;
             pointer start = move_elements_forward(position, distance);
             uninitialized_copy(start, first, last);
             _size += distance;
@@ -511,6 +400,119 @@ namespace ft
             ft::swap(x._capacity, _capacity);
             ft::swap(x._alloc, _alloc);
         };
+            void uninitialized_fill(pointer start, pointer end, const value_type& val)
+        {
+            pointer ptr, ptr1; // ptr1 for destructing if construction fails
+            try
+            {
+                for (ptr = start; ptr != end; ++ptr)
+                {
+                    _alloc.construct(ptr, val); // constructs an element object on the location pointed by ptr.
+                }
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << e.what() << '\n';
+                for (ptr1 = start; ptr1 != ptr; ++ptr1)
+                {
+                    _alloc.destroy(ptr1);
+                    throw; //rethrow
+                }
+            }
+        }
+
+        void uninitialized_copy(pointer dest, pointer src)
+        {
+            pointer dest_ptr = dest, src_ptr = src;
+            for (; dest_ptr != dest + _size; ++src_ptr, ++dest_ptr)
+            {
+                try // if there are exception from the constructor
+                {
+                    _alloc.construct(dest_ptr, *src_ptr); // The calls to alloc.construct() in the vector constructors are simply syntactic sugar for the placement new.
+                }
+                catch (...) // (...)will be catching any exception
+                {
+                    for (; dest != dest_ptr; ++dest)
+                    {
+                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
+                    }
+                    throw;
+                }
+            }
+        }
+
+        template <class InputIterator> 
+        void uninitialized_copy(pointer dest, InputIterator src_first, InputIterator src_last)
+        {
+            pointer dest_start = dest; // needed for destruction in case the alloc is throwing the exception 
+            for (InputIterator it = src_first; it != src_last; ++it, ++dest)
+            {
+                try
+                {
+                    _alloc.construct(dest, *it);
+                }
+                catch (...) // (...)will be catching any exception
+                {
+                    for (; dest_start != dest; ++dest_start)
+                    {
+                        _alloc.destroy(dest); // if anything throws an exception, the container is guaranteed to end in a valid state (basic guarantee)
+                    }
+                    throw;
+                }
+            }
+        }
+
+        // returns the pointer to the poaition that will be filled with the new value
+        pointer move_elements_forward(iterator position, size_type n)
+        {
+            const size_type newsize = _size + n;
+            difference_type distance = position - begin();
+            if (newsize > _capacity) // no more free space; relocate:
+            {
+                reserve(newsize);
+                position = begin() + distance;
+            }
+            iterator it = position;
+            if (!empty())
+            {
+                it = end() - 1;
+                for (; it != (position - 1); --it) // moving from the last element to the position(included)
+                {
+                    *(it + n) = *(it);
+                }
+            }
+            pointer start = _elements + distance;
+            return start;
+        }
+
+        // WHY TO USE DESTRUCT AND DEALLOCATE:
+        // A program may end the lifetime of any object by reusing the storage which the object occupies
+        // or by explicitly calling the destructor for an object of a class type with a non-trivial destructor.
+        // For an object of a class type with a non-trivial destructor,
+        //  the program is not required to call the destructor explicitly
+        //  before the storage which the object occupies is reused or released;
+        // however, if there is no explicit call to the destructor
+        // or if a delete-expression (5.3.5) is not used to release the storage,
+        //  the destructor shall not be implicitly called and any program that depends on the side effects
+        //  produced by the destructor has undeﬁned behavior.
+
+        void destroy_range(pointer destroy_start, pointer destroy_end)
+        {
+            for (; destroy_start != destroy_end; ++destroy_start)
+            {
+                _alloc.destroy(destroy_start);
+            }
+        }
+
+        void destroy_elements()
+        {
+            pointer end = _elements + _size;
+            for (pointer ptr = _elements; ptr != end; ++ptr)
+            {
+                _alloc.destroy(ptr); // Calls the destructor of the object
+            }
+            _alloc.deallocate(_elements, _size); // Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call to allocate()
+        }
     
     };
 

@@ -402,55 +402,60 @@ namespace ft
             ft::swap(other._compare, _compare);
 		}
 
-// 		void tree_print_helper()
-// 		{
-// 			iterator f_it = begin();
-// 			iterator itEnd = end();
-// 			int n = 1;
-// 			for (iterator i = f_it; i != itEnd; ++i, ++n)
-// 			{
-// 				std::string col = "RED  ";
-// 				if (get_node(i)->_color == 0)
-// 				{
-// 					col = "BLACK";
-// 				}
-// 				std::cout << n << ":           	  -----|" << i->first << " " << col ;
-// 				if (get_node(i)->_parent == _sentinel)
-// 				{
-// 					std::cout << " (parent -  sentinel)|-----   " ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << " (parent - " << (get_node(i)->_parent)->_key << ")|-----  ";
-// 				}
-// 
-// 				if (get_node(i) == _root)
-// 				{
-// 					std::cout << "THIS IS THE ROOT";
-// 				}
-// 
-// 				std::cout << std::endl;
-// 				if (get_node(i)->_left == _sentinel)
-// 				{
-// 					std::cout << "  left - sentinel|\n" ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << "  left - " << (get_node(i)->_left)->_key<<  "|\n";
-// 				}
-// 				if (get_node(i)->_right == _sentinel)
-// 				{
-// 					std::cout << "  right-  sentinel|\n" ;
-// 				}
-// 				else
-// 				{
-// 					std::cout << "  right - " << (get_node(i)->_right)->_key << "|\n";
-// 				}
-// 
-// 				std::cout << std::endl;
-// 			}
-// 				std::cout <<"--------------------------------------------------"<<  std::endl;
-// 		}
+		void tree_print_helper()
+		{
+			if (empty())
+			{
+				std::cout << "The map is empty\n";
+				return;
+			}
+			iterator f_it = begin();
+			iterator itEnd = end();
+			int n = 1;
+			for (iterator i = f_it; i != itEnd; ++i, ++n)
+			{
+				std::string col = "RED  ";
+				if (get_node(i)->_color == 0)
+				{
+					col = "BLACK";
+				}
+				std::cout << n << ":           	  -----|" << i->first << " " << col ;
+				if (get_node(i)->_parent == _sentinel)
+				{
+					std::cout << " (parent -  sentinel)|-----   " ;
+				}
+				else
+				{
+					std::cout << " (parent - " << (get_node(i)->_parent)->_key << ")|-----  ";
+				}
+
+				if (get_node(i) == _root)
+				{
+					std::cout << "THIS IS THE ROOT";
+				}
+
+				std::cout << std::endl;
+				if (get_node(i)->_left == _sentinel)
+				{
+					std::cout << "  left - sentinel|\n" ;
+				}
+				else
+				{
+					std::cout << "  left - " << (get_node(i)->_left)->_key<<  "|\n";
+				}
+				if (get_node(i)->_right == _sentinel)
+				{
+					std::cout << "  right-  sentinel|\n" ;
+				}
+				else
+				{
+					std::cout << "  right - " << (get_node(i)->_right)->_key << "|\n";
+				}
+
+				std::cout << std::endl;
+			}
+				std::cout <<"--------------------------------------------------"<<  std::endl;
+		}
 
 	private:
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
