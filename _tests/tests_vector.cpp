@@ -89,12 +89,11 @@ void vector_test()
 		copy.resize(2);
 		print_vector(copy);
 
-		// TODO: comment out back
-		// std::cout << "Pushing many elements... Patience, it might take some time." << std::endl;
-		// for (int i = 0; i < INT_MAX; ++i)
-		// {
-		// 	copy.push_back(i);
-		// }
+		std::cout << "Pushing many elements... Patience, it might take some time." << std::endl;
+		for (int i = 0; i < INT_MAX; ++i)
+		{
+			copy.push_back(i);
+		}
 		std::cout << "The last element is: " << copy.back() << std::endl;
 		
 
