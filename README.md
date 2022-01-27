@@ -89,12 +89,27 @@ Unit tests are divided into two parts:
 - one is based on the Catch2 framework and is mostly comparing containers to their STL counterparts;
 - the other one is writing output values to the stream(demanded by the project subject).
 Namespace _ft_ can be replaced by _std_ with the define flag(-D=STD) and the output can be redirected to a file.
+
 For example:
 ```
-clang++ tests/other_tests/*.cpp  -o ft_containers  && time ./ft_containers > ft.txt
-clang++ tests/other_tests/*.cpp -D=STD -o std_containers && time ./std_containers > std.txt
+clang++ tests/mandatory_tests/*.cpp  -o ft_containers  && time ./ft_containers > ft.txt
+clang++ tests/mandatory_tests/*.cpp -D=STD -o std_containers && time ./std_containers > std.txt
+```
+Or just run
+```
+./run_tests.sh
+```
+and then
+```
+./run_catch_tests.sh
 ```
 Time command can be used to compare the tests execution time. The subject demands the replica cannot be more than 20 times slower than the original.
+**Real** is wall clock time - time from start to finish of the call. 
+**User** is the amount of CPU time spent in user-mode code (outside the kernel) within the process. 
+**Sys** is the amount of CPU time spent in the kernel within the process.
+
+
+
 If you've noticed mistakes or other issues in the description please let me know.
 
 
