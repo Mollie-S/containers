@@ -1,14 +1,9 @@
-// #define CATCH_CONFIG_MAIN 
-#include "catch.hpp"
+#include "include/catch.hpp"
 
-#include "../vector/vector.hpp"
-#include "../map/map.hpp"
-#include <vector>
+#include "vector.hpp"
+#include "map.hpp"
 #include <map>
-
-// https://gjbex.github.io/DPD-online-book/Testing/UnitTesting/catch2_cpp/ more about fixtures
-// add to the command line:
-// -std=c++11
+#include <vector>
 
 namespace ft {
 	template <typename T>
@@ -367,7 +362,6 @@ TEST_CASE("Creating a complex vector: a vector of pairs", "[string, string]")
 
     SECTION("Inserting a range into a vector of pairs - map iterators are passed")
     {
-
         stl_v.insert(stl_v.begin(), stl_m.begin(), stl_m.end());
         my_v.insert(my_v.begin(), my_m.begin(), my_m.end());
         CHECK(my_v.size() == stl_v.size());

@@ -1,9 +1,8 @@
+#include "include/catch.hpp"
 
-#include "catch.hpp"
-
-#include "../map/map.hpp"
+#include "map.hpp"
+#include "vector.hpp"
 #include <map>
-#include "../vector/vector.hpp"
 #include <vector>
 
 namespace ft {

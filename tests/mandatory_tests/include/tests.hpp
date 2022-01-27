@@ -11,10 +11,10 @@
 	#include <set>
 	namespace ft = std;
 #else
-	#include "../map/map.hpp"
-	#include "../stack/stack.hpp"
-	#include "../vector/vector.hpp"
-	#include "../set/set.hpp"
+	#include "map.hpp"
+	#include "stack.hpp"
+	#include "vector.hpp"
+	#include "set.hpp"
 #endif
 
 #include <stdlib.h>

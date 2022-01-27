@@ -1,4 +1,4 @@
-#include "tests.hpp"
+#include "include/tests.hpp"
 
 template <typename K, typename T>
 void print_map(const ft::map<K, T>& m)
@@ -71,7 +71,7 @@ void map_test()
     m.insert(ft::make_pair("color", "green"));
     print_map(m);
     std::cout << "Inserting more new values." << std::endl;
-    for (int i = 0; i < length1 && i < length2; ++i)
+    for (size_t i = 0; i < length1 && i < length2; ++i)
     {
         ft::pair<std::string, std::string> f_pair(args1[i], args2[i]);
 		m.insert(f_pair);
