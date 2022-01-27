@@ -1,7 +1,10 @@
 #ifndef RBTREE_HPP
 #define RBTREE_HPP
 
-#include "../utility/reverse_iterator.hpp"
+#include "iterator/reverse_iterator.hpp"
+#include "utility/enable_if.hpp"
+#include "utility/is_integral.hpp"
+#include "utility/ft_swap.hpp"
 
 #include "rbtree_iterator.hpp"
 #include "rbtree_node.hpp"
@@ -48,10 +51,10 @@ namespace ft
 	public:
 		rbtree(const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type())
-			: _size(0)
-			, _alloc(alloc)
+			: _alloc(alloc)
 			, _node_alloc(alloc)
 			, _node_base_alloc(alloc)
+			, _size(0)
 			, _compare(comp)
 			{
 				_sentinel = create_sentinel_node();
@@ -59,10 +62,10 @@ namespace ft
 			}
 
 		rbtree(const rbtree& other)
-			: _size(0)
-			, _alloc(other._alloc)
+			: _alloc(other._alloc)
 			, _node_alloc(other._alloc)
 			, _node_base_alloc(other._alloc)
+			, _size(0)
 			, _compare(other._compare)
 		{
 			_sentinel = create_sentinel_node();
@@ -640,7 +643,7 @@ namespace ft
 				replacement = node_to_delete->_right;
 				rb_transplant(node_to_delete, replacement);
 			}
-			else if (node_to_delete->_right == _sentinel)
+			else
 			{
 				replacement = node_to_delete->_left;
 				rb_transplant(node_to_delete, replacement);

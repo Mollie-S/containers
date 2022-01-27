@@ -81,6 +81,6 @@ namespace ft{
     {
         return !(rhs < lhs);
     }
-};
+}
 
 #endif

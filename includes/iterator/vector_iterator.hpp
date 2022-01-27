@@ -1,7 +1,7 @@
 #ifndef VECTOR_ITERATOR_HPP
 #define VECTOR_ITERATOR_HPP
 
-#include "../utility/iterator_traits.hpp"
+#include "iterator_traits.hpp"
 
 namespace ft
 {
@@ -104,6 +104,10 @@ namespace ft
 			_ptr -= val;
 			return (*this);
 		}
+		reference operator[](difference_type pos) const
+        {
+            return _ptr[pos];
+        }
 
 		// RELATIONAL OPERATORS
 		bool operator<(const iterator_type& rhs) const

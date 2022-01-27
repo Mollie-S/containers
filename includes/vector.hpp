@@ -5,15 +5,16 @@
 #include <iostream>
 #include <cmath>
 
-#include "../utility/is_iterator.hpp"
-#include "../utility/is_integral.hpp"
-#include "../utility/enable_if.hpp"
-#include "../utility/reverse_iterator.hpp"
-#include "../utility/lexicographical_compare.hpp"
-#include "../utility/equal.hpp"
-#include "../utility/ft_swap.hpp"
+#include "iterator/vector_iterator.hpp"
+#include "iterator/reverse_iterator.hpp"
 
-#include "vector_iterator.hpp"
+#include "utility/is_iterator.hpp"
+#include "utility/is_integral.hpp"
+#include "utility/enable_if.hpp"
+#include "utility/lexicographical_compare.hpp"
+#include "utility/equal.hpp"
+#include "utility/ft_swap.hpp"
+
 namespace ft
 {
     template <class T, class Alloc = ::std::allocator<T> > // generic template
@@ -47,7 +48,7 @@ namespace ft
     public:
         //default constructor(1):
         explicit vector<T, Alloc>(const allocator_type &alloc = allocator_type())
-            : _elements(NULL), _capacity(0), _size(0), _alloc(alloc) {}
+            : _elements(NULL), _size(0), _capacity(0),  _alloc(alloc) {}
             
         //fill constructor(2)
         explicit vector<T, Alloc>(size_type n, const value_type &val = value_type(),
@@ -79,13 +80,13 @@ namespace ft
         template <class InputIterator>
         vector (typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last,
                 const allocator_type& alloc = allocator_type())
-                    : _elements(NULL), _capacity(0), _size(0), _alloc(alloc)
+                    : _elements(NULL), _size(0), _capacity(0), _alloc(alloc)
         {
             assign(first, last);
         }
 
         // copy (4)
-        vector (const vector& x) : _elements(NULL), _capacity(0), _size(0), _alloc() { *this = x; }
+        vector (const vector& x) : _elements(NULL),  _size(0), _capacity(0), _alloc() { *this = x; }
 
         ~vector() { destroy_elements(); }
 
@@ -209,7 +210,7 @@ namespace ft
             if (first == last)
                 return;
             difference_type diff = std::distance(first, last);
-            if (diff > _capacity)
+            if (static_cast<size_type>(diff) > _capacity)
             {
                 pointer temp = _alloc.allocate(diff);
                 uninitialized_copy(temp, first, last);
@@ -521,7 +522,7 @@ namespace ft
     void swap (vector<T>& x, vector<T>& y)
     {
         x.swap(y);
-    };
+    }
 
     //relational operators (vector):
     template <class T, class Alloc>
@@ -559,6 +560,6 @@ namespace ft
     {
         return !(lhs < rhs);
     }
-};
+}
 
 #endif

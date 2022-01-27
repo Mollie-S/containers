@@ -1,9 +1,6 @@
 #ifndef ENABLE_IF_HPP
 #define ENABLE_IF_HPP
 
-
-
-
 // Common technique for algorithm selection based on iterator category tags i
 //s to use a dispatcher function (the alternative is std::enable_if). 
 namespace ft

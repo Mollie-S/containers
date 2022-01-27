@@ -2,7 +2,7 @@
 #define RBTREE_ITERATOR_HPP
 
 #include "rbtree_node.hpp"
-#include "../utility/iterator_traits.hpp"
+#include "iterator/iterator_traits.hpp"
 
 namespace ft
 {

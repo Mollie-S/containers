@@ -43,6 +43,4 @@ namespace ft
 
 // The void type describes an empty set of values.
 
-
-
 #endif

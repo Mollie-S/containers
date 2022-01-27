@@ -1,7 +1,7 @@
 #ifndef RBTREE_NODE_HPP
 #define RBTREE_NODE_HPP
 
-#include "../utility/pair.hpp"
+#include "utility/pair.hpp"
 
 enum color_t { BLACK, RED };
 typedef enum color_t e_color;
@@ -39,7 +39,6 @@ namespace ft
 		{
 			return _value.first;
 		}
-
 		const key_type& get_key() const
 		{
 			return _value.first;
@@ -59,7 +58,6 @@ namespace ft
 		{
 			return _value;
 		}
-
 		const key_type& get_key() const
 		{
 			return _value;
