@@ -463,8 +463,9 @@ namespace ft
 	private:
 		node_pointer create_node(rbtree_node_base* parent_ptr, rbtree_node_base* child_ptr, const value_type& value)
 		{
-			node_pointer new_node = _node_alloc.allocate(1); //Atsuccessorts to allocate a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
-			_node_alloc.construct(new_node, parent_ptr, child_ptr, value);
+			node_pointer new_node = _node_alloc.allocate(1); // allocates a block of storage with a size large enough to contain n elements of member type value_type (an alias of the allocator's template parameter), and returns a pointer to the first element.
+			Node node(parent_ptr, child_ptr, value);
+			_node_alloc.construct(new_node, node);
 			return new_node;
 		}
 
