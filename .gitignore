@@ -8,3 +8,4 @@ vectorit
 alltests
 testMap
 *.dSYM
+includes/.DS_Store
