@@ -50,16 +50,27 @@ namespace ft
 
 		class value_compare // Nested function class to compare elements
 			: public ::std::binary_function<value_type, value_type, bool> { //  // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
-			friend class map;
+			friend class map; // is part of the standard http://www.lirmm.fr/~ducour/Doc-objets/ISO+IEC+14882-1998.pdf 23.3.1 Template class map
+		private:
+			value_compare() {}
 		protected:
 			Compare comp; // Notice that value_compare has no public constructor, therefore no objects can be directly created from this nested class outside map members.
-			value_compare(Compare c) : comp(c) {} // // constructed with map's comparison object
+			value_compare(Compare c) : comp(c) {}
+
 		public:
 			typedef bool result_type;
   			typedef value_type first_argument_type;
   			typedef value_type second_argument_type;
   			bool operator()(const value_type& x, const value_type& y) const {
 				return comp(x.first, y.first);
+			}
+			value_compare(const value_compare& other) : comp(other.comp) {}
+
+			value_compare& operator=(const value_compare& other) {
+				if (this != &other) {
+					comp = other.comp;
+				}
+				return *this;
 			}
 		};
 
