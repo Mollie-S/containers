@@ -401,7 +401,10 @@ namespace ft
             ft::swap(x._capacity, _capacity);
             ft::swap(x._alloc, _alloc);
         };
-            void uninitialized_fill(pointer start, pointer end, const value_type& val)
+
+    private:
+
+        void uninitialized_fill(pointer start, pointer end, const value_type& val)
         {
             pointer ptr, ptr1; // ptr1 for destructing if construction fails
             try
