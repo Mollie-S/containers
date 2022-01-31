@@ -364,6 +364,21 @@ TEST_CASE("const and non const ")
 	}
 }
 
+TEST_CASE("key_comp, value_comp")
+{
+	std::map<std::string,std::string> stl_map;
+	ft::map<std::string, std::string> my_map;
+
+	std::map<std::string, std::string>::key_compare   stl_comp_key = stl_map.key_comp();
+	ft::map<std::string, std::string>::key_compare   my_comp_key = my_map.key_comp();
+
+	std::map<std::string, std::string>::value_compare   stl_comp_value = stl_map.value_comp();
+	ft::map<std::string, std::string>::value_compare   my_comp_value = my_map.value_comp();
+	CHECK(stl_comp_key == my_comp_key);
+	CHECK(stl_comp_value == my_comp_value);
+
+}
+
 TEST_CASE("Comparison", "[string keys, string values]")
 {
 	ft::map<std::string, std::string > my_map1;
