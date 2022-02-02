@@ -481,9 +481,9 @@ namespace ft
 				if (key == static_cast<node_pointer>(current)->get_key())
 				{
 					isUniqueKey = false;
-					return ft::pair<rbtree_node_base*, bool>(current, isUniqueKey);
+					return ft::pair<rbtree_node_base*, bool>(current, isUniqueKey); // returning the current node and the bool that the node is existing (that is not unique)
 				}
-				if (_compare(key, static_cast<node_pointer>(current)->get_key()))
+				if (_compare(key, static_cast<node_pointer>(current)->get_key())) // _compare is std::less
 				{
 					current = current->_left;
 				} 
