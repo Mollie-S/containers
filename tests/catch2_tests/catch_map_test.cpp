@@ -317,11 +317,36 @@ TEST_CASE("Constructing and manipulating elements in the map with string keys", 
 				CHECK(ri1->first == ri2->first);
 				CHECK(ri3->first == ri4->first);
 			}
+
 			SECTION("Equal range")
 			{
 				std::pair<std::map<std::string, std::string>::iterator, std::map<std::string, std::string>::iterator> p = stl_map.equal_range("pea");
 				ft::pair<ft::map<std::string, std::string>::iterator, ft::map<std::string, std::string>::iterator> p1 = my_map.equal_range("pea");
 				CHECK(p.first->first == p1.first->first);
+			}
+
+			SECTION("key_comp, value_comp")
+			{
+				std::map<std::string, std::string>::key_compare   stl_comp_key = stl_map.key_comp();
+				ft::map<std::string, std::string>::key_compare   my_comp_key = my_map.key_comp();
+
+				std::map<std::string, std::string>::value_compare   stl_comp_value = stl_map.value_comp();
+				ft::map<std::string, std::string>::value_compare   my_comp_value = my_map.value_comp();
+
+				std::map<std::string, std::string>::iterator s_it = stl_map.begin();
+				ft::map<std::string, std::string>::iterator my_it = my_map.begin();
+
+				const std::pair<std::string, std::string>  stl_p("animal", "zebra");
+				const ft::pair<std::string, std::string> my_p("animal", "zebra");
+
+				bool stl_val_comp_result = stl_comp_value(*s_it, stl_p);
+				bool my_val_comp_result = my_comp_value(*my_it, my_p);
+
+				bool stl_key_comp_result = stl_comp_key(s_it->first, stl_p.first);
+				bool my_key_comp_result = my_comp_key(my_it->first, my_p.first);
+
+				CHECK(stl_key_comp_result == my_key_comp_result);
+				CHECK(stl_val_comp_result == my_val_comp_result);
 			}
 		}
 	}
@@ -362,21 +387,6 @@ TEST_CASE("const and non const ")
 			CHECK(my_const_map != my_map);
 		}
 	}
-}
-
-TEST_CASE("key_comp, value_comp")
-{
-	std::map<std::string,std::string> stl_map;
-	ft::map<std::string, std::string> my_map;
-
-	std::map<std::string, std::string>::key_compare   stl_comp_key = stl_map.key_comp();
-	ft::map<std::string, std::string>::key_compare   my_comp_key = my_map.key_comp();
-
-	std::map<std::string, std::string>::value_compare   stl_comp_value = stl_map.value_comp();
-	ft::map<std::string, std::string>::value_compare   my_comp_value = my_map.value_comp();
-	CHECK(stl_comp_key == my_comp_key);
-	CHECK(stl_comp_value == my_comp_value);
-
 }
 
 TEST_CASE("Comparison", "[string keys, string values]")
