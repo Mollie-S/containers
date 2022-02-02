@@ -50,7 +50,9 @@ ifdef catch
 
 	HEADERS = $(addprefix $(SRC_DIR)/, include/catch.hpp) 
 	BUILD_PATH = $(addprefix $(BUILD_DIR)/, catch2)
-	CXXFLAGS = -I$(CONTAINERS_INC_DIR) -std=c++11 \
+	CXXFLAGS = -Wall -Wextra -Wpedantic -Werror\
+			-Wno-unused -Wno-unused-parameter \
+			-I$(CONTAINERS_INC_DIR) -std=c++11 \
 			-g -fsanitize=address
 else
 	CXXFLAGS = -Wall -Wextra -Werror \
