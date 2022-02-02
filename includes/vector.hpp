@@ -4,6 +4,7 @@
 #include <memory> //needed for allocator
 #include <iostream>
 #include <cmath>
+#include <iterator> // for std::distance
 
 #include "iterator/vector_iterator.hpp"
 #include "iterator/reverse_iterator.hpp"
@@ -53,7 +54,7 @@ namespace ft
         //fill constructor(2)
         explicit vector<T, Alloc>(size_type n, const value_type &val = value_type(),
                                   const allocator_type &alloc = allocator_type())
-            : _capacity(n), _size(n), _alloc(alloc)
+            : _size(n), _capacity(n), _alloc(alloc)
         {
             _elements = _alloc.allocate(n);
             try
@@ -417,8 +418,8 @@ namespace ft
                 for (ptr1 = start; ptr1 != ptr; ++ptr1)
                 {
                     _alloc.destroy(ptr1);
-                    throw; //rethrow
                 }
+                    throw; //rethrow
             }
         }
 
@@ -526,37 +527,37 @@ namespace ft
 
     //relational operators (vector):
     template <class T, class Alloc>
-    bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
-        if (ft::equal(lhs.begin(), lhs.end(), rhs.begin()) && lhs.size() == rhs.size())
-        {
-            return true;
-        }
-        return false;
+        return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <class T, class Alloc>
-    bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator!=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
         return !(lhs == rhs);
     }
+
     template <class T, class Alloc>
-    bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
         return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
     }
+
     template <class T, class Alloc>
-    bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
         return !(rhs < lhs); // reusing operator<() but changing the sides
     }
+
     template <class T, class Alloc>
-    bool operator> (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator>(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
         return rhs < lhs;
     }
+
     template <class T, class Alloc>
-    bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+    bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
     {
         return !(lhs < rhs);
     }
