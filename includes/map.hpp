@@ -168,10 +168,12 @@ namespace ft
 		{
 			return _tree.empty();
 		}
+
 		size_type max_size() const
 		{
 			return _tree.max_size();
 		}
+		
 		size_type size() const
 		{
 			return _tree.size();

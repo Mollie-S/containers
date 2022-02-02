@@ -256,7 +256,7 @@ TEST_CASE("Constructing and manipulating elements in the map with string keys", 
 			const char* args2[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09","10"};
 			size_t length1 = sizeof(args1) / sizeof(args1[0]);
 			size_t length2 = sizeof(args2) / sizeof(args2[0]);
-			for (int i = 0; i < length1 && i < length2; ++i)
+			for (size_t i = 0; i < length1 && i < length2; ++i)
 			{
 				std::pair<std::string, std::string> s_pair(args1[i], args2[i]);
 				ft::pair<std::string, std::string> f_pair(args1[i], args2[i]);

@@ -5,7 +5,10 @@ namespace ft
 {
 	struct true_type {
 		static const bool value = true;
-		operator bool() const { return value;}
+		operator bool() const
+		{ 
+			return value;
+		}
 	};
 }
 

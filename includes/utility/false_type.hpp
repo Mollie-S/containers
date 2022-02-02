@@ -3,9 +3,13 @@
 
 namespace ft
 {
-	struct false_type {
+	struct false_type
+	{
 		static const bool value = false;
-		operator bool() const { return value;}
+		operator bool() const 
+		{
+			return value;
+		}
 	};
 }
 

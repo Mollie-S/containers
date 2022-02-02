@@ -158,7 +158,7 @@ TEST_CASE("Constructing and manipulating elements in the set with string keys", 
 		{
 			const char* args[] = {"black", "white", "pink", "purple", "turquoise", "beige", "grey", "maroon", "coral", "orange", "khaki", "fuchsia"};
 			size_t length = sizeof(args) / sizeof(args[0]);
-			for (int i = 0; i < length; ++i)
+			for (size_t i = 0; i < length; ++i)
 			{
 				st_set.insert(args[i]);
 				my_set.insert(args[i]);
