@@ -478,7 +478,8 @@ namespace ft
 			while(current != _sentinel)
 			{
 				position = current;
-				if (key == static_cast<node_pointer>(current)->get_key())
+				if (!_compare(key, static_cast<node_pointer>(current)->get_key()) // analogue of if (key == static_cast<node_pointer>(current)->get_key())
+					&& !_compare(static_cast<node_pointer>(current)->get_key(), key))
 				{
 					isUniqueKey = false;
 					return ft::pair<rbtree_node_base*, bool>(current, isUniqueKey); // returning the current node and the bool that the node is existing (that is not unique)
