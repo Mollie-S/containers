@@ -369,3 +369,13 @@ TEST_CASE("Creating a complex vector: a vector of pairs", "[string, string]")
         CHECK(my_v[my_v.size() - 1].second == stl_v[stl_v.size() - 1].second);
     }
 }
+
+TEST_CASE("Comparing vectors", "[small and big containers]")
+{
+	ft::vector<int> small(4,5);
+	ft::vector<int> big(10000, 5);
+	CHECK(small != big);
+	CHECK(big != small);
+	CHECK(big > small);
+	CHECK(small < big);
+}
