@@ -91,11 +91,10 @@ void vector_test()
 		print_vector(copy);
 
 		std::cout << "Pushing many elements... Patience, it might take some time." << std::endl;
-		for (int i = 0; i < INT_MAX; ++i)
+		for (int i = 0; i < INT_MAX/10; ++i)
 		{
 			copy.push_back(i);
 		}
 		std::cout << "The last element is: " << copy.back() << std::endl;
-		
 
 }
