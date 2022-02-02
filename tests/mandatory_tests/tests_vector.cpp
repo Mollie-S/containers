@@ -31,6 +31,7 @@ void vector_test()
 		std::cout << "-----------------------------------------\n";
 		std::cout << "Creating a vector of  integers." << std::endl;
 		ft::vector<int> vec;
+		ft::vector<int> vec1(5,10);
 		std::cout << "Inserting one value." << std::endl;
 		vec.insert(vec.begin(), 30);
 		print_vector(vec);
