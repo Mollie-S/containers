@@ -1,0 +1,31 @@
+@startuml
+skinparam class {
+BackgroundColor LightGray
+ArrowColor Grey
+BorderColor DimGray
+}
+skinparam interface {
+BackgroundColor LightGray
+BorderColor DimGray
+}
+
+skinparam shadowing<<with_shadow>> true
+skinparam stereotypeCBackgroundColor LightGray
+
+class rbtree_node_base {
+	_parent
+	_left
+	_right
+	_color
+}
+circle _sentinel
+class rbtree_node_for_map {
+	Value 	_value (Value is pair<Key,T> type)
+
+}
+class rbtree_node_for_set {
+	Value _value (Value is <T> type
+}
+	rbtree_node_base  <|-- rbtree_node_for_map
+	rbtree_node_base  <|-- rbtree_node_for_set
+@enduml
