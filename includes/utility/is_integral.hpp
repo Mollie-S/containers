@@ -3,26 +3,23 @@
 
 #include "false_type.hpp"
 #include "true_type.hpp"
+#include "remove_cv.hpp"
 
 // Note that std::false_type and std::true_type are specializations of std::integral_constant.
 
 namespace ft
 {
-    template<typename> struct is_integral : ft::false_type {};
+    template<typename> struct is_integral_helper : ft::false_type {};
 
-    template<> struct is_integral<bool>: ft::true_type {};
-    template<> struct is_integral<int>: ft::true_type {};
-    template<> struct is_integral<short> : ft::true_type {};
-    template<> struct is_integral<long> : ft::true_type {};
-    template<> struct is_integral<char> : ft::true_type {};
-    template<> struct is_integral<wchar_t> : ft::true_type {};
+    template<> struct is_integral_helper<bool>: ft::true_type {};
+    template<> struct is_integral_helper<int>: ft::true_type {};
+    template<> struct is_integral_helper<short> : ft::true_type {};
+    template<> struct is_integral_helper<long> : ft::true_type {};
+    template<> struct is_integral_helper<char> : ft::true_type {};
+    template<> struct is_integral_helper<wchar_t> : ft::true_type {};
 
-    template<> struct is_integral<const bool> : ft::true_type {};
-    template<> struct is_integral<const int>: ft::true_type {};
-    template<> struct is_integral<const short> : ft::true_type {};
-    template<> struct is_integral<const long> : ft::true_type {};
-    template<> struct is_integral<const char> : ft::true_type {};
-    template<> struct is_integral<const wchar_t> : ft::true_type {}; 
+    template<typename T>
+    struct is_integral: public is_integral_helper<typename ft::remove_cv<T>::type >{};
 }
 
 // Fundamental types in C++ are divided into three categories: 
