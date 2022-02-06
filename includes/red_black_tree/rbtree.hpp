@@ -49,8 +49,8 @@ namespace ft
 		rbtree_node_base*		_root;
 
 	public:
-		rbtree(const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type())
+		rbtree(const key_compare& comp,
+			const allocator_type& alloc)
 			: _alloc(alloc)
 			, _node_alloc(alloc)
 			, _node_base_alloc(alloc)
