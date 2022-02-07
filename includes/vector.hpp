@@ -6,10 +6,8 @@
 #include <cmath>
 #include <iterator> // for std::distance
 
-#include "iterator/vector_iterator.hpp"
 #include "iterator/reverse_iterator.hpp"
 
-#include "utility/is_iterator.hpp"
 #include "utility/is_integral.hpp"
 #include "utility/enable_if.hpp"
 #include "utility/lexicographical_compare.hpp"
@@ -35,16 +33,16 @@ namespace ft
 		typedef typename allocator_type::const_pointer  const_pointer;
 		typedef std::ptrdiff_t                          difference_type;
 		typedef size_t                                  size_type;
-        typedef vector_iter<value_type>                 iterator;
-        typedef vector_iter<const value_type>           const_iterator;
+        typedef pointer                                 iterator;
+        typedef const_pointer                           const_iterator;
         typedef ft::reverse_iterator<iterator>          reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
     private:
-        pointer         _elements;     // pointer to the first element of the container
-        size_type       _size;       // num of elements in the container
-        size_type       _capacity;   // capacity of the container
-        allocator_type  _alloc; // the type of the allocator used
+        pointer         _elements;
+        size_type       _size;
+        size_type       _capacity;
+        allocator_type  _alloc;
 
     public:
         //default constructor(1):
@@ -72,14 +70,10 @@ namespace ft
         // but the "iterator" type is actually an integral type,
         // it has to delegate to the fill constructor by casting its argument types to force the latter to be an exact match.
 
-        // Additionally, if InputIterator in the range constructor (3)
-        // is not at least of a forward iterator category (i.e., it is just an input iterator)
-        //, the new capacity cannot be determined beforehand and the construction incurs 
-        //in additional logarithmic complexity in size (reallocations while growing).
-
         //	range constructor(3)
         template <class InputIterator>
-        vector (typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last,
+        vector (InputIterator first, InputIterator last,
+                typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0,
                 const allocator_type& alloc = allocator_type())
                     : _elements(NULL), _size(0), _capacity(0), _alloc(alloc)
         {
@@ -113,7 +107,7 @@ namespace ft
             return _alloc;
         }
 
-             // ELEMENT ACCESS:
+        // ELEMENT ACCESS:
         reference at(size_type pos)
         {
             if (pos >= _size)
@@ -134,25 +128,22 @@ namespace ft
         {
             return _elements[_size - 1];
         }
+
         const_reference back() const
         {
             return _elements[_size - 1];
         }
-//  turns out it's c++11:
-//         pointer data() {
-//             return _elements;
-//         }
-//         const_pointer data() const{
-//             return _elements;
-//         }
+
         reference front()
         {
             return _elements[0];
         }
+
         const_reference front() const
         {
             return _elements[0];
         }
+        
         // If the container size is greater than n,
         // the function never throws exceptions (no-throw guarantee).
         //Otherwise, the behavior is undefined.
@@ -160,6 +151,7 @@ namespace ft
         {
             return _elements[pos];
         }
+
         const_reference operator[] (size_type pos) const
         {
             return _elements[pos];
@@ -170,30 +162,37 @@ namespace ft
         {
             return _elements;
         }
+
         iterator end()
         {
             return _elements + _size;
         }
+
         const_iterator begin() const
         {
             return _elements;
         }
+
         const_iterator end() const
         {
             return _elements + _size;
         }
+
         reverse_iterator rbegin()
         {
             return reverse_iterator(end());
         }
+
         const_reverse_iterator rbegin() const
         {
             return const_reverse_iterator(end());
         }
+
         reverse_iterator rend()
         {
             return reverse_iterator(begin());
         }
+
         const_reverse_iterator rend() const
         {
             return const_reverse_iterator(begin());
@@ -206,7 +205,8 @@ namespace ft
        
         // range (1)
         template <class InputIterator> 
-        void assign(typename ft::enable_if<ft::is_forward_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last)
+        void assign(InputIterator first, InputIterator last, 
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
             if (first == last)
                 return;
@@ -227,19 +227,6 @@ namespace ft
             _size = diff;
         }
 
-         // overload if the iterator is an input_iterator and not at least a forward iterator
-        template <class InputIterator> 
-        void assign(typename ft::enable_if<
-            ft::is_input_iterator<InputIterator>::value && !ft::is_forward_iterator<InputIterator>::value, 
-            InputIterator>::type first, InputIterator last)
-        {
-            clear();
-			for (; first != last; ++first) 
-            {
-			    push_back(*first);
-            }
-        }
-
         // fill (2)
         void assign(size_type n, const value_type& val)
         {
@@ -252,14 +239,17 @@ namespace ft
         {
             return _capacity;
         }
+
         bool empty() const
         {
             return (_size == 0);
         }
+
         size_type size() const
         {
             return _size;
         }
+
          //Returns the maximum theoretically possible value of n, for which the call allocate(n, 0) could succeed.
         size_type max_size() const
         {
@@ -292,6 +282,7 @@ namespace ft
         {
             resize(0);
         }
+
         // Linear complexity: the number of calls to the destructor of T is the same as the number of elements erased,
         // the assignment operator of T is called the number of times equal to the number of elements in the vector after the erased elements
         iterator erase(iterator position)
@@ -349,10 +340,8 @@ namespace ft
         template <class InputIterator>
         void insert (iterator position, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
         {
-            // size_type distance = last - first;
-
             difference_type distance = std::distance(first,last);
-            // std::cout << "distance: " << distance << std::endl;
+
             pointer start = move_elements_forward(position, distance);
             uninitialized_copy(start, first, last);
             _size += distance;
