@@ -15,7 +15,6 @@ CONTAINERS_HEADERS = map.hpp \
 					vector.hpp \
 					iterator/iterator_traits.hpp \
 					iterator/reverse_iterator.hpp \
-					iterator/vector_iterator.hpp \
 					red_black_tree/rbtree_iterator.hpp \
 					red_black_tree/rbtree_node.hpp \
 					red_black_tree/rbtree.hpp \
@@ -24,7 +23,6 @@ CONTAINERS_HEADERS = map.hpp \
 					utility/false_type.hpp \
 					utility/ft_swap.hpp \
 					utility/is_integral.hpp \
-					utility/is_iterator.hpp \
 					utility/lexicographical_compare.hpp \
 					utility/pair.hpp \
 					utility/true_type.hpp
