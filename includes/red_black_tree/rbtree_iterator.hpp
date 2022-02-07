@@ -7,15 +7,15 @@
 namespace ft
 {
 	template <class Value, typename NodeBase, typename Node>
-	class rbtree_iter // Iterator base class
+	class rbtree_iter
 	{
 	public:
-		typedef rbtree_iter<Value, NodeBase, Node>								iterator_type;
-		typedef typename ft::iterator_traits<iterator_type>::iterator_category 	iterator_category;
-		typedef typename ft::iterator_traits<iterator_type>::value_type        	value_type;
-    	typedef typename ft::iterator_traits<iterator_type>::difference_type   	difference_type;
-    	typedef typename ft::iterator_traits<iterator_type>::pointer           	pointer;
-    	typedef typename ft::iterator_traits<iterator_type>::reference         	reference;
+		typedef rbtree_iter<Value, NodeBase, Node>		iterator_type;
+		typedef std::bidirectional_iterator_tag			iterator_category;
+		typedef Value        							value_type;
+    	typedef ptrdiff_t  								difference_type;
+    	typedef Value*         							pointer;
+    	typedef Value&         							reference;
 
 	private:
 		typedef Node* NodePtr;
