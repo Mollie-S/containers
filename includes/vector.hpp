@@ -72,9 +72,8 @@ namespace ft
 
         //	range constructor(3)
         template <class InputIterator>
-        vector (InputIterator first, InputIterator last,
-                typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0,
-                const allocator_type& alloc = allocator_type())
+        vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+                typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
                     : _elements(NULL), _size(0), _capacity(0), _alloc(alloc)
         {
             assign(first, last);
