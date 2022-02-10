@@ -26,19 +26,15 @@ namespace ft
 		typedef typename allocator_type::size_type														size_type;
 	private:
 		// explanation for rebind: 
-		// The _Alloc template is used to obtain objects of some type. The container may have an internal need to allocate objects of a different type. For example, when you have a std::list<T, A>, the allocator A is meant to allocate objects of type T but the std::list<T, A> actually needs to allocate objects of some node type. Calling the node type _Ty, the std::list<T, A> needs to get hold of an allocator for _Ty objects which is using the allocation mechanism provided by A. Using
-		// typename _A::template rebind<_Ty>::other
-		// specifies the corresponding type. Now, there are a few syntactic annoyances in this declaration:
-		// Since rebind is a member template of _A and _A is a template argument, the rebind becomes a dependent name. To indicate that a dependent name is a template, it needs to be prefixed by template. Without the template keyword the < would be considered to be the less-than operator.
-		// The name other also depends on a template argument, i.e., it is also a dependent name. To indicate that a dependent name is a type, the typename keyword is needed.
+		// Now, there are a few syntactic annoyances in this declaration:
+		// Since rebind is a member template of _A and _A is a template argument, the rebind becomes a dependent name. 
+		//To indicate that a dependent name is a template, it needs to be prefixed by template.
+		// Without the template keyword the < would be considered to be the less-than operator.
+		// The name other also depends on a template argument, i.e., it is also a dependent name.
+		// To indicate that a dependent name is a type, the typename keyword is needed.
 		typedef typename Alloc::template rebind<Node >::other							node_alloc_type;
 		typedef typename Alloc::template rebind<ft::rbtree_node_base>::other			node_base_alloc_type;
 		typedef Node*																	node_pointer;
-
-		// we will be using _sentinel as a dummy for node leaves pointing to nil. 
-		//In order to save a marginal amount of execution time, 
-		//these (possibly many) NIL leaves may be implemented as pointers to one unique (and black)
-		// sentinel node (instead of pointers of value NULL). view Thomas H. Cormen introduction to algorithms:
 
 		allocator_type 			_alloc;
 		node_alloc_type 		_node_alloc;
@@ -844,7 +840,6 @@ namespace ft
 			_node_base_alloc.deallocate(_sentinel, 1);
 		}
 	};
-
 }
 
 #endif
